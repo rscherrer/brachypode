@@ -1,0 +1,93 @@
+language: cpp
+dist: xenial
+compiler: gcc
+
+addons:
+ apt:
+  packages:
+   - libboost-all-dev
+
+install:
+
+ # Qt5
+ - sudo apt-get install -qq qt5-qmake qt5-default
+  
+ # cppcheck
+ - sudo apt-get install -qq cppcheck
+  
+ # Codecov
+ - sudo pip install codecov
+  
+ # OCLint
+ - chmod +x ci/install_oclint 
+ - ./ci/install_oclint
+  
+ # valgrind, for helgrind and memcheck
+ - sudo apt-get install -qq valgrind
+  
+ # SLOCcount
+ - sudo apt-get install sloccount
+  
+ # proselint
+ - sudo pip install proselint
+
+script: 
+
+ # Build and run the tests
+ - qmake ./EGS_test.pro
+ - make --silent debug
+ - travis_wait 60 ./EGS_test
+  
+ # Build the GUI
+ - make clean
+ - qmake ./EGS_gui.pro
+ - make --silent debug
+  
+ # helgrind
+ - travis_wait 60 valgrind --tool=helgrind --log-file=helgrind.log -v ./EGS_test
+ - cat helgrind.log
+  
+ # memcheck
+ - travis_wait 60 valgrind --leak-check=full -v --show-reachable=yes --log-file=memcheck.log ./EGS_test
+ - cat memcheck.log
+  
+ # Build and run and profile normal program
+ - qmake ./EGS.pro
+ - make --silent release
+ - echo "tend 1000" > parameters.txt
+ - echo "tsave 100" >> parameters.txt
+ - time ./EGS parameters.txt
+ - gprof ./EGS > gprof.log
+ - head gprof.log -n 1000
+  
+ # Get code coverage
+ - chmod +x ci/get_code_cov 
+ - ./ci/get_code_cov
+ - codecov
+  
+ # cppcheck
+ - cppcheck --quiet --error-exitcode=0 . 
+  
+ # Call OCLint
+ - chmod +x ci/do_oclint 
+ - ./ci/do_oclint
+  
+ # proselint
+ - proselint README.md || true
+  
+ # Get my folder
+ - my_github=${PWD##*/}  
+  
+ # SLOCcount
+ #   remove OCLint and .git, otherwise it will be counted as well
+ - rm -rf oclint-0.10.3 oclint-0.10.3-x86_64-linux-3.13.0-74-generic.tar.gz oclint.log
+ - rm -rf .git
+ - rm -rf debug
+ - rm -rf release
+ - cd ..; sloccount --overhead 1 --personcost 22614 $my_github; cd $my_github
+  
+after_success:
+ 
+ # Codecov
+ - bash <(curl -s https://codecov.io/bash)
+

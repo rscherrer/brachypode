@@ -34,30 +34,23 @@ install:
 script: 
 
  # Build and run the tests
- - qmake ./EGS_test.pro
+ - qmake ./brachypode_test.pro
  - make --silent debug
- - travis_wait 60 ./EGS_test
-  
- # Build the GUI
- - make clean
- - qmake ./EGS_gui.pro
- - make --silent debug
+ - travis_wait 60 ./brachypode_test
   
  # helgrind
- - travis_wait 60 valgrind --tool=helgrind --log-file=helgrind.log -v ./EGS_test
+ - travis_wait 60 valgrind --tool=helgrind --log-file=helgrind.log -v ./brachypode_test
  - cat helgrind.log
   
  # memcheck
- - travis_wait 60 valgrind --leak-check=full -v --show-reachable=yes --log-file=memcheck.log ./EGS_test
+ - travis_wait 60 valgrind --leak-check=full -v --show-reachable=yes --log-file=memcheck.log ./brachypode_test
  - cat memcheck.log
   
  # Build and run and profile normal program
- - qmake ./EGS.pro
+ - qmake ./brachypode.pro
  - make --silent release
- - echo "tend 1000" > parameters.txt
- - echo "tsave 100" >> parameters.txt
- - time ./EGS parameters.txt
- - gprof ./EGS > gprof.log
+ - time ./brachypode
+ - gprof ./brachypode > gprof.log
  - head gprof.log -n 1000
   
  # Get code coverage

@@ -4,7 +4,7 @@
 int simulate() {
 
     // Create a population
-
+    Population pop = Population(10u);
 
     return 0;
 

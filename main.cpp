@@ -29,7 +29,12 @@ private:
 
 };
 
+// After a while, you can put code in separate files,
+// so that files will be shorter
+#include "grid.h"
+
 int main() {
+    test_grid();
 
     // Create a population of 10 individuals
     std::vector<Individual> population(10u);

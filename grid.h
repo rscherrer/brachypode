@@ -1,9 +1,9 @@
 #ifndef GRID_H
 #define GRID_H
 
+#include <iosfwd>
 #include <vector>
 
-#include <random>
 /// A 2D grid
 class grid
 {
@@ -58,5 +58,10 @@ grid addLandscape(
 
 /// Test the grid, to be sure it works correctly
 void testGrid();
+
+/// Allow std::cout to stream a grid to screen
+/// Uses ASCII art :-)
+std::ostream& operator<<(std::ostream&, const grid&);
+
 
 #endif // GRID_H

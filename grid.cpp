@@ -1,6 +1,8 @@
 #include "grid.h"
 
 #include <cassert>
+#include <cmath>
+#include <iostream>
 
 grid::grid(
   const int width,
@@ -26,8 +28,8 @@ grid addLandscape(
           const double y_d{static_cast<double>(y)};
           // z_unscaled in range [-2, 2]
           const double z_unscaled{
-            std::sin((x_d / horizontalPeriod) / (2.0 * M_PI)) +
-            std::sin((y_d / verticalPeriod)   / (2.0 * M_PI))
+            std::sin((x_d * horizontalPeriod / (2.0 * M_PI))) +
+            std::cos((y_d * verticalPeriod   / (2.0 * M_PI)))
           };
           const double z{0.5 + (z_unscaled / 4.0)};
           g.set(x, y, z);
@@ -85,4 +87,21 @@ void testGrid()
     g.set(2, 3, 3.14);
     assert(std::abs(g.get(2, 3) - 3.14) < 0.000001);
   }
+}
+
+std::ostream& operator<<(std::ostream& os, const grid& g)
+{
+    const int height{g.getHeight()};
+    assert(g.getHeight() > 0);
+    const int width{g.getWidth()};
+    for (int y = 0; y != height; ++y)
+    {
+        for (int x = 0; x != width; ++x)
+        {
+          const double z{g.get(x, y)};
+          os << '0' + static_cast<int>(z * 10.0);
+        }
+        os << '\n';
+    }
+    return os;
 }

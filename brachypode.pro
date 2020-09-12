@@ -8,6 +8,7 @@ SOURCES += main.cpp \
 
 CONFIG += c++17
 QMAKE_CXXFLAGS += -std=c++17
+
 QMAKE_CXXFLAGS_RELEASE += -O3
 
 # High warnings levels

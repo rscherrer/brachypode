@@ -36,6 +36,11 @@ private:
 int main() {
     testGrid();
 
+    const grid g_empty(30, 20);
+    const grid g{addLandscape(g_empty, 2.0, 2.0)};
+    std::cout << g << '\n';
+
+
     // Create a population of 10 individuals
     std::vector<Individual> population(10u);
 

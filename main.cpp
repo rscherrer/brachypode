@@ -34,7 +34,7 @@ private:
 #include "grid.h"
 
 int main() {
-    test_grid();
+    testGrid();
 
     // Create a population of 10 individuals
     std::vector<Individual> population(10u);

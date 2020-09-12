@@ -23,11 +23,11 @@ public:
   double get(const int x, const int y) const;
 
   /// Get the number of rows
-  int get_height() const noexcept;
+  int getHeight() const noexcept;
 
   /// Get the number of columns
   /// Throws an exception if there are no rows
-  int get_width() const;
+  int getWidth() const;
 
   /// Set a value.
   /// Throws an exception if the grid location does not exist.
@@ -41,42 +41,22 @@ private:
   ///
   /// I will use a double as a data type for now,
   /// this one day will become 'Individual'
-  std::vector<std::vector<double>> m_grid;
+  std::vector<std::vector<double>> mGrid;
 };
 
-/// Add Perlin noise to the grid
+/// Add a landscape to the grid: resulting values go from zero to one
 /// @param g a grid
-/// @param frequency the Perlin noise frequence
-/// @param n_octaves the Perlin noise number of octaves
-/// @param rng_seed the random number generator seed.
-///   TODO: replace by using a RNG engine by reference,
-///   (for example, 'std::mt19937&'), so a simulation has
-///   exactly one RNG engine
-grid add_perlin_noise(
-  const grid g,
-  const double frequency = 8.0,
-  const int n_octaves = 8,
-  const int rng_seed = 12345
-);
-
-/// Create a grid with Perlin noise
-/// @param width the number of columns
-/// @param height the number of rows
-/// @param frequency the Perlin noise frequence
-/// @param n_octaves the Perlin noise number of octaves
-/// @param rng_seed the random number generator seed.
-///   TODO: replace by using a RNG engine by reference,
-///   (for example, 'std::mt19937&'), so a simulation has
-///   exactly one RNG engine
-grid create_grid_with_perlin_noise(
-  const int width = 0,
-  const int height = 0,
-  const double frequency = 8.0,
-  const int n_octaves = 8,
-  const int rng_seed = 12345
+/// @param horizontalPeriod the horizontal period (in number
+///   of grid cells) after which the pattern repeats
+/// @param verticalPeriod the vertical period (in number
+///   of grid cells) after which the pattern repeats
+grid addLandscape(
+  grid g,
+  const double horizontalPeriod,
+  const double verticalPeriod
 );
 
 /// Test the grid, to be sure it works correctly
-void test_grid();
+void testGrid();
 
 #endif // GRID_H

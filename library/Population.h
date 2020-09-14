@@ -9,6 +9,10 @@ public:
 
     Population(const size_t&);
 
+    size_t getSize() const;
+
+    void reproduce(const double&);
+
 private:
 
     std::vector<Individual> pop;

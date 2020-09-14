@@ -50,9 +50,19 @@ OBJECTS_DIR   = release/
 ####### Files
 
 SOURCES       = ../../library/Simul.cpp \
-		../../tests/SimulTests.cpp 
+		../../library/Individual.cpp \
+		../../library/Population.cpp \
+		../../library/Random.cpp \
+		../../tests/SimulTests.cpp \
+		../../tests/PopulationTests.cpp \
+		../../tests/IndividualTests.cpp 
 OBJECTS       = release/Simul.o \
-		release/SimulTests.o
+		release/Individual.o \
+		release/Population.o \
+		release/Random.o \
+		release/SimulTests.o \
+		release/PopulationTests.o \
+		release/IndividualTests.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
@@ -130,8 +140,16 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
-		../../../../brachypode_test.pro ../../library/Simul.h ../../library/Simul.cpp \
-		../../tests/SimulTests.cpp
+		../../../../brachypode_test.pro ../../library/Simul.h \
+		../../library/Individual.h \
+		../../library/Population.h \
+		../../library/Random.h ../../library/Simul.cpp \
+		../../library/Individual.cpp \
+		../../library/Population.cpp \
+		../../library/Random.cpp \
+		../../tests/SimulTests.cpp \
+		../../tests/PopulationTests.cpp \
+		../../tests/IndividualTests.cpp
 QMAKE_TARGET  = brachypode_test
 DESTDIR       = 
 TARGET        = brachypode_test
@@ -158,8 +176,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../../library/Simul.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../../library/Simul.cpp ../../tests/SimulTests.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../../library/Simul.h ../../library/Individual.h ../../library/Population.h ../../library/Random.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../../library/Simul.cpp ../../library/Individual.cpp ../../library/Population.cpp ../../library/Random.cpp ../../tests/SimulTests.cpp ../../tests/PopulationTests.cpp ../../tests/IndividualTests.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -205,11 +223,29 @@ compiler_clean: compiler_moc_predefs_clean
 
 ####### Compile
 
-release/Simul.o: ../../library/Simul.cpp ../../library/Simul.h
+release/Simul.o: ../../library/Simul.cpp ../../library/Simul.h \
+		../../library/Population.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/Simul.o ../../library/Simul.cpp
 
-release/SimulTests.o: ../../tests/SimulTests.cpp ../../library/Simul.h
+release/Individual.o: ../../library/Individual.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/Individual.o ../../library/Individual.cpp
+
+release/Population.o: ../../library/Population.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/Population.o ../../library/Population.cpp
+
+release/Random.o: ../../library/Random.cpp ../../library/Random.h \
+		../../library/rndutils.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/Random.o ../../library/Random.cpp
+
+release/SimulTests.o: ../../tests/SimulTests.cpp ../../library/Simul.h \
+		../../library/Population.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/SimulTests.o ../../tests/SimulTests.cpp
+
+release/PopulationTests.o: ../../tests/PopulationTests.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/PopulationTests.o ../../tests/PopulationTests.cpp
+
+release/IndividualTests.o: ../../tests/IndividualTests.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/IndividualTests.o ../../tests/IndividualTests.cpp
 
 ####### Install
 

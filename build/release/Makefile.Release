@@ -49,8 +49,10 @@ OBJECTS_DIR   = release/
 
 ####### Files
 
-SOURCES       = ../../main.cpp 
-OBJECTS       = release/main.o
+SOURCES       = ../../library/Simul.cpp \
+		../../main.cpp 
+OBJECTS       = release/Simul.o \
+		release/main.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
@@ -126,7 +128,8 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
-		../../../../brachypode.pro  ../../main.cpp
+		../../../../brachypode.pro ../../library/Simul.h ../../library/Simul.cpp \
+		../../main.cpp
 QMAKE_TARGET  = brachypode
 DESTDIR       = 
 TARGET        = brachypode
@@ -153,7 +156,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../../main.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../../library/Simul.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../../library/Simul.cpp ../../main.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -198,6 +202,9 @@ compiler_lex_clean:
 compiler_clean: compiler_moc_predefs_clean 
 
 ####### Compile
+
+release/Simul.o: ../../library/Simul.cpp ../../library/Simul.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/Simul.o ../../library/Simul.cpp
 
 release/main.o: ../../main.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/main.o ../../main.cpp

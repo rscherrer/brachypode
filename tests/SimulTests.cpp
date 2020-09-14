@@ -3,10 +3,8 @@
 
 #include "library/Simul.h"
 #include <boost/test/unit_test.hpp>
-#include <iostream>
 
-
-BOOST_AUTO_TEST_CASE(useSimulate) {
+BOOST_AUTO_TEST_CASE(use) {
 
     // Check that the main simulation function works
     BOOST_CHECK_EQUAL(simulate(), 0u);

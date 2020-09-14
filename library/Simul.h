@@ -1,7 +1,7 @@
 #ifndef BRACHYPODE_SIMUL_H
 #define BRACHYPODE_SIMUL_H
 
-#include <iostream>
+#include "Population.h"
 
 // Main simulation function
 int simulate();

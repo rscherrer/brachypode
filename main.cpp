@@ -31,16 +31,32 @@ private:
 
 int main() {
 
-    // Create a population of 10 individuals
-    std::vector<Individual> population(10u);
+    try {
 
-    // Loop through generations
-    for (size_t t = 0u; t < 100u; ++t) {
+        // Create a population of 10 individuals
+        std::vector<Individual> population(10u);
 
-        // Nothing really happens for now
-        std::cout << "Generation " << t << ", " <<
-         population.size() << " individuals\n";
+        // Loop through generations
+        for (size_t t = 0u; t < 100u; ++t) {
 
+            // Nothing really happens for now
+            std::cout << "Generation " << t << ", " <<
+             population.size() << " individuals\n";
+
+            // The life cycle consists in reproduction, dispersal and survival
+
+
+        }
+
+    }
+    catch (const std::exception& err) {
+        std::cerr << "Exception: " << err.what() << '\n';
+    }
+    catch (const char* err) {
+        std::cerr << "Exception: " << err << '\n';
+    }
+    catch (...) {
+        std::cerr << "Unknown exception\n";
     }
 
 }

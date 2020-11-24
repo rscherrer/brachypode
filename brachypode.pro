@@ -1,9 +1,14 @@
 # Files
-include(brachypode.pri)
-SOURCES += main.cpp
 
-CONFIG += c++14
-QMAKE_CXXFLAGS += -std=c++14
+DEFINES += __cpp_lib_concepts
+
+include(brachypode.pri)
+SOURCES += main.cpp \
+    grid.cpp
+
+CONFIG += c++17
+QMAKE_CXXFLAGS += -std=c++17
+
 QMAKE_CXXFLAGS_RELEASE += -O3
 
 # High warnings levels
@@ -24,3 +29,6 @@ CONFIG(release, debug|release) {
   QMAKE_CXXFLAGS += -pg
   QMAKE_LFLAGS += -pg
 }
+
+HEADERS += \
+    grid.h

@@ -29,7 +29,17 @@ private:
 
 };
 
+// After a while, you can put code in separate files,
+// so that files will be shorter
+#include "grid.h"
+
 int main() {
+    testGrid();
+
+    const grid g_empty(30, 20);
+    const grid g{addLandscape(g_empty, 2.0, 2.0)};
+    std::cout << g << '\n';
+
 
     try {
 

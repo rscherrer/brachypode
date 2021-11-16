@@ -12,3 +12,16 @@ raph|[![Build Status](https://travis-ci.com/rscherrer/brachypode.svg?branch=raph
 megan|[![Build Status](https://travis-ci.com/rscherrer/brachypode.svg?branch=megan)](https://travis-ci.com/rscherrer/brachypode)|[![codecov.io](https://codecov.io/github/rscherrer/brachypode/coverage.svg?branch=megan)](https://codecov.io/github/rscherrer/brachypode/branch/megan)
 richel|[![Build Status](https://travis-ci.com/rscherrer/brachypode.svg?branch=richel)](https://travis-ci.com/rscherrer/brachypode)|[![codecov.io](https://codecov.io/github/rscherrer/brachypode/coverage.svg?branch=richel)](https://codecov.io/github/rscherrer/brachypode/branch/richel)
 
+
+Features to add:
+- Maybe patches should be their own class?
+- maxdensities may not be the best name, risk to confuse it with capacities
+- the way we disperse seeds now is wonky: we impose a cap on the number of seeds depending on what each patch can host but then we distribute the seeds at random across the patches, so some patches will sometimes have slightly more than they can support (prob. not a big problem)
+- Workout inheritance
+- Workout the scales that the parameters should have relative to the traits --- user supplied or automatic rescaling?
+- Write a test for extinction use case
+- Does computation time not depend heavily on the size of the individual bitset?
+- Could populations, landscapes and genetic architectures not store relevant parameters in them so they do not rely on further supply of parameters from the parameter structure?
+- Up next: make trait values emerge from the genotype-phenotype map
+- Make effect sizes part of the parameters
+- Solve memory access violation when making an architecture

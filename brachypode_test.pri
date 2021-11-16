@@ -1,4 +1,8 @@
-SOURCES += $$PWD/tests/SimulTests.cpp
-SOURCES += $$PWD/tests/PopulationTests.cpp
-SOURCES += $$PWD/tests/IndividualTests.cpp
+HEADERS += $$PWD/tests/test_utilities.h
 
+SOURCES += $$PWD/tests/simul_tests.cpp
+SOURCES += $$PWD/tests/population_tests.cpp
+SOURCES += $$PWD/tests/individual_tests.cpp
+SOURCES += $$PWD/tests/landscape_tests.cpp
+SOURCES += $$PWD/tests/architecture_tests.cpp
+SOURCES += $$PWD/tests/test_utilities.cpp

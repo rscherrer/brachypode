@@ -4,8 +4,8 @@
 #include "random.h"
 #include "param.h"
 #include "landscape.h"
-#include <vector>
 #include "architecture.h"
+#include <vector>
 #include <cassert>
 #include <bitset>
 
@@ -26,6 +26,7 @@ public:
     size_t getPatch() const;
     double getTolerance() const;
     double getCompetitiveness() const;
+    double getNeutral() const;
     double getFitness() const;
     bool isAlive() const;
     size_t getNOneAlleles() const;

@@ -30,16 +30,16 @@ int simulate(const std::vector<std::string> &args) {
         // if (pars.loadarch) arch.load(pars);
 
         // Create a population
-        Population pop = Population(pars, lnd);
+        Population pop = Population(pars, lnd, arch);
 
         // At each time step...
         for (size_t t = 0u; t < 10u; ++t) {
 
             // Assign fitness to individuals
-            pop.setFitnesses(pars, lnd);
+            pop.assignFitnesses(pars, lnd);
 
             // Reproduction (+ survival and dispersal)
-            pop.reproduce(lnd);
+            pop.lifeCycle(lnd);
 
             // Is the population still there?
             if (pop.getSize() == 0u) {

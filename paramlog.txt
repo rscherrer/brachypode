@@ -1,0 +1,18 @@
+popsize 100
+nfacil 10
+maxgrowth 2
+steepness 10
+costcomp 0.02
+costtol 0.02
+tradeoff 0.01
+nchrom1
+ncomp 1
+ntol 1
+nneut 1
+allfreq 0.2
+mutation 0.0001
+effect 0.01
+seed 1637234002760483526
+savepars 1
+loadlandscape 0
+loadarch 0

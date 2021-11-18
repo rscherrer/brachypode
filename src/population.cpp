@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-Population::Population(const Param &p, const Landscape &l) :
+Population::Population(const Param &p, const Landscape &l, const Architecture &a) :
     pop(std::vector<Individual>(p.popsize))
 {
 
@@ -16,11 +16,12 @@ Population::Population(const Param &p, const Landscape &l) :
 
         pop[i].setPatch(pickPatch(rnd::rng));
         pop[i].mutateGenome(p.allfreq, nloci);
+        pop[i].develop(a);
 
     }
 }
 
-void Population::setFitnesses(const Param &p, const Landscape &l) {
+void Population::assignFitnesses(const Param &p, const Landscape &l) {
 
     // Compute the total competition intensity in each patch...
     std::vector<double> densities(l.getNPatches(), 0.0);
@@ -51,19 +52,20 @@ auto burry = [](Individual ind) -> bool
     return !ind.isAlive();
 };
 
-void Population::reproduce(const Landscape &l) {
+void Population::lifeCycle(const Landscape &l) {
 
     // Figure how many seeds will be produced
     double sumfit = 0.0;
     std::vector<double> fitnesses(pop.size());
 
     for (size_t i = 0u; i < pop.size(); ++i) {
+
         fitnesses[i] = pop[i].getFitness();
         sumfit += fitnesses[i];
+
     }
 
-    auto getPoolSize = rnd::poisson(sumfit);
-    size_t nseeds = getPoolSize(rnd::rng);
+    size_t nseeds = sumfit > 0.0 ? rnd::poisson(sumfit)(rnd::rng) : 0u;
 
     // Note: this is approx. the same as sample family sizes for each plant
 
@@ -102,5 +104,15 @@ void Population::reproduce(const Landscape &l) {
 }
 
 size_t Population::getSize() const { return pop.size(); }
+double Population::getSumFit() const {
+
+    double sumfit = 0.0;
+    for (size_t i = 0u; i < pop.size(); ++i) sumfit += pop[i].getFitness();
+    return sumfit;
+
+}
 size_t Population::getPatch(const size_t &i) const { return pop[i].getPatch(); }
 double Population::getFitness(const size_t &i) const { return pop[i].getFitness(); }
+double Population::getTolerance(const size_t &i) const { return pop[i].getTolerance(); }
+double Population::getCompetitiveness(const size_t &i) const { return pop[i].getCompetitiveness(); }
+double Population::getNeutral(const size_t &i) const { return pop[i].getNeutral(); }

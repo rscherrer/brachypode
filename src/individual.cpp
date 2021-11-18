@@ -58,16 +58,16 @@ void Individual::mutateGenome(const double &mu, const size_t &n) {
 void Individual::develop(const Architecture &a) {
 
     tolerance = 0.0;
-    competitiveness = 0.0;
+    competitiveness = 1.0;
     neutral = 0.0;
 
     for (size_t l = 0u; l < a.getNLoci(); ++l) {
 
         const size_t trait = a.getTrait(l);
-        const double effect = 0.01; //a.getEffect(l);
+        const double effect = a.getEffect(l);
 
-        const size_t genotype = genome.test(l) + genome.test(l + a.getNLoci());
-        const double expression = genotype - 1.0;
+        const size_t genotype = genome.test(l) + genome.test(l + 3u);
+        const double expression = genotype * 0.5;
         const double contribution = expression * effect;
 
         switch (trait) {
@@ -79,6 +79,11 @@ void Individual::develop(const Architecture &a) {
 
         }
     }
+
+    assert(tolerance >= 0.0);
+    assert(competitiveness >= 0.0);
+    assert(neutral >= 0.0);
+
 }
 
 void Individual::setFitness(const Param &p, const Landscape &l, const double &density) {
@@ -89,13 +94,16 @@ void Individual::setFitness(const Param &p, const Landscape &l, const double &de
     const size_t habitat = l.getHabitat(patch);
 
     // Compute stress-dependent growth
-    const double F = 1.0 - 1.0 / (1.0 + exp(-p.steepness * (stress - tolerance)));
+    double F = 1.0 - 1.0 / (1.0 + exp(-p.steepness * (stress - tolerance)));
+    //F = 1.0;
 
     // Compute competition-dependent growth (no competition in the matrix)
-    const double G = habitat ? exp(-competition * (density / competitiveness - 1.0)) : 1.0;
+    double G = habitat ? exp(-competition * (density / competitiveness - 1.0)) : 1.0;
+    //G = 1.0;
 
     // Compute cost-depdendent growth
-    const double C = exp(-(p.costcomp * competitiveness * competitiveness + p.tradeoff * competitiveness * tolerance + p.costtol * tolerance * tolerance));
+    double C = exp(-(p.costcomp * competitiveness * competitiveness + p.tradeoff * competitiveness * tolerance + p.costtol * tolerance * tolerance));
+    //C = 1.0;
 
     fitness = p.maxgrowth * F * G * C;
 
@@ -109,6 +117,7 @@ void Individual::kill() { alive = false; }
 size_t Individual::getPatch() const { return patch; }
 double Individual::getTolerance() const { return tolerance; }
 double Individual::getCompetitiveness() const { return competitiveness; }
+double Individual::getNeutral() const { return neutral; }
 double Individual::getFitness() const { return fitness; }
 bool Individual::isAlive() const { return alive; }
 size_t Individual::getNOneAlleles() const { return genome.count(); }

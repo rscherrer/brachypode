@@ -43,3 +43,15 @@ BOOST_AUTO_TEST_CASE(onlyMutations) {
     BOOST_CHECK_EQUAL(ind.getNOneAlleles(), 20u);
 
 }
+
+BOOST_AUTO_TEST_CASE(knownTraitValues) {
+
+    Param pars = Param();
+    Architecture arch = Architecture(pars);
+    Individual ind = Individual();
+    ind.develop(arch);
+    BOOST_CHECK_EQUAL(ind.getTolerance(), 0.0);
+    BOOST_CHECK_EQUAL(ind.getCompetitiveness(), 1.0);
+    BOOST_CHECK_EQUAL(ind.getNeutral(), 0.0);
+
+}

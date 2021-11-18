@@ -14,6 +14,7 @@ Param::Param() :
     nneut(1u),
     allfreq(0.2),
     mutation(0.0001),
+    effect(0.01),
     seed(makeDefaultSeed()),
     savepars(true),
     loadlandscape(false),
@@ -69,6 +70,7 @@ void Param::import(std::ifstream &file)
         else if (input == "nneut") file >> nneut;
         else if (input == "allfreq") file >> allfreq;
         else if (input == "mutation") file >> mutation;
+        else if (input == "effect") file >> effect;
         else if (input == "seed") file >> seed;
         else if (input == "savepars") file >> savepars;
         else if (input == "loadlandscape") file >> loadlandscape;
@@ -108,6 +110,7 @@ void Param::check() const
     if (nneut < 1u) msg = "There should be at least one neutral locus";
     if (allfreq < 0.0 || allfreq > 1.0) msg = "Initial allele frequency should be between zero and one";
     if (mutation < 0.0 || mutation > 1.0) msg = "Mutation rate should be between zero and one";
+    if (effect < 0.0) msg = "Locus effect size should be positive";
 
     if (msg != "No error detected")
         throw std::runtime_error(msg);
@@ -141,6 +144,7 @@ void Param::write(std::ofstream &file) const
     file << "nneut " << nneut << '\n';
     file << "allfreq " << allfreq << '\n';
     file << "mutation " << mutation << '\n';
+    file << "effect " << effect << '\n';
     file << "seed " << seed << '\n';
     file << "savepars " << savepars << '\n';
     file << "loadlandscape " << loadlandscape << '\n';

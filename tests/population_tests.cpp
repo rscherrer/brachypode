@@ -6,7 +6,8 @@ BOOST_AUTO_TEST_CASE(initPopRightSize) {
     Param pars = Param();
     pars.popsize = 10u;
     Landscape lnd = Landscape(3u);
-    Population pop(pars, lnd);
+    Architecture arch = Architecture(pars);
+    Population pop(pars, lnd, arch);
 
     BOOST_CHECK(pop.getSize() == 10u);
 
@@ -16,9 +17,10 @@ BOOST_AUTO_TEST_CASE(fitnessesAreCorrectlyBounded) {
 
     Param pars = Param();
     Landscape lnd = Landscape(3u);
-    Population pop(pars, lnd);
+    Architecture arch = Architecture(pars);
+    Population pop(pars, lnd, arch);
 
-    pop.setFitnesses(pars, lnd);
+    pop.assignFitnesses(pars, lnd);
 
     for (size_t i = 0u; i < pop.getSize(); ++i) {
         BOOST_CHECK(pop.getFitness(i) <= pars.maxgrowth);
@@ -27,20 +29,16 @@ BOOST_AUTO_TEST_CASE(fitnessesAreCorrectlyBounded) {
 
 }
 
-BOOST_AUTO_TEST_CASE(reproductionIncreasesPopSize) {
+BOOST_AUTO_TEST_CASE(noBabies) {
 
     Param pars = Param();
-    pars.costtol = 0.0;
-    pars.costcomp = 0.0;
-    pars.tradeoff = 0.0;
-    pars.popsize = 20;
+    pars.maxgrowth = 0.0;
     Landscape lnd = Landscape(3u);
-    Population pop(pars, lnd);
+    Architecture arch = Architecture(pars);
+    Population pop = Population(pars, lnd, arch);
+    pop.assignFitnesses(pars, lnd);
+    pop.lifeCycle(lnd);
 
-    const size_t oldsize = pop.getSize();
+    BOOST_CHECK_EQUAL(pop.getSize(), 0u);
 
-    pop.setFitnesses(pars, lnd);
-    pop.reproduce(lnd);
-
-    BOOST_CHECK(pop.getSize() > oldsize); // most times
 }

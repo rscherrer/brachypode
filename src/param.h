@@ -39,6 +39,7 @@ struct Param {
     size_t nneut; // number of neutral loci
     double allfreq; // initial allele frequency
     double mutation; // mutation rate
+    double effect; // effect size of a locus
     size_t seed;
 
     bool savepars;

@@ -6,6 +6,8 @@
 
 class Landscape {
 
+    friend class Population;
+
 public:
 
     Landscape(const size_t&);
@@ -25,13 +27,13 @@ public:
     double getStress(const size_t&) const;
     double getCompetition(const size_t&) const;
 
+private:
+
     std::vector<double> areas;
     std::vector<size_t> capacities;
     std::vector<size_t> habitats;
     std::vector<double> stresses;
     std::vector<double> competitions;
-
-private:
 
 };
 

@@ -8,14 +8,18 @@ class Population {
 
 public:
 
-    Population(const Param&, const Landscape&);
+    Population(const Param&, const Landscape&, const Architecture&);
 
-    void setFitnesses(const Param&, const Landscape&);
-    void reproduce(const Landscape&);
+    void assignFitnesses(const Param&, const Landscape&);
+    void lifeCycle(const Landscape&);
 
     size_t getSize() const;
+    double getSumFit() const;
     size_t getPatch(const size_t&) const;
     double getFitness(const size_t&) const;
+    double getTolerance(const size_t&) const;
+    double getCompetitiveness(const size_t&) const;
+    double getNeutral(const size_t&) const;
 
 private:
 

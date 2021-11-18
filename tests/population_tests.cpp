@@ -5,7 +5,7 @@ BOOST_AUTO_TEST_CASE(initPopRightSize) {
 
     Param pars = Param();
     pars.popsize = 10u;
-    Landscape lnd = Landscape(3u);
+    Landscape lnd = Landscape(pars);
     Architecture arch = Architecture(pars);
     Population pop(pars, lnd, arch);
 
@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE(initPopRightSize) {
 BOOST_AUTO_TEST_CASE(fitnessesAreCorrectlyBounded) {
 
     Param pars = Param();
-    Landscape lnd = Landscape(3u);
+    Landscape lnd = Landscape(pars);
     Architecture arch = Architecture(pars);
     Population pop(pars, lnd, arch);
 
@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(noBabies) {
 
     Param pars = Param();
     pars.maxgrowth = 0.0;
-    Landscape lnd = Landscape(3u);
+    Landscape lnd = Landscape(pars);
     Architecture arch = Architecture(pars);
     Population pop = Population(pars, lnd, arch);
     pop.assignFitnesses(pars, lnd);

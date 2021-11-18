@@ -18,7 +18,7 @@ int simulate(const std::vector<std::string> &args) {
         if (pars.savepars) pars.save();
 
         // Create a landscape
-        Landscape lnd = Landscape(pars.nfacil);
+        Landscape lnd = Landscape(pars);
 
         // Load the landscape if necessary
         if (pars.loadlandscape) lnd.load();

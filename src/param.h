@@ -28,6 +28,10 @@ struct Param {
 
     size_t popsize; // initial population size
     size_t nfacil; // number of facilitated patches
+    std::vector<double> area; // areas of the two kinds of patches
+    std::vector<size_t> capacity; // carrying capacities in and out
+    std::vector<double> stress; // stress levels in and out
+    double competition; // degree of competition in the facilitated patches
     double maxgrowth; // maximum growth rate
     double steepness; // speed of decay at tolerance threshold
     double costcomp; // cost of competitiveness

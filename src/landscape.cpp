@@ -1,28 +1,37 @@
 #include "landscape.h"
 
-Landscape::Landscape(const size_t &n) :
-    areas(std::vector<double>(n)),
-    capacities(std::vector<size_t>(n)),
-    habitats(std::vector<size_t>(n)),
-    stresses(std::vector<double>(n)),
-    competitions(std::vector<double>(n))
+Landscape::Landscape(const Param &p) :
+    npatches(p.nfacil + 1u),
+    areas(std::vector<double>(npatches)),
+    capacities(std::vector<size_t>(npatches)),
+    habitats(std::vector<size_t>(npatches)),
+    stresses(std::vector<double>(npatches)),
+    competitions(std::vector<double>(npatches))
 {
 
     // Unfacilitated matrix
-    areas[0u] = 4.0;
-    capacities[0u] = 50u;
+    areas[0u] = p.area[0u];
+    capacities[0u] = p.capacity[0u];
     habitats[0u] = 0u;
-    stresses[0u] = 5.0;
-    competitions[0u] = 0.0;
+    stresses[0u] = p.stress[0u];
+    competitions[0u] = 0.0; // this value is never used
 
     // Facilitated patches
-    for (size_t i = 1u; i < n; ++i) {
-        areas[i] = 1.0;
-        capacities[i] = 20u;
+    for (size_t i = 1u; i < npatches; ++i) {
+
+        areas[i] = p.area[1u];
+        capacities[i] = p.capacity[1u];
         habitats[i] = 1u;
-        stresses[i] = 0.0;
-        competitions[i] = 0.1;
+        stresses[i] = p.stress[1u];
+        competitions[i] = p.competition;
+
     }
+
+    assert(areas.size() == npatches);
+    assert(capacities.size() == npatches);
+    assert(habitats.size() == npatches);
+    assert(stresses.size() == npatches);
+    assert(competitions.size() == npatches);
 
 }
 

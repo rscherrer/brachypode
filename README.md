@@ -22,5 +22,4 @@ Features to add:
 - Write a test for extinction use case
 - Does computation time not depend heavily on the size of the individual bitset?
 - Could populations, landscapes and genetic architectures not store relevant parameters in them so they do not rely on further supply of parameters from the parameter structure?
-- Add reproduction back in (add a reproduction test?)
-- Rename reproduction "life"
+- Pass parameters to the landscape

@@ -7,7 +7,8 @@ BOOST_AUTO_TEST_CASE(knownFitness) {
     pars.costtol = 0.0;
     pars.costcomp = 0.0;
     pars.tradeoff = 0.0;
-    Landscape lnd = Landscape(3u);
+    pars.nfacil = 3u;
+    Landscape lnd = Landscape(pars);
     Individual ind = Individual();
 
     // Should be maxed in protected environment when alone

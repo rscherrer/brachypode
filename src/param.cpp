@@ -3,6 +3,10 @@
 Param::Param() :
     popsize(100u),
     nfacil(10u),
+    area({4.0, 1.0}),
+    capacity({50u, 20u}),
+    stress({5.0, 0.0}),
+    competition(0.1),
     maxgrowth(2.0),
     steepness(10.0),
     costcomp(0.02),
@@ -59,6 +63,10 @@ void Param::import(std::ifstream &file)
 
         if (input == "popsize") file >> popsize;
         else if (input == "nfacil") file >> nfacil;
+        else if (input == "area") for (size_t i = 0u; i < 2u; ++i) file >> area[i];
+        else if (input == "capacity") for (size_t i = 0u; i < 2u; ++i) file >> capacity[i];
+        else if (input == "stress") for (size_t i = 0u; i < 2u; ++i) file >> stress[i];
+        else if (input == "competition") file >> competition;
         else if (input == "maxgrowth") file >> maxgrowth;
         else if (input == "steepness") file >> steepness;
         else if (input == "costcomp") file >> costcomp;
@@ -99,6 +107,8 @@ void Param::check() const
 {
     std::string msg = "No error detected";
 
+    if (area[0u] <= 0.0 || area[1u] <= 0.0) msg = "Area should be strictly positive";
+    if (stress[0u] < 0.0 || stress[1u] < 0.0) msg = "Stress level should be positive";
     if (maxgrowth < 0.0) msg = "Maximum growth rate should be positive";
     if (steepness < 0.0) msg = "Steepness of fitness decay should be positive";
     if (costcomp < 0.0) msg = "Cost of competitiveness should be positive";
@@ -133,6 +143,10 @@ void Param::write(std::ofstream &file) const
 
     file << "popsize " << popsize << '\n';
     file << "nfacil " << nfacil << '\n';
+    file << "area " << area[0u] << ' ' << area[1u] << '\n';
+    file << "capacity " << capacity[0u] << ' ' << capacity[1u] << '\n';
+    file << "stress " << stress[0u] << ' ' << stress[1u] << '\n';
+    file << "competition " << competition << '\n';
     file << "maxgrowth " << maxgrowth << '\n';
     file << "steepness " << steepness << '\n';
     file << "costcomp " << costcomp << '\n';

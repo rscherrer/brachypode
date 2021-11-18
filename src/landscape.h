@@ -10,7 +10,7 @@ class Landscape {
 
 public:
 
-    Landscape(const size_t&);
+    Landscape(const Param&);
 
     void load();
     void setArea(const size_t&, const double&);
@@ -29,6 +29,7 @@ public:
 
 private:
 
+    size_t npatches;
     std::vector<double> areas;
     std::vector<size_t> capacities;
     std::vector<size_t> habitats;

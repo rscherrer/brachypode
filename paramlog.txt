@@ -1,5 +1,9 @@
 popsize 100
 nfacil 10
+area 4 1
+capacity 50 20
+stress 5 0
+competition 0.1
 maxgrowth 2
 steepness 10
 costcomp 0.02
@@ -12,7 +16,7 @@ nneut 1
 allfreq 0.2
 mutation 0.0001
 effect 0.01
-seed 1637234002760483526
+seed 1637235706146678265
 savepars 1
 loadlandscape 0
 loadarch 0

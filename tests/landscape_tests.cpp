@@ -27,7 +27,8 @@ BOOST_AUTO_TEST_CASE(landscapeLoading) {
     file.close();
 
     // Load the landscape file
-    Landscape lnd = Landscape(3u);
+    Param pars = Param();
+    Landscape lnd = Landscape(pars);
     lnd.load();
 
     // Check that the parameters were properly read

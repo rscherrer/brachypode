@@ -1,5 +1,5 @@
 popsize 100
-nfacil 10
+npatches 10
 area 4 1
 capacity 50 20
 stress 5 0
@@ -9,14 +9,16 @@ steepness 10
 costcomp 0.02
 costtol 0.02
 tradeoff 0.01
+selfing 0.95
 nchrom1
 ncomp 1
 ntol 1
 nneut 1
 allfreq 0.2
 mutation 0.0001
+recombination 3
 effect 0.01
-seed 1637235706146678265
+seed 1647079487737351607
 savepars 1
 loadlandscape 0
 loadarch 0

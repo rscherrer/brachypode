@@ -51,26 +51,26 @@ OBJECTS_DIR   = debug/
 
 ####### Files
 
-SOURCES       = src/simul.cpp \
-		src/param.cpp \
+SOURCES       = src/parameters.cpp \
+		src/simulation.cpp \
 		src/individual.cpp \
 		src/population.cpp \
 		src/landscape.cpp \
 		src/architecture.cpp \
 		src/random.cpp \
-		tests/simul_tests.cpp \
+		tests/simulation_tests.cpp \
 		tests/population_tests.cpp \
 		tests/individual_tests.cpp \
 		tests/landscape_tests.cpp \
 		tests/architecture_tests.cpp 
-OBJECTS       = debug/simul.o \
-		debug/param.o \
+OBJECTS       = debug/parameters.o \
+		debug/simulation.o \
 		debug/individual.o \
 		debug/population.o \
 		debug/landscape.o \
 		debug/architecture.o \
 		debug/random.o \
-		debug/simul_tests.o \
+		debug/simulation_tests.o \
 		debug/population_tests.o \
 		debug/individual_tests.o \
 		debug/landscape_tests.o \
@@ -154,20 +154,20 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
-		brachypode_test.pro src/simul.h \
-		src/param.h \
+		brachypode_test.pro src/parameters.h \
+		src/simulation.h \
 		src/individual.h \
 		src/population.h \
 		src/landscape.h \
 		src/architecture.h \
-		src/random.h src/simul.cpp \
-		src/param.cpp \
+		src/random.h src/parameters.cpp \
+		src/simulation.cpp \
 		src/individual.cpp \
 		src/population.cpp \
 		src/landscape.cpp \
 		src/architecture.cpp \
 		src/random.cpp \
-		tests/simul_tests.cpp \
+		tests/simulation_tests.cpp \
 		tests/population_tests.cpp \
 		tests/individual_tests.cpp \
 		tests/landscape_tests.cpp \
@@ -198,8 +198,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents src/simul.h src/param.h src/individual.h src/population.h src/landscape.h src/architecture.h src/random.h $(DISTDIR)/
-	$(COPY_FILE) --parents src/simul.cpp src/param.cpp src/individual.cpp src/population.cpp src/landscape.cpp src/architecture.cpp src/random.cpp tests/simul_tests.cpp tests/population_tests.cpp tests/individual_tests.cpp tests/landscape_tests.cpp tests/architecture_tests.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents src/parameters.h src/simulation.h src/individual.h src/population.h src/landscape.h src/architecture.h src/random.h $(DISTDIR)/
+	$(COPY_FILE) --parents src/parameters.cpp src/simulation.cpp src/individual.cpp src/population.cpp src/landscape.cpp src/architecture.cpp src/random.cpp tests/simulation_tests.cpp tests/population_tests.cpp tests/individual_tests.cpp tests/landscape_tests.cpp tests/architecture_tests.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -247,44 +247,46 @@ compiler_clean: compiler_moc_predefs_clean
 
 ####### Compile
 
-debug/simul.o: src/simul.cpp src/simul.h \
-		src/param.h \
+debug/parameters.o: src/parameters.cpp src/parameters.h \
+		src/random.h \
+		src/rndutils.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/parameters.o src/parameters.cpp
+
+debug/simulation.o: src/simulation.cpp src/simulation.h \
+		src/parameters.h \
 		src/random.h \
 		src/rndutils.hpp \
 		src/population.h \
 		src/individual.h \
 		src/landscape.h \
 		src/architecture.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/simul.o src/simul.cpp
-
-debug/param.o: src/param.cpp src/param.h \
-		src/random.h \
-		src/rndutils.hpp
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/param.o src/param.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/simulation.o src/simulation.cpp
 
 debug/individual.o: src/individual.cpp src/individual.h \
 		src/random.h \
 		src/rndutils.hpp \
-		src/param.h \
-		src/landscape.h
+		src/parameters.h \
+		src/landscape.h \
+		src/architecture.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/individual.o src/individual.cpp
 
 debug/population.o: src/population.cpp src/population.h \
 		src/individual.h \
 		src/random.h \
 		src/rndutils.hpp \
-		src/param.h \
-		src/landscape.h
+		src/parameters.h \
+		src/landscape.h \
+		src/architecture.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/population.o src/population.cpp
 
 debug/landscape.o: src/landscape.cpp src/landscape.h \
-		src/param.h \
+		src/parameters.h \
 		src/random.h \
 		src/rndutils.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/landscape.o src/landscape.cpp
 
 debug/architecture.o: src/architecture.cpp src/architecture.h \
-		src/param.h \
+		src/parameters.h \
 		src/random.h \
 		src/rndutils.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/architecture.o src/architecture.cpp
@@ -293,39 +295,41 @@ debug/random.o: src/random.cpp src/random.h \
 		src/rndutils.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/random.o src/random.cpp
 
-debug/simul_tests.o: tests/simul_tests.cpp src/simul.h \
-		src/param.h \
+debug/simulation_tests.o: tests/simulation_tests.cpp src/simulation.h \
+		src/parameters.h \
 		src/random.h \
 		src/rndutils.hpp \
 		src/population.h \
 		src/individual.h \
 		src/landscape.h \
 		src/architecture.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/simul_tests.o tests/simul_tests.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/simulation_tests.o tests/simulation_tests.cpp
 
 debug/population_tests.o: tests/population_tests.cpp src/population.h \
 		src/individual.h \
 		src/random.h \
 		src/rndutils.hpp \
-		src/param.h \
-		src/landscape.h
+		src/parameters.h \
+		src/landscape.h \
+		src/architecture.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/population_tests.o tests/population_tests.cpp
 
 debug/individual_tests.o: tests/individual_tests.cpp src/individual.h \
 		src/random.h \
 		src/rndutils.hpp \
-		src/param.h \
-		src/landscape.h
+		src/parameters.h \
+		src/landscape.h \
+		src/architecture.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/individual_tests.o tests/individual_tests.cpp
 
 debug/landscape_tests.o: tests/landscape_tests.cpp src/landscape.h \
-		src/param.h \
+		src/parameters.h \
 		src/random.h \
 		src/rndutils.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/landscape_tests.o tests/landscape_tests.cpp
 
 debug/architecture_tests.o: tests/architecture_tests.cpp src/architecture.h \
-		src/param.h \
+		src/parameters.h \
 		src/random.h \
 		src/rndutils.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/architecture_tests.o tests/architecture_tests.cpp

@@ -1,0 +1,16 @@
+area 0 0
+stress -1 -1
+maxgrowth -1
+steepness -1
+costcomp -1
+costtol -1
+tradeoff -1
+selfing -1
+nchrom 0
+ncomp 0
+ntol 0
+nneut 0
+allfreq -1
+mutation -1
+recombination -1
+effect -1

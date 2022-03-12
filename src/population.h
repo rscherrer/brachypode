@@ -8,10 +8,10 @@ class Population {
 
 public:
 
-    Population(const Param&, const Landscape&, const Architecture&);
+    Population(const Parameters&, const Landscape&, const Architecture&);
 
-    void assignFitnesses(const Param&, const Landscape&);
-    void lifeCycle(const Landscape&);
+    void assignFitnesses(const Parameters&, const Landscape&);
+    void lifeCycle(const Parameters&, const Landscape&, const Architecture&);
 
     size_t getSize() const;
     double getSumFit() const;

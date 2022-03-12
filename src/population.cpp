@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-Population::Population(const Param &p, const Landscape &l, const Architecture &a) :
+Population::Population(const Parameters &p, const Landscape &l, const Architecture &a) :
     pop(std::vector<Individual>(p.popsize))
 {
 
@@ -21,7 +21,7 @@ Population::Population(const Param &p, const Landscape &l, const Architecture &a
     }
 }
 
-void Population::assignFitnesses(const Param &p, const Landscape &l) {
+void Population::assignFitnesses(const Parameters &p, const Landscape &l) {
 
     // Compute the total competition intensity in each patch...
     std::vector<double> densities(l.getNPatches(), 0.0);
@@ -52,7 +52,7 @@ auto burry = [](Individual ind) -> bool
     return !ind.isAlive();
 };
 
-void Population::lifeCycle(const Landscape &l) {
+void Population::lifeCycle(const Parameters &p, const Landscape &l, const Architecture &a) {
 
     // Figure how many seeds will be produced
     double sumfit = 0.0;
@@ -77,7 +77,10 @@ void Population::lifeCycle(const Landscape &l) {
 
     if (nseeds > capacity) nseeds = capacity;
 
+    const size_t nselfed = std::round(p.selfing * nseeds);
+
     // Sample offspring from parents wrt fitness and disperse them
+    auto pickPollen = rnd::random(0u, pop.size() - 1u);
     auto pickParent = rnd::discrete(fitnesses.begin(), fitnesses.end());
     auto pickPatch = rnd::discrete(l.areas.begin(), l.areas.end());
 
@@ -86,9 +89,27 @@ void Population::lifeCycle(const Landscape &l) {
     for (size_t k = 0u; k < nseeds; ++k) {
 
         const size_t parent = pickParent(rnd::rng);
-        const size_t patch = pickPatch(rnd::rng);
 
-        pop.push_back(pop[parent]);
+        if (k < nselfed) {
+
+            pop.push_back(pop[parent]);
+
+        } else {
+
+            const size_t pollen = pickPollen(rnd::rng);
+
+            Individual seedling = Individual();
+            seedling.inherit(pop[parent], p, a, false);
+            seedling.inherit(pop[pollen], p, a, true);
+
+            pop.push_back(seedling);
+
+        }
+
+        pop.back().mutateGenome(p.mutation, a.getNLoci());
+        pop.back().develop(a);
+
+        const size_t patch = pickPatch(rnd::rng);
         pop.back().setPatch(patch);
 
     }

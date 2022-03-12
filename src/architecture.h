@@ -1,16 +1,21 @@
 #ifndef BRACHYPODE_ARCHITECTURE_H
 #define BRACHYPODE_ARCHITECTURE_H
 
-#include "param.h"
+#include "parameters.h"
 #include <vector>
 
 class Architecture {
 
 public:
 
-    Architecture(const Param&);
+    Architecture(const Parameters&);
+
+    void load();
 
     size_t getNLoci() const;
+    size_t getNTol() const;
+    size_t getNComp() const;
+    size_t getNNeut() const;
     size_t getNChrom() const;
     double getChromEnd(const size_t&) const;
     double getLocation(const size_t&) const;
@@ -20,7 +25,12 @@ public:
 
 private:
 
+    size_t nchrom; // number of chromosomes
+    size_t ntol; // number of loci coding for tolerance
+    size_t ncomp; // number of loci coding for competitiveness
+    size_t nneut; // number of neutral loci
     size_t nloci; // number of loci in the genome
+
     std::vector<double> chromends; // genomic location of chromosome ends
     std::vector<double> locations; // genomic location of loci
     std::vector<size_t> chromosomes; // chromosomal location of loci

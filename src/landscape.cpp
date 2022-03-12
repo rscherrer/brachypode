@@ -1,9 +1,9 @@
 #include "landscape.h"
 
-Landscape::Landscape(const Param &p) :
-    npatches(p.nfacil + 1u),
+Landscape::Landscape(const Parameters &p) :
+    npatches(p.npatches),
     areas(std::vector<double>(npatches)),
-    capacities(std::vector<size_t>(npatches)),
+    capacities(std::vector<double>(npatches)),
     habitats(std::vector<size_t>(npatches)),
     stresses(std::vector<double>(npatches)),
     competitions(std::vector<double>(npatches))
@@ -46,34 +46,53 @@ void Landscape::load()
     if (!file.is_open())
         throw std::runtime_error("Unable to open file " + filename + '\n');
 
-    // Read in the number of patches
-    size_t n;
-    file >> n;
+    std::string field;
 
-    // Reset patch areas and capacities
-    areas = std::vector<double>(n, 0.0);
-    capacities = std::vector<size_t>(n, 0u);
-    habitats = std::vector<size_t>(n, 0u);
-    stresses = std::vector<double>(n, 0.0);
-    competitions = std::vector<double>(n, 0.0);
+    file >> field;
+    if (field == "npatches") file >> npatches;
+    else throw std::runtime_error("Number of patches should be provided first");
 
-    // Read them in back again from the file
-    for (size_t i = 0u; i < n; ++i) file >> areas[i];
-    for (size_t i = 0u; i < n; ++i) file >> capacities[i];
-    for (size_t i = 0u; i < n; ++i) file >> habitats[i];
-    for (size_t i = 0u; i < n; ++i) file >> stresses[i];
-    for (size_t i = 0u; i < n; ++i) file >> competitions[i];
+    areas = std::vector<double>(npatches);
+    capacities = std::vector<double>(npatches);
+    habitats = std::vector<size_t>(npatches);
+    stresses = std::vector<double>(npatches);
+    competitions = std::vector<double>(npatches);
 
-    // Check dimensions
-    assert(areas.size() == n);
-    assert(capacities.size() == n);
-    assert(habitats.size() == n);
-    assert(stresses.size() == n);
-    assert(competitions.size() == n);
+    bool isAreas = false, isCapacities = false, isHabitats = false;
+    bool isStresses = false, isCompetitions = false;
 
-    // Close the file
+    while (file >> field) {
+
+        if (field == "areas") { isAreas = true; for (size_t j = 0u; j < npatches; ++j) file >> areas[j]; }
+        else if (field == "capacities") { isCapacities = true; for (size_t j = 0u; j < npatches; ++j) file >> capacities[j]; }
+        else if (field == "habitats") { isHabitats = true; for (size_t j = 0u; j < npatches; ++j) file >> habitats[j]; }
+        else if (field == "stresses") { isStresses = true; for (size_t j = 0u; j < npatches; ++j) file >> stresses[j]; }
+        else if (field == "competitions") { isCompetitions = true; for (size_t j = 0u; j < npatches; ++j) file >> competitions[j]; }
+        else throw std::runtime_error("Unknown landscape field provided");
+
+    }
+
     file.close();
 
+    if (!(isAreas && isCapacities && isHabitats && isStresses && isCompetitions))
+        throw std::runtime_error("Some landscape fields are missing");
+
+    assert(areas.size() == npatches);
+    assert(capacities.size() == npatches);
+    assert(habitats.size() == npatches);
+    assert(stresses.size() == npatches);
+    assert(competitions.size() == npatches);
+
+    // For each patch...
+    for (size_t j = 0u; j < npatches; ++j) {
+
+        if (areas[j] <= 0.0) throw std::runtime_error("Patches should have positive areas");
+        if (capacities[j] <= 0.0) throw std::runtime_error("Patches should have positive carrying capacities");
+        if (habitats[j] > 1u) throw std::runtime_error("Habitats can only be zero or one");
+        if (stresses[j] < 0.0) throw std::runtime_error("Stress should be positive");
+        if (competitions[j] < 0.0) throw std::runtime_error("Competition should be positive");
+
+    }
 }
 
 void Landscape::setArea(const size_t &i, const double &x) { areas[i] = x; }

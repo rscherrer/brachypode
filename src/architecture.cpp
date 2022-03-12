@@ -1,62 +1,46 @@
 #include "architecture.h"
 
-Architecture::Architecture(const Parameters &p) :
-    nchrom(p.nchrom),
-    ntol(p.ntol),
-    ncomp(p.ncomp),
-    nneut(p.nneut),
-    nloci(ntol + ncomp + nneut),
-    chromends(std::vector<double>(nchrom)),
-    locations(std::vector<double>(nloci)),
-    chromosomes(std::vector<size_t>(nloci)),
-    traits(std::vector<size_t>(nloci)),
-    effects(std::vector<double>(nloci, p.effect))
+Architecture::Architecture(const size_t &nchrom, const size_t& nloci) :
+    chromends(std::vector<double>(nchrom, 0.0)),
+    locations(std::vector<double>(nloci, 0.0))
 {
 
-    // Assign end locations to each chromosome
-    for (size_t k = 0u; k < chromends.size(); ++k)
-        chromends[k] = (k + 1.0) / chromends.size();
-
-    // Sample locus relative locations along the genome
-    auto getLocation = rnd::uniform(0.0, 1.0);
-
-    for (size_t l = 0u; l < nloci; ++l)
-        locations[l] = getLocation(rnd::rng);
-
-    std::sort(locations.begin(), locations.end());
-
-    // Assign chromosomes to each locus
-    for (size_t l = 0u, k = 0u; l < nloci && k < p.nchrom; ) {
-        if (locations[l] < chromends[k]) {
-            chromosomes[l] = k;
-            ++l;
-        } else ++k;
+    // Generate ends of chromosomes (chromosomes have equal sizes)
+    for (size_t k = 0u; k < nchrom; ++k) {
+        chromends[k] = (k + 1.0) / nchrom;
+        assert(chromends[k] >= 0.0);
+        assert(chromends[k] <= 1.0);
     }
 
-    // Randomly assign encoded trait to each locus
-    size_t l = 0u;
-    for (; l < p.ntol; ++l) traits[l] = 0u;
-    for (; l < p.ntol + p.ncomp; ++l) traits[l] = 1u;
-    for (; l < nloci; ++l) traits[l] = 2u;
+    // Extra check
+    assert(chromends.size() == nchrom);
 
-    std::shuffle(traits.begin(), traits.end(), rnd::rng);
+    // Sample random gene locations
+    auto getlocation = rnd::uniform(0.0, 1.0);
 
-    assert(chromends.size() == p.nchrom);
+    for (size_t l = 0u; l < nloci; ++l)
+        locations[l] = getlocation(rnd::rng);
+
+    // Now sort the vector of locations
+    std::sort(locations.begin(), locations.end());
+
+    // Check the locus locations
     assert(locations.size() == nloci);
-    assert(chromosomes.size() == nloci);
-    assert(traits.size() == nloci);
-    assert(effects.size() == nloci);
+    for (size_t l = 1u; l < nloci; ++l) {
+        assert(locations[l] > locations[l - 1u]);
+        assert(locations[l] <= 1.0);
+        assert(locations[l] >= 0.0);
+    }
 
 }
 
+void read(std::vector<double> &v, const size_t &n, std::ifstream &file)
+{
+    for (size_t i = 0u; i < n; ++i)
+        file >> v[i];
+}
+
 void Architecture::load() {
-
-    // This function will overwrite the genetic architecture
-    // with that found in the arhictecture file provided
-    // and update the parameters accordingly
-
-    // The file should contain the hyperparameters first (i.e. nchrom, nloci),
-    // then the lists of parameter values (e.g. locations, effects...)
 
     const std::string filename = "architecture.txt";
 
@@ -65,116 +49,68 @@ void Architecture::load() {
     if (!file.is_open())
         throw std::runtime_error("Unable to open file " + filename + '\n');
 
+    // Prepare to read parameters
     std::string field;
-    bool isNChrom = false, isNLoci = false;
+    size_t nchrom = 1u;
+    size_t nloci = 0u;
 
-    while (!(isNChrom || isNLoci)) {
+    // Read in parameters of interest first
+    do {
 
         file >> field;
 
-        if (field == "nchrom") { file >> nchrom; isNChrom = true; }
-        else if (field == "nloci") { file >> nloci; isNLoci = true; }
-        else throw std::runtime_error("Hyperparameters must be provided first");
+        if (field == "nchrom") file >> nchrom;
+        if (field == "nloci") file >> nloci;
 
     }
+    while (field != "--architecture--");
 
-    assert(isNChrom && isNLoci);
+    // Reset the architecture and check dimensions
+    chromends.resize(nchrom);
+    locations.resize(nloci);
 
-    if (nchrom < 1u) throw std::runtime_error("There should be at least one chromosome");
-    if (nloci < 3u) throw std::runtime_error("There should be at least three loci");
+    assert(chromends.size() == nchrom);
+    assert(locations.size() == nloci);
 
-    chromends = std::vector<double>(nchrom);
-    locations = std::vector<double>(nloci);
-    chromosomes = std::vector<size_t>(nloci);
-    traits = std::vector<size_t>(nloci);
-    effects = std::vector<double>(nloci);
-
-    bool isChromEnds = false, isLocations = false, isTraits = false, isEffects = false;
-
+    // Read in architecture
     while (file >> field) {
 
-        if (field == "chromends") { isChromEnds = true; for (size_t k = 0u; k < nchrom; ++k) file >> chromends[k]; }
-        else if (field == "locations") { isLocations = true; for (size_t l = 0u; l < nloci; ++l) file >> locations[l]; }
-        else if (field == "traits") { isTraits = true; for (size_t l = 0u; l < nloci; ++l) file >> traits[l]; }
-        else if (field == "effects") { isEffects = true; for (size_t l = 0u; l < nloci; ++l) file >> effects[l]; }
-        else throw std::runtime_error("Unknown architecture field provided");
+        if (field == "chromends") read(chromends, nchrom, file);
+        else if (field == "locations") read(locations, nloci, file);
 
     }
 
     file.close();
 
-    // Check that all fields were provided
-    if (!(isChromEnds && isLocations && isTraits && isEffects))
-        throw std::runtime_error("Some architecture fields are missing");
-
-    // For each chromosome...
-    for (size_t k = 0u; k < nchrom; ++k) {
-
-        // Check that its end location is positive
-        if (chromends[k] <= 0.0) throw std::runtime_error("Chromosome ends should be positive");
-
-        // Check that the chromosomes are in increasing order
-        if (k > 0u) if (chromends[k] <= chromends[k - 1u]) throw std::runtime_error("Chromosome ends should be in increasing order");
-
-    }
-
-    // Assign chromosomes to each locus
-    for (size_t l = 0u, k = 0u; l < nloci && k < nchrom; ) {
-        if (locations[l] < chromends[k]) {
-            chromosomes[l] = k;
-            ++l;
-        } else ++k;
-    }
-
-    assert(chromends.size() == nchrom);
-    assert(locations.size() == nloci);
-    assert(chromosomes.size() == nloci);
-    assert(traits.size() == nloci);
-    assert(effects.size() == nloci);
-
-    ntol = 0u, ncomp = 0u, nneut = 0u;
-
-    // For each locus...
-    for (size_t l = 0u; l < nloci; ++l) {
-
-        // Update numbers of loci for each trait...
-        switch (traits[l]) {
-
-        case 0u: ++ntol; break;
-        case 1u: ++ncomp; break;
-        case 2u: ++nneut; break;
-
-        // ... and check that there are no weird traits
-        default: std::runtime_error("Unknown encoded trait"); break;
-
-        }
-
-        // Genomic locations should be positive
-        if (locations[l] < 0.0)
-            throw std::runtime_error("Locus found with a negative location");
-
-        // Check that the locus is within the specified genomic bounds
-        if (locations[l] > chromends.back())
-            throw std::runtime_error("Locus found beyond the end of the last chromosome");
-
-        // Check that it is on an existing chromosome
-        assert(chromosomes[l] < nchrom);
-
-    }
-
-    // Check that enough loci were provided
-    if (ntol < 1u || ncomp < 1u || nneut < 1u)
-        throw std::runtime_error("Too few loci provided for at least one trait");
-
 }
 
-size_t Architecture::getNLoci() const { return nloci; }
-size_t Architecture::getNTol() const { return ntol; }
-size_t Architecture::getNComp() const { return ncomp; }
-size_t Architecture::getNNeut() const { return nneut; }
-size_t Architecture::getNChrom() const { return nchrom; }
-double Architecture::getChromEnd(const size_t &k) const { return chromends[k]; }
-double Architecture::getLocation(const size_t &l) const { return locations[l]; }
-size_t Architecture::getChromosome(const size_t &l) const { return chromosomes[l]; }
-size_t Architecture::getTrait(const size_t &l) const { return traits[l]; }
-double Architecture::getEffect(const size_t &l) const { return effects[l]; }
+// Write vector as a row in text file, with end of line
+void write(const std::vector<double> &v, std::ofstream &file)
+{
+    for (auto x : v)
+        file << x << ' ';
+    file << '\n';
+}
+
+void Architecture::save(const Parameters &pars) const
+{
+    const std::string filename = "architecture.txt";
+    std::ofstream archfile(filename);
+
+    if (!archfile.is_open())
+        throw std::runtime_error("Unable to open file " + filename + '\n');
+
+    // Write parameters first
+    archfile << "--parameters--\n";
+    pars.write(archfile);
+
+    archfile << "\n--architecture--\n";
+
+    archfile << "chromends ";
+    write(chromends, archfile);
+
+    archfile << "locations ";
+    write(locations, archfile);
+
+    archfile.close();
+}

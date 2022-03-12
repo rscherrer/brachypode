@@ -2,29 +2,23 @@
 
 Parameters::Parameters() :
     popsize(100u),
-    npatches(10u),
-    area({4.0, 1.0}),
-    capacity({50u, 20u}),
-    stress({5.0, 0.0}),
-    competition(0.1),
-    maxgrowth(2.0),
-    steepness(10.0),
-    costcomp(0.02),
-    costtol(0.02),
-    tradeoff(0.01),
-    selfing(0.95),
+    pgood({0.8, 0.6, 0.5, 0.3, 0.1}),
+    maxgrowths({1.0, 2.0}),
+    xopts({3.0, 1.0}),
+    xwidths({4.0, 1.0}),
+    capacities({10000.0, 100.0}),
+    dispersal(0.1),
+    mutation(0.001),
     nchrom(1u),
-    ncomp(1u),
-    ntol(1u),
-    nneut(1u),
-    allfreq(0.2),
-    mutation(0.0001),
+    nloci(20u),
+    effect(0.3),
+    selfing(0.95),
     recombination(3.0),
-    effect(0.01),
     seed(makeDefaultSeed()),
+    loadarch(false),
     savepars(true),
-    loadlandscape(false),
-    loadarch(false)
+    savelog(false),
+    savearch(true)
 {
 
     // Make sure parameter values make sense
@@ -60,33 +54,34 @@ void Parameters::import(std::ifstream &file)
 {
 
     std::string input;
+    size_t ndemes;
 
     while (file >> input) {
 
         if (input == "popsize") file >> popsize;
-        else if (input == "npatches") file >> npatches;
-        else if (input == "area") for (size_t i = 0u; i < 2u; ++i) file >> area[i];
-        else if (input == "capacity") for (size_t i = 0u; i < 2u; ++i) file >> capacity[i];
-        else if (input == "stress") for (size_t i = 0u; i < 2u; ++i) file >> stress[i];
-        else if (input == "competition") file >> competition;
-        else if (input == "maxgrowth") file >> maxgrowth;
-        else if (input == "steepness") file >> steepness;
-        else if (input == "costcomp") file >> costcomp;
-        else if (input == "costtol") file >> costtol;
-        else if (input == "tradeoff") file >> tradeoff;
-        else if (input == "selfind") file >> selfing;
-        else if (input == "nchrom") file >> nchrom;
-        else if (input == "ncomp") file >> ncomp;
-        else if (input == "ntol") file >> ntol;
-        else if (input == "nneut") file >> nneut;
-        else if (input == "allfreq") file >> allfreq;
+        else if (input == "pgood") {
+            file >> ndemes;
+            if (!ndemes) throw std::runtime_error("Zero deme provided");
+            pgood = std::vector<double>(ndemes);
+            for (size_t i = 0u; i < ndemes; ++i)
+                file >> pgood[i];
+        }
+        else if (input == "maxgrowths") for (size_t i = 0u; i < 2u; ++i) file >> maxgrowths[i];
+        else if (input == "xopts") for (size_t i = 0u; i < 2u; ++i) file >> xopts[i];
+        else if (input == "xwidths") for (size_t i = 0u; i < 2u; ++i) file >> xwidths[i];
+        else if (input == "capacities") for (size_t i = 0u; i < 2u; ++i) file >> capacities[i];
+        else if (input == "dispersal") file >> dispersal;
         else if (input == "mutation") file >> mutation;
-        else if (input == "recombination") file >> recombination;
+        else if (input == "nchrom") file >> nchrom;
+        else if (input == "nloci") file >> nloci;
         else if (input == "effect") file >> effect;
+        else if (input == "selfing") file >> selfing;
+        else if (input == "recombination") file >> recombination;
         else if (input == "seed") file >> seed;
-        else if (input == "savepars") file >> savepars;
-        else if (input == "loadlandscape") file >> loadlandscape;
         else if (input == "loadarch") file >> loadarch;
+        else if (input == "savepars") file >> savepars;
+        else if (input == "savelog") file >> savelog;
+        else if (input == "savearch") file >> savearch;
         else
             throw std::runtime_error("Invalid parameter name: " + input);
 
@@ -111,23 +106,23 @@ void Parameters::check() const
 {
     std::string msg = "No error detected";
 
-    if (npatches < 1u) throw std::runtime_error("There should be at least one patch");
-    if (area[0u] <= 0.0 || area[1u] <= 0.0) throw std::runtime_error("Area should be strictly positive");
-    if (stress[0u] < 0.0 || stress[1u] < 0.0) throw std::runtime_error("Stress level should be positive");
-    if (maxgrowth < 0.0) throw std::runtime_error("Maximum growth rate should be positive");
-    if (steepness < 0.0) throw std::runtime_error("Steepness of fitness decay should be positive");
-    if (costcomp < 0.0) throw std::runtime_error("Cost of competitiveness should be positive");
-    if (costtol < 0.0) throw std::runtime_error("Cost of tolerance should be positive");
-    if (tradeoff < 0.0) throw std::runtime_error("Trade-off should be positive");
-    if (selfing < 0.0 || selfing > 1.0) throw std::runtime_error("Proportion of selfing should be between zero and one");
-    if (nchrom < 1u) throw std::runtime_error("There should be at least one chromosome");
-    if (ncomp < 1u) throw std::runtime_error("There should be at least one competitiveness locus");
-    if (ntol < 1u) throw std::runtime_error("There should be at least one tolerance locus");
-    if (nneut < 1u) throw std::runtime_error("There should be at least one neutral locus");
-    if (allfreq < 0.0 || allfreq > 1.0) throw std::runtime_error("Initial allele frequency should be between zero and one");
+    if (popsize == 0u) throw std::runtime_error("Initial population size cannot be zero");
+    if (pgood.size() < 1u) throw std::runtime_error("There should be at least one patch");
+    for (size_t i = 0u; i < pgood.size(); ++i)
+        if (pgood[i] < 0.0 || pgood[i] > 1.0)
+            throw std::runtime_error("Proportion of good patches should be between zero and one");
+    for (size_t i = 0u; i < 2u; ++i) {
+        if (maxgrowths[i] < 0.0) throw std::runtime_error("Maximum growth rate cannot be negative");
+        if (xwidths[i] < 0.0) throw std::runtime_error("Niche width cannot be negative");
+        if (capacities[i] < 0.0) throw std::runtime_error("Carrying capacity cannot be negative");
+    }
+    if (dispersal < 0.0 || dispersal > 1.0) throw std::runtime_error("Dispersal rate should be between zero and one");
     if (mutation < 0.0 || mutation > 1.0) throw std::runtime_error("Mutation rate should be between zero and one");
-    if (recombination < 0.0) throw std::runtime_error("Recombination rate should be positive");
-    if (effect < 0.0) throw std::runtime_error("Locus effect size should be positive");
+    if (nloci > 1000) throw std::runtime_error("There cannot be more than 1000 loci");
+    if (nchrom == 0) throw std::runtime_error("There cannot be zero chromosomes");
+    if (nloci == 0u) throw std::runtime_error("There cannot be zero loci");
+    if (selfing < 0.0 || selfing > 1.0) throw std::runtime_error("Rate of selfing must be between zero and one");
+    if (recombination < 0.0) throw std::runtime_error("Recombination rate cannot be negative");
 
 }
 
@@ -147,28 +142,24 @@ void Parameters::write(std::ofstream &file) const
 {
 
     file << "popsize " << popsize << '\n';
-    file << "npatches " << npatches << '\n';
-    file << "area " << area[0u] << ' ' << area[1u] << '\n';
-    file << "capacity " << capacity[0u] << ' ' << capacity[1u] << '\n';
-    file << "stress " << stress[0u] << ' ' << stress[1u] << '\n';
-    file << "competition " << competition << '\n';
-    file << "maxgrowth " << maxgrowth << '\n';
-    file << "steepness " << steepness << '\n';
-    file << "costcomp " << costcomp << '\n';
-    file << "costtol " << costtol << '\n';
-    file << "tradeoff " << tradeoff << '\n';
-    file << "selfing " << selfing << '\n';
-    file << "nchrom" << nchrom << '\n';
-    file << "ncomp " << ncomp << '\n';
-    file << "ntol " << ntol << '\n';
-    file << "nneut " << nneut << '\n';
-    file << "allfreq " << allfreq << '\n';
-    file << "mutation " << mutation << '\n';
-    file << "recombination " << recombination << '\n';
-    file << "effect " << effect << '\n';
-    file << "seed " << seed << '\n';
-    file << "savepars " << savepars << '\n';
-    file << "loadlandscape " << loadlandscape << '\n';
-    file << "loadarch " << loadarch << '\n';
+    file << "pgood";
+    for (size_t i = 0u; i < pgood.size(); ++i) file << ' ' << pgood[i];
+    file << '\n';
+    file << "maxgrowths " << maxgrowths[0u] << ' ' << maxgrowths[1u] << '\n';
+    file << "xopts " << xopts[0u] << ' ' << xopts[1u] << '\n';
+    file << "xwidths " << xwidths[0u] << ' ' << xwidths[1u] << '\n';
+    file << "capacities " << capacities[0u] << ' ' << capacities[1u] << '\n';
+    file << "dispersal " << dispersal;
+    file << "mutation " << mutation;
+    file << "nchrom " << nchrom;
+    file << "nloci " << nloci;
+    file << "effect " << effect;
+    file << "selfing" << selfing;
+    file << "recombination " << recombination;
+    file << "seed " << seed;
+    file << "loadarch " << loadarch;
+    file << "savepars " << savepars;
+    file << "savelog " << savelog;
+    file << "savearch " << savearch;
 
 }

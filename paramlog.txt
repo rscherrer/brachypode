@@ -1,24 +1,7 @@
 popsize 100
-npatches 10
-area 4 1
-capacity 50 20
-stress 5 0
-competition 0.1
-maxgrowth 2
-steepness 10
-costcomp 0.02
-costtol 0.02
-tradeoff 0.01
-selfing 0.95
-nchrom1
-ncomp 1
-ntol 1
-nneut 1
-allfreq 0.2
-mutation 0.0001
-recombination 3
-effect 0.01
-seed 1647079487737351607
-savepars 1
-loadlandscape 0
-loadarch 0
+pgood 0.8 0.6 0.5 0.3 0.1
+maxgrowths 1 2
+xopts 3 1
+xwidths 4 1
+capacities 10000 100
+dispersal 0.1mutation 0.001nchrom 1nloci 20effect 0.3selfing0.95recombination 3seed 1647113685996350512loadarch 0savepars 1savelog 0savearch 1

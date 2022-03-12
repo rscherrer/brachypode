@@ -19,38 +19,31 @@ struct Parameters {
     void read(const std::string&);
     void update();
     void import(std::ifstream&);
-
     void write(std::ofstream&) const;
     void save() const;
     void check() const;
-
     size_t makeDefaultSeed();
 
     size_t popsize; // initial population size
-    size_t npatches; // number of patches
-    std::vector<double> area; // areas of the two kinds of patches
-    std::vector<size_t> capacity; // carrying capacities in and out
-    std::vector<double> stress; // stress levels in and out
-    double competition; // degree of competition in the facilitated patches
-    double maxgrowth; // maximum growth rate
-    double steepness; // speed of decay at tolerance threshold
-    double costcomp; // cost of competitiveness
-    double costtol; // cost of tolerance
-    double tradeoff; // tradeoff between the two
-    double selfing; // proportion of selfing
-    size_t nchrom; // number of chromosomes
-    size_t ncomp; // number of loci coding for competitiveness
-    size_t ntol; // number of loci coding for tolerance
-    size_t nneut; // number of neutral loci
-    double allfreq; // initial allele frequency
+    std::vector<double> pgood; // proportion of good patches in each deme
+    std::vector<double> maxgrowths; // maximum growth rate in each patch
+    std::vector<double> xopts; // optimal trait value in each patch
+    std::vector<double> xwidths; // niche width in each patch
+    std::vector<double> capacities; // carrying capacity in each patch
+    double dispersal; // dispersal rate
     double mutation; // mutation rate
+    size_t nchrom; // number of chromosomes
+    size_t nloci; // number of loci
+    double effect; // locus effect size
+    double selfing; // rate of selfing
     double recombination; // recombination rate
-    double effect; // effect size of a locus
+
     size_t seed;
 
-    bool savepars;
-    bool loadlandscape;
     bool loadarch;
+    bool savepars;
+    bool savelog;
+    bool savearch;
 
 };
 

@@ -1,6 +1,5 @@
-#ifndef EXPLICITGENOMESPECIATION_RANDOM_H
-#define EXPLICITGENOMESPECIATION_RANDOM_H
-
+#ifndef BRACHYPODE_RANDOM_H
+#define BRACHYPODE_RANDOM_H
 
 #include "rndutils.hpp"
 #include <stddef.h>

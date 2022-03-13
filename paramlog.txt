@@ -4,4 +4,4 @@ maxgrowths 1 2
 xopts 3 1
 xwidths 4 1
 capacities 10000 100
-dispersal 0.1mutation 0.001nchrom 1nloci 20effect 0.3selfing0.95recombination 3seed 1647113685996350512loadarch 0savepars 1savelog 0savearch 1
+dispersal 0.1mutation 0.001nchrom 1nloci 20effect 0.3selfing0.95recombination 3tend 100seed 1647163129891654818loadarch 0savepars 1savelog 0savearch 1

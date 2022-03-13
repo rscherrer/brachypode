@@ -38,6 +38,8 @@ struct Parameters {
     double selfing; // rate of selfing
     double recombination; // recombination rate
 
+    size_t tend; // simulation time
+
     size_t seed;
 
     bool loadarch;

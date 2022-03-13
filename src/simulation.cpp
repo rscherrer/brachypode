@@ -51,7 +51,7 @@ int simulate(const std::vector<std::string> &args) {
         std::cout << "Simulation started.\n";
 
         // At each time step...
-        for (size_t t = 0u; t < 100u; ++t) {
+        for (size_t t = 0u; t < pars.tend; ++t) {
 
             // Track deme and patch sizes
             std::vector<size_t> demesizes(ndemes, 0u);

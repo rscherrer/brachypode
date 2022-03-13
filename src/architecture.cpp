@@ -34,12 +34,6 @@ Architecture::Architecture(const size_t &nchrom, const size_t& nloci) :
 
 }
 
-void read(std::vector<double> &v, const size_t &n, std::ifstream &file)
-{
-    for (size_t i = 0u; i < n; ++i)
-        file >> v[i];
-}
-
 void Architecture::load() {
 
     const std::string filename = "architecture.txt";
@@ -54,42 +48,55 @@ void Architecture::load() {
     size_t nchrom = 1u;
     size_t nloci = 0u;
 
-    // Read in parameters of interest first
-    do {
+    // Read the number of chromosomes
+    file >> nchrom;
+    if (nchrom == 0u) throw std::runtime_error("There should be at least one chromosome");
 
-        file >> field;
+    // Resize container
+    chromends.resize(nchrom);
 
-        if (field == "nchrom") file >> nchrom;
-        if (field == "nloci") file >> nloci;
+    // For each chromosome...
+    for (size_t k = 0u; k < nchrom; ++k) {
+
+        // Read end of chromosome
+        file >> chromends[k];
+
+        // Check order
+        if (k > 0u && chromends[k] <= chromends[k - 1u])
+            throw std::runtime_error("Chromosome ends should be in increasing order");
+
+        // Check bounds
+        if (chromends[k] < 0.0) throw std::runtime_error("Chromosome ends should be postitive");
 
     }
-    while (field != "--architecture--");
 
-    // Reset the architecture and check dimensions
-    chromends.resize(nchrom);
+    // Check end of the last chromosome
+    if (chromends.back() != 1.0) throw std::runtime_error("End of the last chromosome should be one");
+
+    // Check size
+    assert(chromends.size() == nchrom);
+
+    // Read the number of loci
+    file >> nloci;
+    if (nloci == 0) throw std::runtime_error("There should be at least one locus");
+
+    // Resize containers
     locations.resize(nloci);
 
-    assert(chromends.size() == nchrom);
-    assert(locations.size() == nloci);
+    // For each locus...
+    for (size_t l = 0u; l < nloci; ++l) {
 
-    // Read in architecture
-    while (file >> field) {
+        // Read the locus position
+        file >> locations[l];
 
-        if (field == "chromends") read(chromends, nchrom, file);
-        else if (field == "locations") read(locations, nloci, file);
+        // Check location
+        if (locations[l] < 0.0) throw std::runtime_error("Locus location should be positive");
+        if (locations[l] > chromends.back()) throw std::runtime_error("Locus location should not be beyond the end of the last chromosome");
 
     }
 
     file.close();
 
-}
-
-// Write vector as a row in text file, with end of line
-void write(const std::vector<double> &v, std::ofstream &file)
-{
-    for (auto x : v)
-        file << x << ' ';
-    file << '\n';
 }
 
 void Architecture::save(const Parameters &pars) const
@@ -100,17 +107,15 @@ void Architecture::save(const Parameters &pars) const
     if (!archfile.is_open())
         throw std::runtime_error("Unable to open file " + filename + '\n');
 
-    // Write parameters first
-    archfile << "--parameters--\n";
-    pars.write(archfile);
+    // Write chromosome ends
+    assert(pars.nchrom == chromends.size());
+    archfile << pars.nchrom;
+    for (size_t k = 0u; k < pars.nchrom; ++k) archfile << ' ' << chromends[k];
 
-    archfile << "\n--architecture--\n";
-
-    archfile << "chromends ";
-    write(chromends, archfile);
-
-    archfile << "locations ";
-    write(locations, archfile);
+    // Write locus locations
+    assert(pars.nloci == locations.size());
+    archfile << pars.nloci;
+    for (size_t l = 0u; l < pars.nloci; ++l) archfile << ' ' << locations[l];
 
     archfile.close();
 }

@@ -14,6 +14,7 @@ Parameters::Parameters() :
     effect(0.3),
     selfing(0.95),
     recombination(3.0),
+    tend(100u),
     seed(makeDefaultSeed()),
     loadarch(false),
     savepars(true),
@@ -77,6 +78,7 @@ void Parameters::import(std::ifstream &file)
         else if (input == "effect") file >> effect;
         else if (input == "selfing") file >> selfing;
         else if (input == "recombination") file >> recombination;
+        else if (input == "tend") file >> tend;
         else if (input == "seed") file >> seed;
         else if (input == "loadarch") file >> loadarch;
         else if (input == "savepars") file >> savepars;
@@ -123,6 +125,7 @@ void Parameters::check() const
     if (nloci == 0u) throw std::runtime_error("There cannot be zero loci");
     if (selfing < 0.0 || selfing > 1.0) throw std::runtime_error("Rate of selfing must be between zero and one");
     if (recombination < 0.0) throw std::runtime_error("Recombination rate cannot be negative");
+    if (tend == 0u) throw std::runtime_error("Simulation time cannot be zero");
 
 }
 
@@ -156,6 +159,7 @@ void Parameters::write(std::ofstream &file) const
     file << "effect " << effect;
     file << "selfing" << selfing;
     file << "recombination " << recombination;
+    file << "tend " << tend;
     file << "seed " << seed;
     file << "loadarch " << loadarch;
     file << "savepars " << savepars;

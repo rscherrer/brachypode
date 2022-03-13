@@ -1,6 +1,8 @@
 #ifndef BRACHYPODE_INDIVIDUAL_H
 #define BRACHYPODE_INDIVIDUAL_H
 
+// This is the header for the Individual class.
+
 #include "random.h"
 #include "parameters.h"
 #include "architecture.h"
@@ -27,6 +29,7 @@ public:
     double getX() const;
     bool isAlive() const;
     size_t getAllele(const size_t&) const;
+    size_t getAlleleSum() const;
 
 private:
 

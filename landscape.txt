@@ -1,6 +1,0 @@
-npatches 3
-areas 10.3	2	1
-capacities 50	20	20
-habitats 0	1	1
-stresses 5	0	0
-competitions 0	0.1	0.1

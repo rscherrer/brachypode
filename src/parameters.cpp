@@ -1,3 +1,5 @@
+// This script contains all the functions of the Parameters structure.
+
 #include "parameters.h"
 
 Parameters::Parameters() :
@@ -19,7 +21,8 @@ Parameters::Parameters() :
     loadarch(false),
     savepars(true),
     savelog(false),
-    savearch(true)
+    savearch(true),
+    talkative(false)
 {
 
     // Make sure parameter values make sense
@@ -84,6 +87,7 @@ void Parameters::import(std::ifstream &file)
         else if (input == "savepars") file >> savepars;
         else if (input == "savelog") file >> savelog;
         else if (input == "savearch") file >> savearch;
+        else if (input == "talkative") file >> talkative;
         else
             throw std::runtime_error("Invalid parameter name: " + input);
 
@@ -92,7 +96,7 @@ void Parameters::import(std::ifstream &file)
     // Now update interactive parameters
     update();
 
-    std::clog << "Parameters were read in succesfully.\n";
+    std::cout << "Parameters were read in succesfully.\n";
 
 }
 
@@ -109,7 +113,6 @@ void Parameters::check() const
     std::string msg = "No error detected";
 
     if (popsize == 0u) throw std::runtime_error("Initial population size cannot be zero");
-    if (pgood.size() < 1u) throw std::runtime_error("There should be at least one patch");
     for (size_t i = 0u; i < pgood.size(); ++i)
         if (pgood[i] < 0.0 || pgood[i] > 1.0)
             throw std::runtime_error("Proportion of good patches should be between zero and one");
@@ -145,25 +148,26 @@ void Parameters::write(std::ofstream &file) const
 {
 
     file << "popsize " << popsize << '\n';
-    file << "pgood";
+    file << "pgood " << pgood.size();
     for (size_t i = 0u; i < pgood.size(); ++i) file << ' ' << pgood[i];
     file << '\n';
     file << "maxgrowths " << maxgrowths[0u] << ' ' << maxgrowths[1u] << '\n';
     file << "xopts " << xopts[0u] << ' ' << xopts[1u] << '\n';
     file << "xwidths " << xwidths[0u] << ' ' << xwidths[1u] << '\n';
     file << "capacities " << capacities[0u] << ' ' << capacities[1u] << '\n';
-    file << "dispersal " << dispersal;
-    file << "mutation " << mutation;
-    file << "nchrom " << nchrom;
-    file << "nloci " << nloci;
-    file << "effect " << effect;
-    file << "selfing" << selfing;
-    file << "recombination " << recombination;
-    file << "tend " << tend;
-    file << "seed " << seed;
-    file << "loadarch " << loadarch;
-    file << "savepars " << savepars;
-    file << "savelog " << savelog;
-    file << "savearch " << savearch;
+    file << "dispersal " << dispersal << '\n';
+    file << "mutation " << mutation << '\n';
+    file << "nchrom " << nchrom << '\n';
+    file << "nloci " << nloci << '\n';
+    file << "effect " << effect << '\n';
+    file << "selfing " << selfing << '\n';
+    file << "recombination " << recombination << '\n';
+    file << "tend " << tend << '\n';
+    file << "seed " << seed << '\n';
+    file << "loadarch " << loadarch << '\n';
+    file << "savepars " << savepars << '\n';
+    file << "savelog " << savelog << '\n';
+    file << "savearch " << savearch << '\n';
+    file << "talkative " << talkative << '\n';
 
 }

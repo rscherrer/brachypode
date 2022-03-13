@@ -1,3 +1,7 @@
+// This is the main simulation script. The core of the program has been
+// encapsulated into a function called simulate(), so its proper behavior
+// can be tested in different use cases in our tests.
+
 #include "simulation.h"
 
 // Lambda for removing dead individuals
@@ -65,9 +69,13 @@ int simulate(const std::vector<std::string> &args) {
 
             }
 
-            std::cout << "n = { ";
-            for (size_t j = 0u; j < ndemes; ++j) std::cout << demesizes[j] << ' ';
-            std::cout << "} at t = " << t << '\n';
+            if (pars.talkative) {
+
+                std::cout << "n = { ";
+                for (size_t j = 0u; j < ndemes; ++j) std::cout << demesizes[j] << ' ';
+                std::cout << "} at t = " << t << '\n';
+
+            }
 
             // Prepare to count the total number of offspring
             size_t nseeds = 0u;
@@ -88,6 +96,9 @@ int simulate(const std::vector<std::string> &args) {
 
                 // Compute fitness depending trait and patch
                 double fitness = maxgrowth * exp(-utl::sqr((x - xopt) / xwidth));
+
+                assert(fitness >= 0.0);
+                assert(fitness <= maxgrowth);
 
                 // Account for local competition within deme and within patch
                 fitness *= (1.0 - patchsizes[deme][patch] / capacity);

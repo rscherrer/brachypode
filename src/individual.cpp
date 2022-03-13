@@ -1,5 +1,6 @@
-#include "individual.h"
+// This script contains all the functions of the Individual class
 
+#include "individual.h"
 #include <cmath>
 
 Individual::Individual() :
@@ -19,7 +20,7 @@ void Individual::setX(const double &val) { x = val; }
 void Individual::mutate(const double &mu, const size_t &n) {
 
     if (mu == 0.0) return;
-    if (mu == 1.0) for (size_t i = 0u; i < n; ++i) genome.set(i);
+    if (mu == 1.0) { for (size_t i = 0u; i < n; ++i) genome.flip(i); return; }
 
     // Mutations are sampled from a geometric distribution
     auto getnextmutant = rnd::iotagap(mu);
@@ -37,6 +38,8 @@ void Individual::recombine(
     const std::vector<double> &chromends, const std::vector<double> &locations
 ) {
 
+    if (rho == 0.0) return;
+
     size_t locus = 0u;
     size_t chrom = 0u;
 
@@ -47,11 +50,10 @@ void Individual::recombine(
     auto gethaplotype = rnd::bernoulli(0.5);
 
     // Crossovers are sampled from an exponential distribution
-    const double recombrate = rho > 0.0 ? rho : 100.0;
-    auto nextcrossover = rnd::exponential(recombrate);
+    auto nextcrossover = rnd::exponential(rho);
 
     double crossover = 1.1; // beyond the end of the genome
-    if (rho > 0.0) crossover = nextcrossover(rnd::rng);
+    crossover = nextcrossover(rnd::rng);
 
     double position = locations[0u];
     double chromend = chromends[0u];
@@ -112,3 +114,4 @@ size_t Individual::getPatch() const { return patch; }
 double Individual::getX() const { return x; }
 bool Individual::isAlive() const { return alive; }
 size_t Individual::getAllele(const size_t &l) const { return genome.test(l); }
+size_t Individual::getAlleleSum() const { return genome.count(); }

@@ -1,6 +1,21 @@
 #ifndef BRACHYPODE_RANDOM_H
 #define BRACHYPODE_RANDOM_H
 
+// This header contains aliases for various kinds of probability distributions
+// as well as a random number generator. Include this header in other scripts
+// to be able to use it. Note that the header rndutils.hpp (cc Hanno Hildebrandt)
+// is needed for some distributions.
+
+// Example usage:
+// double x = rnd::normal(0.0, 1.0)(rnd::rng);
+// to sample a number from a normal distribution with mean zero and standard
+// deviation one. Alternatively, use:
+// auto mynormal = rnd::normal(0.0, 1.0);
+// to set up the normal distribution and only sample from it when needed:
+// double x = mynormal(rnd::rng);
+// (This can be useful when sampling many times, as setting up a distribution
+// takes time...)
+
 #include "rndutils.hpp"
 #include <stddef.h>
 

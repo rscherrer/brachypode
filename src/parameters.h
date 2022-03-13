@@ -1,16 +1,16 @@
 #ifndef BRACHYPODE_PARAMETERS_H
 #define BRACHYPODE_PARAMETERS_H
 
+// Parameter set. Contains values of the parameters of the simulation.
+// All parameters have default values that can be modified by calling
+// the program with a parameter file name as unique argument.
+
 #include "random.h"
 #include <fstream>
 #include <iostream>
 #include <chrono>
 #include <cassert>
 #include <cstdint>
-
-// Parameter set. Contains values of the parameters of the simulation.
-// All parameters have default values that can be modified by calling
-// the program with a parameter file name as unique argument.
 
 struct Parameters {
 
@@ -46,6 +46,7 @@ struct Parameters {
     bool savepars;
     bool savelog;
     bool savearch;
+    bool talkative;
 
 };
 

@@ -59,7 +59,8 @@ SOURCES       = src/parameters.cpp \
 		src/utilities.cpp \
 		tests/simulation_tests.cpp \
 		tests/individual_tests.cpp \
-		tests/architecture_tests.cpp 
+		tests/architecture_tests.cpp \
+		tests/test_utilities.cpp 
 OBJECTS       = debug/parameters.o \
 		debug/simulation.o \
 		debug/individual.o \
@@ -68,7 +69,8 @@ OBJECTS       = debug/parameters.o \
 		debug/utilities.o \
 		debug/simulation_tests.o \
 		debug/individual_tests.o \
-		debug/architecture_tests.o
+		debug/architecture_tests.o \
+		debug/test_utilities.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
@@ -153,7 +155,8 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		src/individual.h \
 		src/architecture.h \
 		src/random.h \
-		src/utilities.h src/parameters.cpp \
+		src/utilities.h \
+		tests/test_utilities.h src/parameters.cpp \
 		src/simulation.cpp \
 		src/individual.cpp \
 		src/architecture.cpp \
@@ -161,7 +164,8 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		src/utilities.cpp \
 		tests/simulation_tests.cpp \
 		tests/individual_tests.cpp \
-		tests/architecture_tests.cpp
+		tests/architecture_tests.cpp \
+		tests/test_utilities.cpp
 QMAKE_TARGET  = brachypode_test
 DESTDIR       = 
 TARGET        = brachypode_test
@@ -188,8 +192,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents src/parameters.h src/simulation.h src/individual.h src/architecture.h src/random.h src/utilities.h $(DISTDIR)/
-	$(COPY_FILE) --parents src/parameters.cpp src/simulation.cpp src/individual.cpp src/architecture.cpp src/random.cpp src/utilities.cpp tests/simulation_tests.cpp tests/individual_tests.cpp tests/architecture_tests.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents src/parameters.h src/simulation.h src/individual.h src/architecture.h src/random.h src/utilities.h tests/test_utilities.h $(DISTDIR)/
+	$(COPY_FILE) --parents src/parameters.cpp src/simulation.cpp src/individual.cpp src/architecture.cpp src/random.cpp src/utilities.cpp tests/simulation_tests.cpp tests/individual_tests.cpp tests/architecture_tests.cpp tests/test_utilities.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -277,7 +281,8 @@ debug/simulation_tests.o: tests/simulation_tests.cpp src/simulation.h \
 		src/rndutils.hpp \
 		src/individual.h \
 		src/architecture.h \
-		src/utilities.h
+		src/utilities.h \
+		tests/test_utilities.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/simulation_tests.o tests/simulation_tests.cpp
 
 debug/individual_tests.o: tests/individual_tests.cpp src/individual.h \
@@ -292,6 +297,9 @@ debug/architecture_tests.o: tests/architecture_tests.cpp src/architecture.h \
 		src/random.h \
 		src/rndutils.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/architecture_tests.o tests/architecture_tests.cpp
+
+debug/test_utilities.o: tests/test_utilities.cpp tests/test_utilities.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/test_utilities.o tests/test_utilities.cpp
 
 ####### Install
 

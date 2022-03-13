@@ -1,3 +1,5 @@
+// This script contains all the functions of the Architecture structure.
+
 #include "architecture.h"
 
 Architecture::Architecture(const size_t &nchrom, const size_t& nloci) :
@@ -66,7 +68,7 @@ void Architecture::load() {
             throw std::runtime_error("Chromosome ends should be in increasing order");
 
         // Check bounds
-        if (chromends[k] < 0.0) throw std::runtime_error("Chromosome ends should be postitive");
+        if (chromends[k] < 0.0) throw std::runtime_error("Chromosome ends should be positive");
 
     }
 
@@ -88,6 +90,9 @@ void Architecture::load() {
 
         // Read the locus position
         file >> locations[l];
+
+        // Check order
+        if (l > 0u && locations[l] <= locations[l - 1]) throw std::runtime_error("Locus locations should be in increasing order");
 
         // Check location
         if (locations[l] < 0.0) throw std::runtime_error("Locus location should be positive");
@@ -111,11 +116,13 @@ void Architecture::save(const Parameters &pars) const
     assert(pars.nchrom == chromends.size());
     archfile << pars.nchrom;
     for (size_t k = 0u; k < pars.nchrom; ++k) archfile << ' ' << chromends[k];
+    archfile << '\n';
 
     // Write locus locations
     assert(pars.nloci == locations.size());
     archfile << pars.nloci;
     for (size_t l = 0u; l < pars.nloci; ++l) archfile << ' ' << locations[l];
+    archfile << '\n';
 
     archfile.close();
 }

@@ -39,6 +39,7 @@ struct Parameters {
     double recombination; // recombination rate
 
     size_t tend; // simulation time
+    size_t tsave; // recording time
 
     size_t seed;
 
@@ -47,6 +48,7 @@ struct Parameters {
     bool savelog;
     bool savearch;
     bool talkative;
+    bool choose;
 
 };
 

@@ -36,9 +36,13 @@ int simulate(const std::vector<std::string> &args) {
         // Create a genetic architecture
         Architecture arch(pars.nchrom, pars.nloci);
 
-        // Load the genetic architecture if necessary
+        // If necessary...
         if (pars.loadarch) {
+
+            // Load the genetic architecture from a file
             arch.load();
+
+            // Update hyperparameters accordingly
             pars.nchrom = arch.chromends.size();
             pars.nloci = arch.locations.size();
         }
@@ -52,18 +56,43 @@ int simulate(const std::vector<std::string> &args) {
         // Redirect output to log file if needed
         if (pars.savelog) pars.savelog = std::freopen("log.txt", "w", stdout);
 
+        // Create a vector of output file streams (using smart pointers)
+        std::vector<std::shared_ptr<std::ofstream> > outfiles;
+
+        // Which data files to save
+        std::vector<std::string> filenames = {"time", "popsize", "demesizes", "patchsizes", "individuals"};
+
+        // Update the files to save if needed...
+        if (pars.choose) {
+
+            // Read file where those are provided
+            std::ifstream infile("whattosave.txt");
+            if (!infile.is_open())
+                throw std::runtime_error("Could not read input file whattosave.txt");
+            filenames = { };
+            std::string input;
+            while (infile >> input) filenames.push_back(input);
+
+        }
+
+        // Open the file streams
+        stf::open(outfiles, filenames);
+
         std::cout << "Simulation started.\n";
 
         // At each time step...
-        for (size_t t = 0u; t < pars.tend; ++t) {
+        for (size_t t = 0u; t <= pars.tend; ++t) {
 
             // Track deme and patch sizes
+            size_t popsize = 0u;
             std::vector<size_t> demesizes(ndemes, 0u);
             std::vector<std::vector<size_t>> patchsizes(ndemes, {0u, 0u});
+
             for (size_t i = 0u; i < pop.size(); ++i) {
 
                 const size_t deme = pop[i].getDeme();
                 const size_t patch = pop[i].getPatch();
+                ++popsize;
                 ++demesizes[deme];
                 ++patchsizes[deme][patch];
 
@@ -75,6 +104,37 @@ int simulate(const std::vector<std::string> &args) {
                 for (size_t j = 0u; j < ndemes; ++j) std::cout << demesizes[j] << ' ';
                 std::cout << "} at t = " << t << '\n';
 
+            }
+
+            // If it is time to save output...
+            if (t % pars.tsave == 0u) {
+
+                // For each file to save to...
+                for (size_t f = 0u; f < filenames.size(); ++f) {
+
+                    // Save the corresponding data
+                    if (filenames[f] == "time") outfiles[f]->write((char *) &t, sizeof(t));
+                    else if (filenames[f] == "popsize") outfiles[f]->write((char *) &popsize, sizeof(popsize));
+                    else if (filenames[f] == "demesizes")
+                        for (size_t j = 0u; j < demesizes.size(); ++j)
+                            outfiles[f]->write((char *) &demesizes[j], sizeof(demesizes[j]));
+                    else if (filenames[f] == "patchsizes") {
+                        for (size_t j = 0u; j < patchsizes.size(); ++j) {
+                            outfiles[f]->write((char *) &patchsizes[j][0u], sizeof(patchsizes[j][0u]));
+                            outfiles[f]->write((char *) &patchsizes[j][1u], sizeof(patchsizes[j][1u]));
+                        }
+                    }
+                    else if (filenames[f] == "individuals") {
+                        for (size_t i = 0u; i < pop.size(); ++i) {
+                            const double x = pop[i].getX();
+                            const size_t deme = pop[i].getDeme();
+                            const size_t patch = pop[i].getPatch();
+                            outfiles[f]->write((char *) &x, sizeof(x));
+                            outfiles[f]->write((char *) &deme, sizeof(deme));
+                            outfiles[f]->write((char *) &patch, sizeof(patch));
+                        }
+                    }
+                }
             }
 
             // Prepare to count the total number of offspring
@@ -165,6 +225,9 @@ int simulate(const std::vector<std::string> &args) {
 
         std::cout << "Simulation ended.\n";
         if (pars.savelog) std::fclose(stdout);
+
+        // Close output file streams
+        stf::close(outfiles);
 
         return 0;
     }

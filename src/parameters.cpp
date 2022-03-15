@@ -5,7 +5,7 @@
 Parameters::Parameters() :
     popsize(100u),
     pgood({0.8, 0.6, 0.5, 0.3, 0.1}),
-    maxgrowths({1.0, 2.0}),
+    maxgrowths({1.0, 3.0}),
     xopts({3.0, 1.0}),
     xwidths({4.0, 1.0}),
     capacities({10000.0, 100.0}),
@@ -17,12 +17,14 @@ Parameters::Parameters() :
     selfing(0.95),
     recombination(3.0),
     tend(100u),
+    tsave(20u),
     seed(makeDefaultSeed()),
     loadarch(false),
     savepars(true),
     savelog(false),
     savearch(true),
-    talkative(false)
+    talkative(false),
+    choose(false)
 {
 
     // Make sure parameter values make sense
@@ -82,12 +84,14 @@ void Parameters::import(std::ifstream &file)
         else if (input == "selfing") file >> selfing;
         else if (input == "recombination") file >> recombination;
         else if (input == "tend") file >> tend;
+        else if (input == "tsave") file >> tsave;
         else if (input == "seed") file >> seed;
         else if (input == "loadarch") file >> loadarch;
         else if (input == "savepars") file >> savepars;
         else if (input == "savelog") file >> savelog;
         else if (input == "savearch") file >> savearch;
         else if (input == "talkative") file >> talkative;
+        else if (input == "choose") file >> choose;
         else
             throw std::runtime_error("Invalid parameter name: " + input);
 
@@ -129,6 +133,7 @@ void Parameters::check() const
     if (selfing < 0.0 || selfing > 1.0) throw std::runtime_error("Rate of selfing must be between zero and one");
     if (recombination < 0.0) throw std::runtime_error("Recombination rate cannot be negative");
     if (tend == 0u) throw std::runtime_error("Simulation time cannot be zero");
+    if (tsave == 0u) throw std::runtime_error("Cannot save data every zero time point");
 
 }
 
@@ -163,11 +168,13 @@ void Parameters::write(std::ofstream &file) const
     file << "selfing " << selfing << '\n';
     file << "recombination " << recombination << '\n';
     file << "tend " << tend << '\n';
+    file << "tsave " << tsave << '\n';
     file << "seed " << seed << '\n';
     file << "loadarch " << loadarch << '\n';
     file << "savepars " << savepars << '\n';
     file << "savelog " << savelog << '\n';
     file << "savearch " << savearch << '\n';
     file << "talkative " << talkative << '\n';
+    file << "choose " << choose << '\n';
 
 }

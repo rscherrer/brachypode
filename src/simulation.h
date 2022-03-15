@@ -6,6 +6,7 @@
 #include "parameters.h"
 #include "individual.h"
 #include "architecture.h"
+#include "printer.h"
 #include "utilities.h"
 
 // Main simulation function

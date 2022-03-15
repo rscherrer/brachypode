@@ -113,25 +113,36 @@ int simulate(const std::vector<std::string> &args) {
                 for (size_t f = 0u; f < filenames.size(); ++f) {
 
                     // Save the corresponding data
-                    if (filenames[f] == "time") outfiles[f]->write((char *) &t, sizeof(t));
-                    else if (filenames[f] == "popsize") outfiles[f]->write((char *) &popsize, sizeof(popsize));
-                    else if (filenames[f] == "demesizes")
-                        for (size_t j = 0u; j < demesizes.size(); ++j)
-                            outfiles[f]->write((char *) &demesizes[j], sizeof(demesizes[j]));
+                    if (filenames[f] == "time") {
+                        const double t_ = static_cast<double>(t);
+                        outfiles[f]->write((char *) &(t_), sizeof(double));
+                    }
+                    else if (filenames[f] == "popsize") {
+                        const double popsize_ = static_cast<double>(popsize);
+                        outfiles[f]->write((char *) &popsize_, sizeof(double));
+                    }
+                    else if (filenames[f] == "demesizes") {
+                        for (size_t j = 0u; j < demesizes.size(); ++j) {
+                            const double demesize_ = static_cast<double>(demesizes[j]);
+                            outfiles[f]->write((char *) &demesize_, sizeof(double));
+                        }
+                    }
                     else if (filenames[f] == "patchsizes") {
                         for (size_t j = 0u; j < patchsizes.size(); ++j) {
-                            outfiles[f]->write((char *) &patchsizes[j][0u], sizeof(patchsizes[j][0u]));
-                            outfiles[f]->write((char *) &patchsizes[j][1u], sizeof(patchsizes[j][1u]));
+                            const double patchsize0_ = static_cast<double>(patchsizes[j][0u]);
+                            const double patchsize1_ = static_cast<double>(patchsizes[j][1u]);
+                            outfiles[f]->write((char *) &patchsize0_, sizeof(double));
+                            outfiles[f]->write((char *) &patchsize1_, sizeof(double));
                         }
                     }
                     else if (filenames[f] == "individuals") {
                         for (size_t i = 0u; i < pop.size(); ++i) {
                             const double x = pop[i].getX();
-                            const size_t deme = pop[i].getDeme();
-                            const size_t patch = pop[i].getPatch();
-                            outfiles[f]->write((char *) &x, sizeof(x));
-                            outfiles[f]->write((char *) &deme, sizeof(deme));
-                            outfiles[f]->write((char *) &patch, sizeof(patch));
+                            const double deme_ = static_cast<double>(pop[i].getDeme());
+                            const double patch_ = static_cast<double>(pop[i].getPatch());
+                            outfiles[f]->write((char *) &x, sizeof(double));
+                            outfiles[f]->write((char *) &deme_, sizeof(double));
+                            outfiles[f]->write((char *) &patch_, sizeof(double));
                         }
                     }
                 }

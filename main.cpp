@@ -1,21 +1,11 @@
-#include <iostream>
-#include <vector>
+#include "src/simulation.h"
 
-int main() {
+int main(int argc, char * argv[]) {
 
-    try {
+    // Convert arguments into a vector of strings
+    const std::vector<std::string> args(argv, argv + argc);
 
-        return(0u);
-
-    }
-    catch (const std::exception& err) {
-        std::cerr << "Exception: " << err.what() << '\n';
-    }
-    catch (const char* err) {
-        std::cerr << "Exception: " << err << '\n';
-    }
-    catch (...) {
-        std::cerr << "Unknown exception\n";
-    }
+    // Run the program
+    return simulate(args);
 
 }

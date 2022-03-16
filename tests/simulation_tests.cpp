@@ -37,21 +37,28 @@ BOOST_AUTO_TEST_CASE(runWithParameterFile) {
     file << "tend 100\n";
     file.close();
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 0);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 0);
+
+}
+
+// Test that it fails when an even number of arguments is provided
+BOOST_AUTO_TEST_CASE(evenNumberOfArgs) {
+
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file"}), 1);
 
 }
 
 // Test that it fails when too many arguments are provided
 BOOST_AUTO_TEST_CASE(tooManyArgs) {
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt", "arg2"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt", "-type", "1", "-extra"}), 1);
 
 }
 
 // Test that it fails if the parameter file name is invalid
 BOOST_AUTO_TEST_CASE(invalidFileName) {
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "paraaameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "paraaameters.txt"}), 1);
 
 }
 
@@ -63,7 +70,7 @@ BOOST_AUTO_TEST_CASE(errorWhenNoDeme) {
     file << "pgood 0\n";
     file.close();
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 }
 
 // Should error when invalid parameter name
@@ -74,7 +81,7 @@ BOOST_AUTO_TEST_CASE(errorWhenInvalidParameterName) {
     file << "pgoooood 0\n";
     file.close();
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 }
 
 // Should error when initial population size is zero
@@ -85,7 +92,7 @@ BOOST_AUTO_TEST_CASE(errorWhenInitPopSizeIsZero) {
     file << "popsize 0\n";
     file.close();
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 }
 
 // Should error when proportion of good patches is not between zero and one
@@ -96,7 +103,7 @@ BOOST_AUTO_TEST_CASE(errorWhenPropGoodNotBetweenZeroAndOne) {
     file << "pgood 3 1.5 -4 2\n";
     file.close();
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 }
 
 // Should error when maximum growth rate is negative
@@ -107,7 +114,7 @@ BOOST_AUTO_TEST_CASE(errorWhenMaxGrowthIsNegative) {
     file << "maxgrowths 1 -1\n";
     file.close();
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 }
 
 // Should error when niche width is negative
@@ -118,7 +125,7 @@ BOOST_AUTO_TEST_CASE(errorWhenNicheWidthIsNegative) {
     file << "xwidth 1 -1\n";
     file.close();
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 }
 
 // Should error when carrying capacity is negative
@@ -129,7 +136,7 @@ BOOST_AUTO_TEST_CASE(errorWhenCapacityIsNegative) {
     file << "capacities 1 -1\n";
     file.close();
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 }
 
 // Should error when dispersal is not between zero and one
@@ -140,7 +147,7 @@ BOOST_AUTO_TEST_CASE(errorWhenDispersalNotBetweenZeroAndOne) {
     file << "dispersal -1\n";
     file.close();
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 }
 
 // Should error when mutation is not between zero and one
@@ -151,7 +158,7 @@ BOOST_AUTO_TEST_CASE(errorWhenMutationNotBetweenZeroAndOne) {
     file << "mutation -1\n";
     file.close();
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 }
 
 // Should error when too many loci
@@ -162,7 +169,7 @@ BOOST_AUTO_TEST_CASE(errorWhenTooManyLoci) {
     file << "nloci 2000\n";
     file.close();
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 }
 
 // Should error when zero chromosomes
@@ -173,7 +180,7 @@ BOOST_AUTO_TEST_CASE(errorWhenZeroChromosomes) {
     file << "nchrom 0\n";
     file.close();
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 }
 
 // Should error when zero loci
@@ -184,7 +191,7 @@ BOOST_AUTO_TEST_CASE(errorWhenZeroLoci) {
     file << "nloci 0\n";
     file.close();
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 }
 
 // Should error when selfing is not between zero and one
@@ -195,7 +202,7 @@ BOOST_AUTO_TEST_CASE(errorWhenSelfingNotBetweenZeroAndOne) {
     file << "selfing -1\n";
     file.close();
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 }
 
 // Should error when recombination is negative
@@ -206,7 +213,7 @@ BOOST_AUTO_TEST_CASE(errorWhenRecombinationIsNegative) {
     file << "recombination -1\n";
     file.close();
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 }
 
 // Should error when simulation time is zero
@@ -217,7 +224,7 @@ BOOST_AUTO_TEST_CASE(errorWhenSimulationTimeIsZero) {
     file << "tend 0\n";
     file.close();
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 }
 
 // Test that parameters are saved properly
@@ -230,10 +237,10 @@ BOOST_AUTO_TEST_CASE(paramSavedProperly) {
     file.close();
 
     // First run where we save the parameters
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 0);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 0);
 
     // Second run where we provide the saved parameters from the first one
-    BOOST_CHECK_EQUAL(simulate({"program_name", "paramlog.txt"}), 0);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "paramlog.txt"}), 0);
 
     // Check the seed was saved too
     std::ifstream infile;
@@ -263,7 +270,7 @@ BOOST_AUTO_TEST_CASE(architectureFileLoadedProperly) {
     file.close();
 
     // First run where we save the parameters
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 0);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 0);
 
     // Read the numbers of chromosomes and loci from parameters that were saved
     std::ifstream infile;
@@ -297,7 +304,7 @@ BOOST_AUTO_TEST_CASE(errorWhenZeroChromosomesInArchitecture) {
     file.close();
 
     // First run where we save the parameters
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 
 }
 
@@ -316,7 +323,7 @@ BOOST_AUTO_TEST_CASE(errorWhenChromosomeEndsInWrongOrder) {
     file.close();
 
     // First run where we save the parameters
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 
 }
 
@@ -335,7 +342,7 @@ BOOST_AUTO_TEST_CASE(errorWhenNegativeChromosomeEnds) {
     file.close();
 
     // First run where we save the parameters
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 
 }
 
@@ -354,7 +361,7 @@ BOOST_AUTO_TEST_CASE(errorWhenLastChromosomeEndIsNotOne) {
     file.close();
 
     // First run where we save the parameters
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 
 }
 
@@ -373,7 +380,7 @@ BOOST_AUTO_TEST_CASE(errorWhenZeroLociInArchitecture) {
     file.close();
 
     // First run where we save the parameters
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 
 }
 
@@ -392,7 +399,7 @@ BOOST_AUTO_TEST_CASE(errorWhenZeroLociInWrongOrder) {
     file.close();
 
     // First run where we save the parameters
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 
 }
 
@@ -411,7 +418,7 @@ BOOST_AUTO_TEST_CASE(errorWhenNegativeLocusLocation) {
     file.close();
 
     // First run where we save the parameters
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 
 }
 
@@ -430,7 +437,7 @@ BOOST_AUTO_TEST_CASE(errorWhenLocusBeyondLastChromosomeEnd) {
     file.close();
 
     // First run where we save the parameters
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "-file", "parameters.txt"}), 1);
 
 }
 
@@ -479,7 +486,7 @@ BOOST_AUTO_TEST_CASE(writingTheRightStuff) {
     file.close();
 
     // Run a simulation
-    simulate({"program_name", "parameters.txt"});
+    simulate({"program_name", "-file", "parameters.txt"});
 
     // Read back one saved output data file
     std::vector<size_t> timepoints = readBinary("time.dat");
@@ -498,7 +505,7 @@ BOOST_AUTO_TEST_CASE(whatToSaveWorks) {
     file << "tend 10\n";
     file << "tsave 1\n";
     file.close();
-    simulate({"program_name", "parameters.txt"});
+    simulate({"program_name", "-file", "parameters.txt"});
     std::vector<size_t> timepoints = readBinary("time.dat");
 
     // Now change the number of entries to save
@@ -508,7 +515,7 @@ BOOST_AUTO_TEST_CASE(whatToSaveWorks) {
     file.close();
 
     // Re-simulate
-    simulate({"program_name", "parameters.txt"});
+    simulate({"program_name", "-file", "parameters.txt"});
 
     // Read the new data back
     std::vector<size_t> newtimepoints = readBinary("time.dat");

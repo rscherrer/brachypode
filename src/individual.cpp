@@ -1,12 +1,15 @@
 // This script contains all the functions of the Individual class
 
 #include "individual.h"
+#include "utilities.h"
 #include <cmath>
 
 Individual::Individual() :
     deme(0u),
     patch(0u),
     x(0.0),
+    y(0.0),
+    z(0.0),
     alive(true),
     genome(std::bitset<1000>())
 {
@@ -32,7 +35,20 @@ void Individual::mutate(const double &mu, const size_t &n) {
     }
 
 }
-void Individual::develop(const double &effect) { x = genome.count() * effect; }
+void Individual::develop(const double &effect) {
+    z = genome.count() * effect;
+}
+void Individual::develop2(
+    const size_t &nloci, const double &xmax,
+    const double &ymax, const double &tradeoff
+) {
+
+    const double zmin = 0.0;
+    const double zmax = nloci;
+    x = xmax * exp(-tradeoff * utl::sqr(z - zmax));
+    y = ymax * exp(-tradeoff * utl::sqr(z - zmin));
+
+}
 void Individual::recombine(
     const double &rho, const Individual &pollen,
     const std::vector<double> &chromends, const std::vector<double> &locations
@@ -112,6 +128,8 @@ void Individual::recombine(
 size_t Individual::getDeme() const { return deme; }
 size_t Individual::getPatch() const { return patch; }
 double Individual::getX() const { return x; }
+double Individual::getY() const { return y; }
+double Individual::getZ() const { return z; }
 bool Individual::isAlive() const { return alive; }
 size_t Individual::getAllele(const size_t &l) const { return genome.test(l); }
 size_t Individual::getAlleleSum() const { return genome.count(); }

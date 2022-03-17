@@ -76,11 +76,34 @@ BOOST_AUTO_TEST_CASE(fullMutationChangesTheWholeGenome) {
 BOOST_AUTO_TEST_CASE(development) {
 
     Individual ind;
-    ind.develop(1.0); // eta = 1
-    BOOST_CHECK_EQUAL(ind.getX(), 0.0);
+    ind.develop(1.0); // effect = 1
+    BOOST_CHECK_EQUAL(ind.getZ(), 0.0);
     ind.mutate(1.0, 20u); // mu = 1, nloci = 20
     ind.develop(1.0);
-    BOOST_CHECK_EQUAL(ind.getX(), 20.0);
+    BOOST_CHECK_EQUAL(ind.getZ(), 20.0);
+
+}
+
+// Test type II development with maximum tolerance
+BOOST_AUTO_TEST_CASE(typeIIDevelopmentWithMaximumTolerance) {
+
+    Individual ind;
+    ind.mutate(1.0, 20u);
+    ind.develop(1.0); // effect = 1
+    ind.develop2(20u, 1.0, 1.0, 1.0); // xmax = 1, ymax = 1, tradeoff = 1
+    BOOST_CHECK_EQUAL(ind.getZ(), 20.0);
+    BOOST_CHECK_EQUAL(ind.getX(), 1.0);
+
+}
+
+// Test type II development with maximum tolerance
+BOOST_AUTO_TEST_CASE(typeIIDevelopmentWithMaximumCompetitiveness) {
+
+    Individual ind;
+    ind.develop(1.0); // effect = 1
+    ind.develop2(20u, 1.0, 1.0, 1.0); // xmax = 1, ymax = 1, tradeoff = 1
+    BOOST_CHECK_EQUAL(ind.getZ(), 0.0);
+    BOOST_CHECK_EQUAL(ind.getY(), 1.0);
 
 }
 

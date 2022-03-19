@@ -62,7 +62,7 @@ tsave 100
 
 will work fine.
 
-## About
+## About this program
 
 ### Parameter details
 
@@ -152,7 +152,7 @@ The reason behind saving the data as binary arrays is that they are fast to writ
 
 We developed an R package called [brachypoder](https://github.com/rscherrer/brachypoder) to perform these tasks and read the data into a format suitable for analysis in R.
 
-## Content
+## Content of this repository
 
 * `main.cpp`: is the main source file of the program
 * `ci`: contains the necessary files for continuous integration

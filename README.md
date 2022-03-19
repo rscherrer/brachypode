@@ -4,16 +4,16 @@ This is the repository for a program simulating the evolution of an annual grass
 
 ## Usage
 
-This program is a command-line interface program. Assuming the name of the executable is `brachypode`, use:
+This program is a command-line interface program. Assuming the name of the executable is `brachypode`, use, from the working directory:
 
 ```
-brachypode
+./brachypode
 ```
 
 to run a simulation with default parameters, and
 
 ```
-brachypode parameters.txt
+./brachypode parameters.txt
 ```
 
 where `parameters.txt` is a text file specifying custom parameters values to supply.

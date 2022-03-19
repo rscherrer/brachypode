@@ -28,11 +28,9 @@ struct Parameters {
     size_t popsize; // initial population size
     std::vector<double> pgood; // proportion of good patches in each deme
     std::vector<double> maxgrowths; // maximum growth rate in each patch
-    std::vector<double> zopts; // optimal trait value in each patch
+    std::vector<double> stress; // stress level in each patch
     std::vector<double> zwidths; // niche width in each patch
     std::vector<double> capacities; // carrying capacity in each patch
-    std::vector<double> stress; // stress level in each patch (type II)
-    double growth; // maximum growth rate (type II)
     double steep; // steepness of tolerance function (type II)
     double dispersal; // dispersal rate
     double mutation; // mutation rate

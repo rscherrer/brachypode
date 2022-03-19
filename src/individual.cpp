@@ -6,7 +6,7 @@
 
 Individual::Individual() :
     deme(0u),
-    patch(0u),
+    patch(1u),
     x(0.0),
     y(0.0),
     z(0.0),

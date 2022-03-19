@@ -10,44 +10,6 @@ auto burry = [](Individual ind) -> bool
     return !ind.isAlive();
 };
 
-// Function to compute fitness
-double getFitness(
-    const double &x, const double &maxgrowth, const double &xopt,
-    const double &xwidth, const size_t &n, const double &capacity
-) {
-
-    // Compute fitness
-    double fitness = maxgrowth * exp(-utl::sqr((x - xopt) / xwidth));
-
-    assert(fitness >= 0.0);
-    assert(fitness <= maxgrowth);
-
-    // Account for local competition within deme and within patch
-    fitness *= (1.0 - n / capacity);
-
-    return fitness;
-
-}
-
-// Type II fitness
-double getFitness2(
-    const double &x, const double &sumy, const double &growth,
-    const double &steep, const double &stress, const double &capacity
-) {
-
-    // Compute fitness
-    double fitness = growth / (1.0 + exp(steep * (stress - x)));
-
-    assert(fitness >= 0.0);
-    assert(fitness <= growth);
-
-    // Account for local competition within deme and within patch
-    fitness *= (1.0 - sumy / capacity);
-
-    return fitness;
-
-}
-
 // Main simulation function
 int simulate(const std::vector<std::string> &args) {
 
@@ -185,11 +147,11 @@ int simulate(const std::vector<std::string> &args) {
                             const double z = pop[i].getZ();
                             const double deme_ = static_cast<double>(pop[i].getDeme());
                             const double patch_ = static_cast<double>(pop[i].getPatch());
+                            outfiles[f]->write((char *) &deme_, sizeof(double));
+                            outfiles[f]->write((char *) &patch_, sizeof(double));
                             outfiles[f]->write((char *) &x, sizeof(double));
                             outfiles[f]->write((char *) &y, sizeof(double));
                             outfiles[f]->write((char *) &z, sizeof(double));
-                            outfiles[f]->write((char *) &deme_, sizeof(double));
-                            outfiles[f]->write((char *) &patch_, sizeof(double));
                         }
                     }
                 }
@@ -208,17 +170,22 @@ int simulate(const std::vector<std::string> &args) {
                 const size_t patch = pop[i].getPatch();
                 const double x = pop[i].getX();
                 const double z = pop[i].getZ();
-                const double maxgrowth = pars.maxgrowths[patch];
-                const double zopt = pars.zopts[patch];
+                const double maxgrowth = pars.type == 1u ? pars.maxgrowths[patch] : pars.maxgrowths[0u];
+                const double stress = pars.stress[patch];
                 const double zwidth = pars.zwidths[patch];
                 const double capacity = pars.capacities[patch];
-                const double stress = pars.stress[patch];
 
-                // Compute fitness...
-                double fitness = 0.0;
+                // Initialize fitness
+                double fitness = maxgrowth;
 
-                if (pars.type == 1u) fitness = getFitness(z, maxgrowth, zopt, zwidth, patchsizes[deme][patch], capacity);
-                else fitness = getFitness2(x, sumys[deme][patch], pars.growth, pars.steep, stress, capacity);
+                // Compute realized growth rate
+                if (pars.type == 1u) fitness *= exp(-utl::sqr((z - stress) / zwidth));
+                else if (pars.type == 2u) fitness /= (1.0 + exp(pars.steep * (stress - x)));
+                else throw std::runtime_error("Invalid simulation type");
+
+                // Local competition within deme and patches
+                const double n = pars.type == 1u ? patchsizes[deme][patch] : sumys[deme][patch];
+                fitness *= (1.0 - n / capacity);
 
                 // Sample the number of surviving offspring
                 const size_t noff = rnd::poisson(fitness)(rnd::rng);

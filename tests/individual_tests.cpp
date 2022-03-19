@@ -8,7 +8,7 @@ BOOST_AUTO_TEST_CASE(individualInitialization) {
 
     Individual ind;
     BOOST_CHECK_EQUAL(ind.getDeme(), 0u);
-    BOOST_CHECK_EQUAL(ind.getPatch(), 0u);
+    BOOST_CHECK_EQUAL(ind.getPatch(), 1u);
     BOOST_CHECK_EQUAL(ind.getX(), 0.0);
     BOOST_CHECK(ind.isAlive());
     BOOST_CHECK_EQUAL(ind.getAlleleSum(), 0u);

@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(runWithParameterFile) {
     file << "popsize 10\n";
     file << "pgood 3 0.5 0.5 0.5\n";
     file << "maxgrowths 1.0 2.0\n";
-    file << "zopts 5.0 1.0\n";
+    file << "stress 5.0 1.0\n";
     file << "zwidths 1.0 3.0\n";
     file << "capacities 1000 100\n";
     file << "dispersal 0.1\n";

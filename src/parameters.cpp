@@ -4,25 +4,23 @@
 
 Parameters::Parameters() :
     type(1u),
-    popsize(100u),
+    popsize(10u),
     pgood({0.8, 0.6, 0.5, 0.3, 0.1}),
-    maxgrowths({1.0, 3.0}),
-    zopts({3.0, 1.0}),
-    zwidths({4.0, 1.0}),
+    maxgrowths({1.0, 2.0}),
+    stress({4.0, 0.0}),
+    zwidths({1.0, 2.0}),
     capacities({10000.0, 100.0}),
-    stress({3.0, 0.0}),
-    growth(3.0),
     steep(2.0),
     dispersal(0.1),
-    mutation(0.001),
+    mutation(0.0001),
     nchrom(1u),
-    nloci(20u),
-    effect(0.3),
-    xmax(10.0),
-    ymax(3.0),
+    nloci(50u),
+    effect(0.1),
+    xmax(5.0),
+    ymax(5.0),
     tradeoff(1.0),
     selfing(0.95),
-    recombination(3.0),
+    recombination(1.0),
     tend(100u),
     tsave(20u),
     seed(makeDefaultSeed()),
@@ -81,11 +79,9 @@ void Parameters::import(std::ifstream &file)
                 file >> pgood[i];
         }
         else if (input == "maxgrowths") for (size_t i = 0u; i < 2u; ++i) file >> maxgrowths[i];
-        else if (input == "zopts") for (size_t i = 0u; i < 2u; ++i) file >> zopts[i];
         else if (input == "zwidths") for (size_t i = 0u; i < 2u; ++i) file >> zwidths[i];
         else if (input == "capacities") for (size_t i = 0u; i < 2u; ++i) file >> capacities[i];
         else if (input == "stress") for (size_t i = 0u; i < 2u; ++i) file >> stress[i];
-        else if (input == "growth") file >> growth;
         else if (input == "steep") file >> steep;
         else if (input == "dispersal") file >> dispersal;
         else if (input == "mutation") file >> mutation;
@@ -141,7 +137,6 @@ void Parameters::check() const
         if (capacities[i] < 0.0) throw std::runtime_error("Carrying capacity cannot be negative");
         if (stress[i] < 0.0) throw std::runtime_error("Stress level cannot be negative");
     }
-    if (growth < 0.0) throw std::runtime_error("Baseline growth rate cannot be negative");
     if (steep < 0.0) throw std::runtime_error("Steepness of the tolerance function cannot be negative");
     if (dispersal < 0.0 || dispersal > 1.0) throw std::runtime_error("Dispersal rate should be between zero and one");
     if (mutation < 0.0 || mutation > 1.0) throw std::runtime_error("Mutation rate should be between zero and one");
@@ -179,11 +174,9 @@ void Parameters::write(std::ofstream &file) const
     for (size_t i = 0u; i < pgood.size(); ++i) file << ' ' << pgood[i];
     file << '\n';
     file << "maxgrowths " << maxgrowths[0u] << ' ' << maxgrowths[1u] << '\n';
-    file << "zopts " << zopts[0u] << ' ' << zopts[1u] << '\n';
     file << "zwidths " << zwidths[0u] << ' ' << zwidths[1u] << '\n';
     file << "capacities " << capacities[0u] << ' ' << capacities[1u] << '\n';
     file << "stress " << stress[0u] << ' ' << stress[1u] << '\n';
-    file << "growth " << growth << '\n';
     file << "steep " << steep << '\n';
     file << "dispersal " << dispersal << '\n';
     file << "mutation " << mutation << '\n';

@@ -226,11 +226,7 @@ int simulate(const std::vector<std::string> &args) {
                     pop.back().mutate(pars.mutation, pars.nloci);
 
                     // Update trait value based on its genes
-                    pop.back().develop(pars.effect);
-
-                    // A little more if type II
-                    if (pars.type == 2u)
-                        pop.back().develop2(pars.nloci, pars.xmax, pars.ymax, pars.tradeoff);
+                    pop.back().develop(pars.nloci, pars.effect, pars.xmax, pars.ymax, pars.tradeoff);
 
                 }
             }

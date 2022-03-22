@@ -21,8 +21,7 @@ public:
     void setPatch(const size_t&);
     void setX(const double&);
     void mutate(const double&, const size_t&);
-    void develop(const double&);
-    void develop2(const size_t&, const double&, const double&, const double&);
+    void develop(const size_t&, const double&, const double&, const double&, const double&);
     void recombine(const double&, const Individual&, const std::vector<double>&, const std::vector<double>&);
 
     size_t getDeme() const;

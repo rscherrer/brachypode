@@ -35,16 +35,14 @@ void Individual::mutate(const double &mu, const size_t &n) {
     }
 
 }
-void Individual::develop(const double &effect) {
-    z = genome.count() * effect;
-}
-void Individual::develop2(
-    const size_t &nloci, const double &xmax,
+void Individual::develop(
+    const size_t &nloci, const double &effect, const double &xmax,
     const double &ymax, const double &tradeoff
 ) {
 
     const double zmin = 0.0;
     const double zmax = nloci;
+    z = genome.count() * effect;
     x = xmax * exp(-tradeoff * utl::sqr(z - zmax));
     y = ymax * exp(-tradeoff * utl::sqr(z - zmin));
 

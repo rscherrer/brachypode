@@ -4,16 +4,16 @@ This is the repository for a program simulating the evolution of an annual grass
 
 ## Usage
 
-This program is a command-line interface program. Assuming the name of the executable is `brachypode`, use:
+This program is a command-line interface program. Assuming the name of the executable is `brachypode`, use, from the working directory:
 
 ```
-brachypode
+./brachypode
 ```
 
 to run a simulation with default parameters, and
 
 ```
-brachypode parameters.txt
+./brachypode parameters.txt
 ```
 
 where `parameters.txt` is a text file specifying custom parameters values to supply.
@@ -62,7 +62,7 @@ tsave 100
 
 will work fine.
 
-## About
+## About this program
 
 ### Parameter details
 
@@ -152,7 +152,7 @@ The reason behind saving the data as binary arrays is that they are fast to writ
 
 We developed an R package called [brachypoder](https://github.com/rscherrer/brachypoder) to perform these tasks and read the data into a format suitable for analysis in R.
 
-## Content
+## Content of this repository
 
 * `main.cpp`: is the main source file of the program
 * `ci`: contains the necessary files for continuous integration

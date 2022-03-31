@@ -145,7 +145,7 @@ int simulate(const std::vector<std::string> &args) {
                             outfiles[f]->write((char *) &patchsize1_, sizeof(double));
                         }
                     }
-                    else if (filenames[f] == "meantraits") {
+                    else if (filenames[f] == "traitmeans") {
 
                         // Containers for mean traits in each deme and each patch
                         std::vector<std::vector<double> > meanx(demesizes.size(), std::vector<double>(2u, 0.0));

@@ -6,7 +6,7 @@ Parameters::Parameters() :
     type(1u),
     popsize(10u),
     pgood({0.8, 0.6, 0.5, 0.3, 0.1}),
-    maxgrowths({1.0, 2.0}),
+    maxgrowths({2.0, 3.0}),
     stress({4.0, 0.0}),
     zwidths({1.0, 2.0}),
     capacities({10000.0, 100.0}),

@@ -134,6 +134,7 @@ The program saves data every `tsave` generations. The data are saved in binary f
 * `popsize.dat`: the total population size every saved generation
 * `demesizes.dat`: the number of individuals in each deme in each saved generation
 * `patchsizes.dat`: the number of individuals in each patch, in each deme, in each saved generation
+* `traitmeants.dat`: the mean value of each trait (`x`, `y` and `z`) in each patch, in each deme, at each saved generation
 * `individuals.dat`: the deme, patch, `x`, `y` and `z` values of each individual in each saved generation
 
 The data are converted to double-precision numbers before being saved as binary, and because the data is saved in this format each file contains a one-dimensional array of data (e.g. `individuals.dat` starts with the deme, patch, `x`, `y` and `z` values of the first individual of the first saved generation, followed by the same variables for the second individual, etc.).

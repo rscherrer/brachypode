@@ -62,7 +62,7 @@ int simulate(const std::vector<std::string> &args) {
         std::vector<std::shared_ptr<std::ofstream> > outfiles;
 
         // Which data files to save
-        std::vector<std::string> filenames = {"time", "popsize", "demesizes", "patchsizes", "individuals"};
+        std::vector<std::string> filenames = {"time", "popsize", "demesizes", "patchsizes", "traitmeans", "individuals"};
 
         // Update the files to save if needed...
         if (pars.choose) {
@@ -71,9 +71,14 @@ int simulate(const std::vector<std::string> &args) {
             std::ifstream infile("whattosave.txt");
             if (!infile.is_open())
                 throw std::runtime_error("Could not read input file whattosave.txt");
-            filenames = { };
+            std::vector<std::string> newfilenames = { };
             std::string input;
-            while (infile >> input) filenames.push_back(input);
+            while (infile >> input) newfilenames.push_back(input);
+            stf::check(newfilenames, filenames);
+            filenames.reserve(newfilenames.size());
+            filenames.resize(newfilenames.size());
+            for (size_t f = 0u; f < newfilenames.size(); ++f)
+                filenames[f] = newfilenames[f];
 
         }
 
@@ -138,6 +143,40 @@ int simulate(const std::vector<std::string> &args) {
                             const double patchsize1_ = static_cast<double>(patchsizes[j][1u]);
                             outfiles[f]->write((char *) &patchsize0_, sizeof(double));
                             outfiles[f]->write((char *) &patchsize1_, sizeof(double));
+                        }
+                    }
+                    else if (filenames[f] == "meantraits") {
+
+                        // Containers for mean traits in each deme and each patch
+                        std::vector<std::vector<double> > meanx(demesizes.size(), std::vector<double>(2u, 0.0));
+                        std::vector<std::vector<double> > meany(demesizes.size(), std::vector<double>(2u, 0.0));
+                        std::vector<std::vector<double> > meanz(demesizes.size(), std::vector<double>(2u, 0.0));
+
+                        // For each individual...
+                        for (size_t i = 0u; i < pop.size(); ++i) {
+                            const double x = pop[i].getX();
+                            const double y = pop[i].getY();
+                            const double z = pop[i].getZ();
+                            const double deme = pop[i].getDeme();
+                            const double patch = pop[i].getPatch();
+                            meanx[deme][patch] += x;
+                            meany[deme][patch] += y;
+                            meanz[deme][patch] += z;
+                        }
+
+                        // Convert each sum into a mean...
+                        for (size_t j = 0u; j < demesizes.size(); ++j) {
+                            for (size_t k = 0u; k < 2u; ++k) {
+                                const size_t n = patchsizes[j][k];
+                                if (n > 0u) {
+                                    meanx[j][k] /= n;
+                                    meany[j][k] /= n;
+                                    meanz[j][k] /= n;
+                                }
+                                outfiles[f]->write((char *) &meanx[j][k], sizeof(double));
+                                outfiles[f]->write((char *) &meany[j][k], sizeof(double));
+                                outfiles[f]->write((char *) &meanz[j][k], sizeof(double));
+                            }
                         }
                     }
                     else if (filenames[f] == "individuals") {

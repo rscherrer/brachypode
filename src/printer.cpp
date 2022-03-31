@@ -43,4 +43,31 @@ void stf::close(std::vector<std::shared_ptr<std::ofstream> > &outfiles) {
 
 }
 
+// Function to check that the provided file names are good
+void stf::check(const std::vector<std::string> &v1, const std::vector<std::string> &v2) {
 
+    // v1 is the vector of provided file names
+    // v2 is the vector of default file names
+
+    if (!v1.size()) return;
+
+    bool found = false;
+
+    // For each supplied file name...
+    for (size_t i = 0u; i < v1.size(); ++i) {
+
+        // Match it to each file name in the default list...
+        for (size_t j = 0u; j < v2.size(); ++i) {
+
+            // If there is one match, the provided name is valid
+            if (v1[i] == v2[j]) {
+                found = true;
+                break;
+            }
+        }
+
+        // Error if the file name is unknown
+        if (!found) throw std::runtime_error("Invalid file name provided in whattosave");
+    }
+
+}

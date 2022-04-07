@@ -2,6 +2,85 @@
 
 This is the repository for a program simulating the evolution of an annual grass species in a semi-arid patchy environment.
 
+## Build
+
+### Linux, MacOS
+
+Install CMake
+
+```bash
+sudo apt install cmake		# replace 'apt' with your distro package manager
+```
+
+```bash
+git clone git@github.com:HHildenbrandt/brachypode.git
+cd brachypode
+git submodule update --init --remote
+mkdir build && cd build
+cmake ..
+cmake --build .
+```
+
+This will build the executable `../bin/brachypode`.
+
+### Peregrin
+
+```bash
+module load cmake
+module load binutils
+```
+
+```bash
+git clone git@github.com:HHildenbrandt/brachypode.git
+cd brachypode
+git submodule update --init --remote
+mkdir build && cd build
+cmake ..
+cmake --build .
+```
+
+This will build the executable `../bin/brachypode`.
+
+### Windows
+
+Download and install CMake:
+
+https://github.com/Kitware/CMake/releases/download/v3.23.0/cmake-3.23.0-windows-x86_64.msi
+
+Make sure you select the option "Add CMake to the system PATH for the current user" when asked by the installer.
+
+```bash
+git clone git@github.com:HHildenbrandt/brachypode.git
+cd brachypode
+git submodule update --init --remote
+mkdir build
+cd build
+cmake ..
+cmake --build . --config Release
+```
+
+This will build the executable `../bin/brachypode.exe`.
+
+### IDEs
+
+Many IDEs (like VisualStudio, VisualCode, XCode, Qt(?)) support CMake out of the box. 'Open folder' should do the trick...
+
+You can use CMake to generate the input files for your favoured IDE too:
+
+```bash
+git clone git@github.com:HHildenbrandt/brachypode.git
+cd brachypode
+git submodule update --init --recursive
+mkdir build
+cd build
+# Generate VisualStudio project files
+cmake -G "Visual Studio 17 2022" -A x64 ..
+# Generate Xcode project files (Xcode must be installed)
+cmake -G Xcode    
+```
+
+This will place the project files in `../build`.
+
 ## Usage
 
 This program is a command-line interface program. Assuming the name of the executable is `brachypode`, use, from the working directory:

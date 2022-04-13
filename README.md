@@ -6,15 +6,16 @@ This is the repository for a program simulating the evolution of an annual grass
 
 ### Linux, MacOS
 
-Install CMake
+First, CMake needs to be installed (this is the build system we use). To install CMake,
 
 ```bash
 sudo apt install cmake		# replace 'apt' with your distro package manager
 ```
 
 ```bash
-git clone git@github.com:HHildenbrandt/brachypode.git
+git clone git@github.com:rscherrer/brachypode.git
 cd brachypode
+git submodule add https://github.com/microsoft/vcpkg
 git submodule update --init --remote
 mkdir build && cd build
 cmake ..
@@ -23,15 +24,17 @@ cmake --build .
 
 This will build the executable `../bin/brachypode`.
 
-### Peregrin
+Note that by doing this we clone the `vcpkg` repository from Microsoft into our repository. We use its utilities to be able to build our program on multiple platforms.
+
+### Peregrine (University of Groningen High Performance Cluster)
 
 ```bash
-module load cmake
+module load CMake
 module load binutils
 ```
 
 ```bash
-git clone git@github.com:HHildenbrandt/brachypode.git
+git clone git@github.com:rscherrer/brachypode.git
 cd brachypode
 git submodule update --init --remote
 mkdir build && cd build
@@ -41,17 +44,22 @@ cmake --build .
 
 This will build the executable `../bin/brachypode`.
 
+Here, it is important to make sure that the loaded version of CMake is of an adequate version compared to what the `CMakeLists.txt` file requires. You can explore the available versions on Peregrine by using `module spider CMake`, and replace `CMake` in `module load CMake` by the specific version that is required, if any error occurs. You can also change the required version of CMake in the `CMakeLists.txt` file to make sure it matches what is available on the cluster.
+
+Check this [webpage](https://www.rug.nl/society-business/centre-for-information-technology/research/services/hpc/facilities/peregrine-hpc-cluster?lang=en) for more information about the Peregrine cluster.
+
 ### Windows
 
-Download and install CMake:
+Download and install CMake at this link:
 
 https://github.com/Kitware/CMake/releases/download/v3.23.0/cmake-3.23.0-windows-x86_64.msi
 
 Make sure you select the option "Add CMake to the system PATH for the current user" when asked by the installer.
 
 ```bash
-git clone git@github.com:HHildenbrandt/brachypode.git
+git clone git@github.com:rscherrer/brachypode.git
 cd brachypode
+git submodule add https://github.com/microsoft/vcpkg
 git submodule update --init --remote
 mkdir build
 cd build
@@ -68,7 +76,7 @@ Many IDEs (like VisualStudio, VisualCode, XCode, Qt(?)) support CMake out of the
 You can use CMake to generate the input files for your favoured IDE too:
 
 ```bash
-git clone git@github.com:HHildenbrandt/brachypode.git
+git clone git@github.com:rscherrer/brachypode.git
 cd brachypode
 git submodule update --init --recursive
 mkdir build

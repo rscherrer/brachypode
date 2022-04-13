@@ -238,6 +238,8 @@ will only save the requested data files (do not specify any file extension).
 
 The reason behind saving the data as binary arrays is that they are fast to write, fast to read and relatively light in terms of space. In addition, because not every variable may need to be saved depending on the simulation, we opted for saving the different variables in different files. This also makes it possible to assemble and organize the various saved data in different ways depending on the analysis that needs to be done.
 
+## Analysis of the results
+
 We developed an R package called [brachypoder](https://github.com/rscherrer/brachypoder) to perform these tasks and read the data into a format suitable for analysis in R.
 
 ## Content of this repository

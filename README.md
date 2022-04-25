@@ -12,6 +12,8 @@ First, CMake needs to be installed (this is the build system we use). To install
 sudo apt install cmake		# replace 'apt' with your distro package manager
 ```
 
+Then,
+
 ```bash
 git clone git@github.com:rscherrer/brachypode.git
 cd brachypode

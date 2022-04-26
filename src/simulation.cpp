@@ -63,7 +63,7 @@ int simulate(const std::vector<std::string> &args) {
         std::vector<std::shared_ptr<std::ofstream> > outfiles;
 
         // Which data files to save
-        std::vector<std::string> filenames = {"time", "patchsizes", "traitmeans", "individuals"};
+        std::vector<std::string> filenames = {"time", "popsize", "patchsizes", "traitmeans", "individuals"};
 
         // Update the files to save if needed...
         if (pars.choose) {
@@ -127,6 +127,10 @@ int simulate(const std::vector<std::string> &args) {
                     if (filenames[f] == "time") {
                         const double t_ = static_cast<double>(t);
                         outfiles[f]->write((char *) &(t_), sizeof(double));
+                    }
+                    else if (filenames[f] == "popsize") {
+                        const double popsize_ = static_cast<double>(popsize);
+                        outfiles[f]->write((char *) &popsize_, sizeof(double));
                     }
                     else if (filenames[f] == "patchsizes") {
                         for (size_t j = 0u; j < patchsizes.size(); ++j) {

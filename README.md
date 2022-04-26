@@ -221,7 +221,6 @@ The program outputs to the screen messages about the status of the simulation as
 The program saves data every `tsave` generations. The data are saved in binary format, in files with extension `.dat`. By default the program saves all of the following:
 * `time.dat`: each saved generation
 * `popsize.dat`: the total population size every saved generation
-* `demesizes.dat`: the number of individuals in each deme in each saved generation
 * `patchsizes.dat`: the number of individuals in each patch, in each deme, in each saved generation
 * `traitmeants.dat`: the mean value of each trait (`x`, `y` and `z`) in each patch, in each deme, at each saved generation
 * `individuals.dat`: the deme, patch, `x`, `y` and `z` values of each individual in each saved generation

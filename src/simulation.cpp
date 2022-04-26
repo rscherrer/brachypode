@@ -86,109 +86,124 @@ int simulate(const std::vector<std::string> &args) {
         // Open the file streams
         stf::open(outfiles, filenames);
 
+        // Set up flags for which data to save
+        int timeFile(-1), popsizeFile(-1), patchsizesFile(-1), traitmeansFile(-1), individualsFile(-1);
+        for (size_t f = 0u; f < filenames.size(); ++f) {
+
+            const std::string filename = filenames[f];
+
+            if (filename == "time") timeFile = f;
+            else if (filename == "popsize") popsizeFile = f;
+            else if (filename == "patchsizes") patchsizesFile = f;
+            else if (filename == "traitmeans") traitmeansFile = f;
+            else if (filename == "individuals") individualsFile = f;
+            else throw std::runtime_error("Invalid output requested in whattosave.txt");
+        }
+
         std::cout << "Simulation started.\n";
 
         // At each time step...
         for (size_t t = 0u; t <= pars.tend; ++t) {
 
-            // Track deme and patch sizes
+            // Flag to know if it is time to save some data
+            const bool timetosave = t % pars.tsave == 0u;
+
+            // Compute useful population statistics
             size_t popsize = 0u;
             std::vector<size_t> demesizes(ndemes, 0u);
             std::vector<std::vector<size_t>> patchsizes(ndemes, {0u, 0u});
-            std::vector<std::vector<double>> sumys(ndemes, {0.0, 0.0});
 
+            // Containers for mean traits in each deme and each patch
+            std::vector<std::vector<double> > meanx(ndemes, std::vector<double>(2u, 0.0));
+            std::vector<std::vector<double> > meany(ndemes, std::vector<double>(2u, 0.0));
+            std::vector<std::vector<double> > meanz(ndemes, std::vector<double>(2u, 0.0));
+
+            // Loop through individuals to calculate them
             for (size_t i = 0u; i < pop.size(); ++i) {
 
-                const size_t y = pop[i].getY();
+                // Get trait values and locations
+                const double x = pop[i].getX();
+                const double y = pop[i].getY();
+                const double z = pop[i].getZ();
                 const size_t deme = pop[i].getDeme();
                 const size_t patch = pop[i].getPatch();
+
+                // Save individual-level data if needed
+                if (timetosave && individualsFile >= 0) {
+
+                    const double deme_ = static_cast<double>(pop[i].getDeme());
+                    const double patch_ = static_cast<double>(pop[i].getPatch());
+                    outfiles[individualsFile]->write((char *) &deme_, sizeof(double));
+                    outfiles[individualsFile]->write((char *) &patch_, sizeof(double));
+                    outfiles[individualsFile]->write((char *) &x, sizeof(double));
+                    outfiles[individualsFile]->write((char *) &y, sizeof(double));
+                    outfiles[individualsFile]->write((char *) &z, sizeof(double));
+
+                }
+
+                // Update statistics
                 ++popsize;
                 ++demesizes[deme];
                 ++patchsizes[deme][patch];
-                sumys[deme][patch] += y;
+                meanx[deme][patch] += x;
+                meany[deme][patch] += y;
+                meanz[deme][patch] += z;
 
             }
 
+            // Save time if needed
+            if (timetosave && timeFile >= 0) {
+                const double t_ = static_cast<double>(t);
+                outfiles[timeFile]->write((char *) &(t_), sizeof(double));
+            }
+
+            // Save population size if needed
+            if (timetosave && popsizeFile >= 0) {
+                const double popsize_ = static_cast<double>(popsize);
+                outfiles[popsizeFile]->write((char *) &popsize_, sizeof(double));
+            }
+
+            // Save patch sizes if needed
+            if (timetosave && patchsizesFile >= 0) {
+                for (size_t j = 0u; j < patchsizes.size(); ++j) {
+                    const double patchsize0_ = static_cast<double>(patchsizes[j][0u]);
+                    const double patchsize1_ = static_cast<double>(patchsizes[j][1u]);
+                    outfiles[patchsizesFile]->write((char *) &patchsize0_, sizeof(double));
+                    outfiles[patchsizesFile]->write((char *) &patchsize1_, sizeof(double));
+                }
+            }
+
+            // Keep sums of competitiveness (y) for later
+            std::vector<std::vector<double>> sumys(meany);
+
+            // Convert sums into a mean...
+            for (size_t j = 0u; j < demesizes.size(); ++j) {
+                for (size_t k = 0u; k < 2u; ++k) {
+
+                    const size_t n = patchsizes[j][k];
+
+                    if (n > 0u) {
+                        meanx[j][k] /= n;
+                        meany[j][k] /= n;
+                        meanz[j][k] /= n;
+                    }
+
+                    // Save trait means if needed
+                    if (timetosave && traitmeansFile >= 0) {
+                        outfiles[traitmeansFile]->write((char *) &meanx[j][k], sizeof(double));
+                        outfiles[traitmeansFile]->write((char *) &meany[j][k], sizeof(double));
+                        outfiles[traitmeansFile]->write((char *) &meanz[j][k], sizeof(double));
+                    }
+                }
+            }
+
+            // Verbose if needed
             if (pars.talkative) {
 
                 std::cout << "n = { ";
                 for (size_t j = 0u; j < ndemes; ++j) std::cout << demesizes[j] << ' ';
                 std::cout << "} at t = " << t << '\n';
 
-            }
-
-            // If it is time to save output...
-            if (t % pars.tsave == 0u) {
-
-                // For each file to save to...
-                for (size_t f = 0u; f < filenames.size(); ++f) {
-
-                    // Save the corresponding data
-                    if (filenames[f] == "time") {
-                        const double t_ = static_cast<double>(t);
-                        outfiles[f]->write((char *) &(t_), sizeof(double));
-                    }
-                    else if (filenames[f] == "popsize") {
-                        const double popsize_ = static_cast<double>(popsize);
-                        outfiles[f]->write((char *) &popsize_, sizeof(double));
-                    }
-                    else if (filenames[f] == "patchsizes") {
-                        for (size_t j = 0u; j < patchsizes.size(); ++j) {
-                            const double patchsize0_ = static_cast<double>(patchsizes[j][0u]);
-                            const double patchsize1_ = static_cast<double>(patchsizes[j][1u]);
-                            outfiles[f]->write((char *) &patchsize0_, sizeof(double));
-                            outfiles[f]->write((char *) &patchsize1_, sizeof(double));
-                        }
-                    }
-                    else if (filenames[f] == "traitmeans") {
-
-                        // Containers for mean traits in each deme and each patch
-                        std::vector<std::vector<double> > meanx(demesizes.size(), std::vector<double>(2u, 0.0));
-                        std::vector<std::vector<double> > meany(demesizes.size(), std::vector<double>(2u, 0.0));
-                        std::vector<std::vector<double> > meanz(demesizes.size(), std::vector<double>(2u, 0.0));
-
-                        // For each individual...
-                        for (size_t i = 0u; i < pop.size(); ++i) {
-                            const double x = pop[i].getX();
-                            const double y = pop[i].getY();
-                            const double z = pop[i].getZ();
-                            const double deme = pop[i].getDeme();
-                            const double patch = pop[i].getPatch();
-                            meanx[deme][patch] += x;
-                            meany[deme][patch] += y;
-                            meanz[deme][patch] += z;
-                        }
-
-                        // Convert each sum into a mean...
-                        for (size_t j = 0u; j < demesizes.size(); ++j) {
-                            for (size_t k = 0u; k < 2u; ++k) {
-                                const size_t n = patchsizes[j][k];
-                                if (n > 0u) {
-                                    meanx[j][k] /= n;
-                                    meany[j][k] /= n;
-                                    meanz[j][k] /= n;
-                                }
-                                outfiles[f]->write((char *) &meanx[j][k], sizeof(double));
-                                outfiles[f]->write((char *) &meany[j][k], sizeof(double));
-                                outfiles[f]->write((char *) &meanz[j][k], sizeof(double));
-                            }
-                        }
-                    }
-                    else if (filenames[f] == "individuals") {
-                        for (size_t i = 0u; i < pop.size(); ++i) {
-                            const double x = pop[i].getX();
-                            const double y = pop[i].getY();
-                            const double z = pop[i].getZ();
-                            const double deme_ = static_cast<double>(pop[i].getDeme());
-                            const double patch_ = static_cast<double>(pop[i].getPatch());
-                            outfiles[f]->write((char *) &deme_, sizeof(double));
-                            outfiles[f]->write((char *) &patch_, sizeof(double));
-                            outfiles[f]->write((char *) &x, sizeof(double));
-                            outfiles[f]->write((char *) &y, sizeof(double));
-                            outfiles[f]->write((char *) &z, sizeof(double));
-                        }
-                    }
-                }
             }
 
             // Prepare to count the total number of offspring
@@ -263,10 +278,13 @@ int simulate(const std::vector<std::string> &args) {
                     pop.back().develop(pars.nloci, pars.effect, pars.xmax, pars.ymax, pars.tradeoff);
 
                 }
+
+                // Kill the current adult (will be removed after reproduction)
+                pop[i].kill();
+
             }
 
-            // All adults die
-            for (size_t i = 0u; i < pop.size() - nseeds; ++i) pop[i].kill();
+            // Remove dead plants
             auto it = std::remove_if(pop.begin(), pop.end(), burry);
             pop.erase(it, pop.end());
             pop.shrink_to_fit();
@@ -278,7 +296,6 @@ int simulate(const std::vector<std::string> &args) {
                 break;
 
             }
-
         }
 
         std::cout << "Simulation ended.\n";

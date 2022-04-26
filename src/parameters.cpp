@@ -18,7 +18,7 @@ Parameters::Parameters() :
     effect(0.1),
     xmax(5.0),
     ymax(5.0),
-    tradeoff(1.0),
+    tradeoff(0.005),
     selfing(0.95),
     recombination(1.0),
     tend(100u),

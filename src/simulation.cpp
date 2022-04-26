@@ -47,6 +47,7 @@ int simulate(const std::vector<std::string> &args) {
             // Update hyperparameters accordingly
             pars.nchrom = arch.chromends.size();
             pars.nloci = arch.locations.size();
+
         }
 
         // Save the architecture if necessary
@@ -62,7 +63,7 @@ int simulate(const std::vector<std::string> &args) {
         std::vector<std::shared_ptr<std::ofstream> > outfiles;
 
         // Which data files to save
-        std::vector<std::string> filenames = {"time", "popsize", "demesizes", "patchsizes", "traitmeans", "individuals"};
+        std::vector<std::string> filenames = {"time", "patchsizes", "traitmeans", "individuals"};
 
         // Update the files to save if needed...
         if (pars.choose) {
@@ -126,16 +127,6 @@ int simulate(const std::vector<std::string> &args) {
                     if (filenames[f] == "time") {
                         const double t_ = static_cast<double>(t);
                         outfiles[f]->write((char *) &(t_), sizeof(double));
-                    }
-                    else if (filenames[f] == "popsize") {
-                        const double popsize_ = static_cast<double>(popsize);
-                        outfiles[f]->write((char *) &popsize_, sizeof(double));
-                    }
-                    else if (filenames[f] == "demesizes") {
-                        for (size_t j = 0u; j < demesizes.size(); ++j) {
-                            const double demesize_ = static_cast<double>(demesizes[j]);
-                            outfiles[f]->write((char *) &demesize_, sizeof(double));
-                        }
                     }
                     else if (filenames[f] == "patchsizes") {
                         for (size_t j = 0u; j < patchsizes.size(); ++j) {

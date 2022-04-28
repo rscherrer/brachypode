@@ -4,6 +4,9 @@ data/
 # Results folder (where we store analysis scripts and figures)
 results/
 
+# Manuscript folder
+ms/
+
 ##### Windows
 # Windows thumbnail cache files
 Thumbs.db

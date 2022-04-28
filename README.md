@@ -251,3 +251,12 @@ We developed an R package called [brachypoder](https://github.com/rscherrer/brac
 * `tests`: contains the testing scripts (the Boost C++ library was used for test-driven development)
 
 The program was developed on Ubuntu 20.04 using QtCreator, and so comes with `.pro` files used by Qt to compile a running version of the program (`brachypode`, in release mode) and a version running all the tests (`brachypode_test`, in debug mode). These `.pro` files contain all the settings used to built the program during its development. The accompanying `.pri` files specify which scripts need to be included in the build. The script `brachypode.pro` may be reused to build the program on another machine using Qt, but the source code can also be compiled with other tools (e.g. XCode, Visual Studio etc.).
+
+## About the study
+
+This repository only contains the simulation program used in our study. Content for the full study can be accessed at the following links (presently private):
+* [data](https://github.com/rscherrer/brachypode-data) for the simulation data
+* [results](https://github.com/rscherrer/brachypode-results) for scripts and figures
+* [ms](https://github.com/rscherrer/brachypode-ms) for the manuscript
+
+For full reproducibility of the analyses we recommend that the aforementioned repositories be downloaded within the current repository and with names as shown above.

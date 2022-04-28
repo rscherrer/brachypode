@@ -1,3 +1,6 @@
+# Data folder (where we store the simulations)
+data/
+
 ##### Windows
 # Windows thumbnail cache files
 Thumbs.db

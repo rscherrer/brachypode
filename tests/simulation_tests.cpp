@@ -621,3 +621,17 @@ BOOST_AUTO_TEST_CASE(whatToSaveWorks) {
     BOOST_CHECK_EQUAL(newtimepoints.size(), 3u);
 
 }
+
+// Test that the program works with only one deme
+BOOST_AUTO_TEST_CASE(worksWithOneDeme) {
+
+    // Same as the previous test at the beginning
+    std::ofstream file;
+    file.open("parameters.txt");
+    file << "pgood 1 0.8\n";
+    file.close();
+
+    // Now make sure that the simulation runs
+    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 0);
+
+}

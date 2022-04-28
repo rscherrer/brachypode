@@ -259,7 +259,7 @@ int simulate(const std::vector<std::string> &args) {
                     }
 
                     // If the seed disperses...
-                    if (rnd::bernoulli(pars.dispersal)(rnd::rng)) {
+                    if (ndemes > 1u && rnd::bernoulli(pars.dispersal)(rnd::rng)) {
 
                         // Sample destination deme
                         size_t newdeme = rnd::random(1u, ndemes - 1u)(rnd::rng);

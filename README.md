@@ -117,13 +117,14 @@ pgood 3 0.8 0.6 0.5 0.3 0.1
 maxgrowths 1 2
 stress 4 0
 zwidths 1 2
-capacities 10000 100
+capacities 100 10000
 steep 2
 dispersal 0.1
 mutation 0.0001
 nchrom 1
 nloci 50
 effect 0.1
+allfreq 0.5
 xmax 5
 ymax 5
 tradeoff 1
@@ -163,13 +164,14 @@ Note: hereafter "sites" refer to the demes and "patches" refer to facilitated an
 * `maxgrowths`: the maximum per capita growth rate in each patch. This corresponds to the basal number of offspring produced per individual per generation, before selection and density-dependence apply. When `type` is `2` there is only one basal growth rate, so only the first value of `maxgrowths` is used (the second is set to equal the first one).
 * `stress`: the level of environmental stress in each patch. If `type` is `1`, then it refers to the point along phenotypic axis `z` that maximizes growth rate in the local patch (the "optimal" value of trait `z`). If `type` is `2`, then the growth rate of the individual depends on its stress tolerance level `x` relative to environmental stress (the growth rate is a logistic function decaying as stress goes up, with inflexion point located at `x`).
 * `zwidths`: the niche width in each patch. This is the standard deviation of the Gaussian curve of growth rate as a function of trait `z`. Only applicable when `type` is `1`.
-* `capacities`: the carrying capacity in each patch, in number of individuals. This is used to apply density-dependent population regulation. The growth rate of individuals is reduced, even more that the number of individuals locally competing (weighted by their competitiveness if `type` is `2`) approaches the carrying capacity. Set a second value lower than the first value to model the fact that competition is stronger in facilitated than in unfacilitated patches.
+* `capacities`: the carrying capacity in each patch, in number of individuals per unit area. This is used to apply density-dependent population regulation. The growth rate of individuals is reduced, even more that the number of individuals locally competing (weighted by their competitiveness if `type` is `2`) approaches the carrying capacity.
 * `steep`: the intensity of the decay of the growth rate function when external stress is at its inflexion point (i.e. when external stress is equal to the level of stress tolerance of the individual, `x`). This corresponds to the absolute value of the (negative) slope of the curve at this point. Only applicable if `type` is `2`.
 * `dispersal`: the rate of dispersal among sites, between zero and one. This is the number of individuals sampled each generation to migrate (migrants can end up in any other deme with equal probability).
 * `mutation`: the mutation rate per locus, between zero and one (i.e. probability that a given allele flips to its opposite when an offspring is born).
 * `nchrom`: the number of chromosomes.
 * `nloci`: the number of loci coding for trait `z`.
 * `effect`: the effect size of single loci, i.e. the effect on trait `z` when one allele mutates. This value cannot be negative.
+* `allfreq`: the initial frequency of the 1-allele in the population.
 * `xmax`: the maximum possible stress tolerance level `x`. This value is reached when all loci have allele `1`. Trait `x` cannot be negative.
 * `ymax`: the maximum level of competitiveness `y`. This value is reached when all loci have allele `0`. Trait `y` cannot be negative.
 * `tradeoff`: the trade-off between stress tolerance `x` and competitiveness `y`. Should be positive. The higher this trade-off, the least a given value of trait `z` can translate into both a high `x` and a high `y`.

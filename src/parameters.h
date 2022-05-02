@@ -31,15 +31,16 @@ struct Parameters {
     std::vector<double> stress; // stress level in each patch
     std::vector<double> zwidths; // niche width in each patch
     std::vector<double> capacities; // carrying capacity in each patch
-    double steep; // steepness of tolerance function (type II)
+    double steep; // steepness of tolerance function
     double dispersal; // dispersal rate
     double mutation; // mutation rate
     size_t nchrom; // number of chromosomes
     size_t nloci; // number of loci
     double effect; // locus effect size
-    double xmax; // maximum level of tolerance (type II)
-    double ymax; // maximum level of competitiveness (type II)
-    double tradeoff; // tradeoff between tolerance and competitiveness (type II)
+    double allfreq; // initial frequency of allele 1
+    double xmax; // maximum level of tolerance
+    double ymax; // maximum level of competitiveness
+    double tradeoff; // tradeoff between tolerance and competitiveness
     double selfing; // rate of selfing
     double recombination; // recombination rate
     size_t tend; // simulation time

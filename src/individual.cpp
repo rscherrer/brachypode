@@ -4,7 +4,7 @@
 #include "utilities.h"
 #include <cmath>
 
-Individual::Individual() :
+Individual::Individual(const double &p, const size_t &n) :
     deme(0u),
     patch(1u),
     x(0.0),
@@ -13,6 +13,9 @@ Individual::Individual() :
     alive(true),
     genome(std::bitset<1000>())
 {
+
+    // Throw mutations around
+    mutate(p, n);
 
 }
 

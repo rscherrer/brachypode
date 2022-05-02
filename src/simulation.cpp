@@ -30,7 +30,7 @@ int simulate(const std::vector<std::string> &args) {
         if (pars.savepars) pars.save();
 
         // Initialize a population of individuals
-        std::vector<Individual> pop(pars.popsize);
+        std::vector<Individual> pop(pars.popsize, {pars.allfreq, pars.nloci});
 
         // Number of demes
         const size_t ndemes = pars.pgood.size();

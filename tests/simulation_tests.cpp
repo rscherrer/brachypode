@@ -5,7 +5,7 @@
 // with calling the program, passing arguments, reading from and writing to
 // files, and error handling.
 
-#include "src/simulation.h"
+#include "../src/simulation.h"
 #include <boost/test/unit_test.hpp>
 
 // Test that the simulation runs

@@ -1,6 +1,6 @@
 // Here we test functionalities of the Individual class.
 
-#include "src/individual.h"
+#include "../src/individual.h"
 #include <boost/test/unit_test.hpp>
 
 // Test that an individual is initialized properly

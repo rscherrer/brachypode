@@ -16,6 +16,7 @@ Parameters::Parameters() :
     nchrom(1u),
     nloci(50u),
     effect(0.1),
+    allfreq(0.5),
     xmax(5.0),
     ymax(5.0),
     tradeoff(0.005),
@@ -88,6 +89,7 @@ void Parameters::import(std::ifstream &file)
         else if (input == "nchrom") file >> nchrom;
         else if (input == "nloci") file >> nloci;
         else if (input == "effect") file >> effect;
+        else if (input == "allfreq") file >> allfreq;
         else if (input == "xmax") file >> xmax;
         else if (input == "ymax") file >> ymax;
         else if (input == "tradeoff") file >> tradeoff;
@@ -143,6 +145,7 @@ void Parameters::check() const
     if (nloci > 1000) throw std::runtime_error("There cannot be more than 1000 loci");
     if (nchrom == 0) throw std::runtime_error("There cannot be zero chromosomes");
     if (nloci == 0u) throw std::runtime_error("There cannot be zero loci");
+    if (allfreq < 0.0 || allfreq > 1.0) throw std::runtime_error("Initial allele frequency should be between zero and one");
     if (xmax < 0.0) throw std::runtime_error("Maximum tolerance cannot be negative");
     if (ymax < 0.0) throw std::runtime_error("Maximum competitiveness cannot be negative");
     if (tradeoff < 0.0) throw std::runtime_error("Trade-off cannot be negative");
@@ -183,6 +186,7 @@ void Parameters::write(std::ofstream &file) const
     file << "nchrom " << nchrom << '\n';
     file << "nloci " << nloci << '\n';
     file << "effect " << effect << '\n';
+    file << "allfreq " << allfreq << '\n';
     file << "xmax " << xmax << '\n';
     file << "ymax " << ymax << '\n';
     file << "tradeoff " << tradeoff << '\n';

@@ -41,7 +41,7 @@ void Individual::develop(
 ) {
 
     const double zmin = 0.0;
-    const double zmax = nloci;
+    const double zmax = nloci * effect;
     z = genome.count() * effect;
     x = xmax * exp(-tradeoff * utl::sqr(z - zmax));
     y = ymax * exp(-tradeoff * utl::sqr(z - zmin));

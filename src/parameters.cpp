@@ -9,7 +9,7 @@ Parameters::Parameters() :
     maxgrowths({2.0, 3.0}),
     stress({4.0, 0.0}),
     zwidths({1.0, 2.0}),
-    capacities({10000.0, 100.0}),
+    capacities({100.0, 10000.0}),
     steep(2.0),
     dispersal(0.1),
     mutation(0.0001),

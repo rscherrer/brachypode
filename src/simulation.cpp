@@ -222,7 +222,8 @@ int simulate(const std::vector<std::string> &args) {
                 const double maxgrowth = pars.type == 1u ? pars.maxgrowths[patch] : pars.maxgrowths[0u];
                 const double stress = pars.stress[patch];
                 const double zwidth = pars.zwidths[patch];
-                const double capacity = pars.capacities[patch];
+                const double cover = patch == 0u ? 1.0 - pars.pgood[deme] : pars.pgood[deme];
+                const double capacity = pars.capacities[patch] * cover;
 
                 // Initialize fitness
                 double fitness = maxgrowth;
@@ -237,7 +238,8 @@ int simulate(const std::vector<std::string> &args) {
                 fitness *= (1.0 - n / capacity);
 
                 // Sample the number of surviving offspring
-                const size_t noff = rnd::poisson(fitness)(rnd::rng);
+                size_t noff = 0u;
+                if (fitness > 0.0) noff = rnd::poisson(fitness)(rnd::rng);
                 nseeds += noff;
 
                 // For each surviving offspring...

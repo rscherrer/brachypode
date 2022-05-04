@@ -15,7 +15,10 @@ Individual::Individual(const double &p, const size_t &n) :
 {
 
     // Throw mutations around
-    mutate(p, n);
+    assert(genome.count() == 0u);
+    auto ismutation = rnd::bernoulli(p);
+    for (size_t i = 0u; i < n; ++i)
+        if (ismutation(rnd::rng)) genome.set(i);
 
 }
 

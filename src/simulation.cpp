@@ -236,7 +236,7 @@ int simulate(const std::vector<std::string> &args) {
 
                 // Local competition within deme and patche
                 if (pars.type == 1u) fitness *= (1.0 - patchsizes[deme][patch] / capacity);
-                else if (pars.type == 2u) fitness *= (y / sumys[deme][patch]);
+                else if (pars.type == 2u) fitness *= (y / sumys[deme][patch] * capacity);
                 else throw std::runtime_error("Invalid simulation type");
 
                 // Sample the number of surviving offspring

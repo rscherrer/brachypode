@@ -218,6 +218,7 @@ int simulate(const std::vector<std::string> &args) {
                 const size_t deme = pop[i].getDeme();
                 const size_t patch = pop[i].getPatch();
                 const double x = pop[i].getX();
+                const double y = pop[i].getY();
                 const double z = pop[i].getZ();
                 const double maxgrowth = pars.type == 1u ? pars.maxgrowths[patch] : pars.maxgrowths[0u];
                 const double stress = pars.stress[patch];
@@ -233,9 +234,10 @@ int simulate(const std::vector<std::string> &args) {
                 else if (pars.type == 2u) fitness /= (1.0 + exp(pars.steep * (stress - x)));
                 else throw std::runtime_error("Invalid simulation type");
 
-                // Local competition within deme and patches
-                const double n = pars.type == 1u ? patchsizes[deme][patch] : sumys[deme][patch];
-                fitness *= (1.0 - n / capacity);
+                // Local competition within deme and patche
+                if (pars.type == 1u) fitness *= (1.0 - patchsizes[deme][patch] / capacity);
+                else if (pars.type == 2u) fitness *= (y / sumys[deme][patch]);
+                else throw std::runtime_error("Invalid simulation type");
 
                 // Sample the number of surviving offspring
                 size_t noff = 0u;

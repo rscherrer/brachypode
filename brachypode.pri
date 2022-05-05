@@ -1,9 +1,15 @@
-HEADERS += $$PWD/library/Simul.h
-HEADERS += $$PWD/library/Individual.h
-HEADERS += $$PWD/library/Population.h
-HEADERS += $$PWD/library/Random.h
+HEADERS += $$PWD/src/parameters.h
+HEADERS += $$PWD/src/simulation.h
+HEADERS += $$PWD/src/individual.h
+HEADERS += $$PWD/src/architecture.h
+HEADERS += $$PWD/src/printer.h
+HEADERS += $$PWD/src/random.h
+HEADERS += $$PWD/src/utilities.h
 
-SOURCES += $$PWD/library/Simul.cpp
-SOURCES += $$PWD/library/Individual.cpp
-SOURCES += $$PWD/library/Population.cpp
-SOURCES += $$PWD/library/Random.cpp
+SOURCES += $$PWD/src/parameters.cpp
+SOURCES += $$PWD/src/simulation.cpp
+SOURCES += $$PWD/src/individual.cpp
+SOURCES += $$PWD/src/architecture.cpp
+SOURCES += $$PWD/src/printer.cpp
+SOURCES += $$PWD/src/random.cpp
+SOURCES += $$PWD/src/utilities.cpp

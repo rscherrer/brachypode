@@ -3,8 +3,7 @@
 DEFINES += __cpp_lib_concepts
 
 include(brachypode.pri)
-SOURCES += main.cpp \
-    grid.cpp
+SOURCES += main.cpp
 
 CONFIG += c++17
 QMAKE_CXXFLAGS += -std=c++17
@@ -29,6 +28,3 @@ CONFIG(release, debug|release) {
   QMAKE_CXXFLAGS += -pg
   QMAKE_LFLAGS += -pg
 }
-
-HEADERS += \
-    grid.h

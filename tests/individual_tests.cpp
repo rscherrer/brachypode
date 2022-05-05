@@ -120,7 +120,3 @@ BOOST_AUTO_TEST_CASE(noChangeIfRecombinationIsZero) {
     BOOST_CHECK_EQUAL(ind.getAlleleSum(), 0u);
 
 }
-
-
-
-

@@ -1,3 +1,6 @@
+#define BOOST_TEST_DYNAMIC_LINK
+#define BOOST_TEST_MODULE Main
+
 // These are tests of the good behavior of the Architecture structure. We
 // test that the architecture, whether generated or loaded from a file, has
 // the expected attributes.

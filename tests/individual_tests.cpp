@@ -1,3 +1,6 @@
+#define BOOST_TEST_DYNAMIC_LINK
+#define BOOST_TEST_MODULE Main
+
 // Here we test functionalities of the Individual class.
 
 #include "../src/individual.h"

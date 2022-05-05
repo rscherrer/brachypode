@@ -4,6 +4,8 @@ This is the repository for a program simulating the evolution of an annual grass
 
 ## Build
 
+The program was developed in C++20 on Ubuntu 20.04 and compiled using the CMake build system. The CMake files used during the development of the program are provided here.
+
 ### Linux, MacOS
 
 First, CMake needs to be installed (this is the build system we use). To install CMake,
@@ -91,6 +93,10 @@ cmake -G Xcode
 
 This will place the project files in `../build`.
 
+### Tests
+
+The program was written using test-driven development. Tests of the different functionalities were performed using the Boost unit test framework. Source code for tests is available in the `tests/` folder. The CMake files provided with this repository build the test targets as well as the actual program. Hence, running the above steps (for any platform) should also build the executables for tests in `../bin/tests/`.
+
 ## Usage
 
 This program is a command-line interface program. Assuming the name of the executable is `brachypode`, use, from the working directory:
@@ -152,7 +158,7 @@ tsave 100
 
 will work fine.
 
-## About this program
+## Simulation details
 
 ### Parameter details
 
@@ -248,11 +254,8 @@ We developed an R package called [brachypoder](https://github.com/rscherrer/brac
 ## Content of this repository
 
 * `main.cpp`: is the main source file of the program
-* `ci`: contains the necessary files for continuous integration
 * `src`: contains the source code (`.h` and `.cpp` files) for the program, coded in C++17
 * `tests`: contains the testing scripts (the Boost C++ library was used for test-driven development)
-
-The program was developed on Ubuntu 20.04 using QtCreator, and so comes with `.pro` files used by Qt to compile a running version of the program (`brachypode`, in release mode) and a version running all the tests (`brachypode_test`, in debug mode). These `.pro` files contain all the settings used to built the program during its development. The accompanying `.pri` files specify which scripts need to be included in the build. The script `brachypode.pro` may be reused to build the program on another machine using Qt, but the source code can also be compiled with other tools (e.g. XCode, Visual Studio etc.).
 
 ## About the study
 

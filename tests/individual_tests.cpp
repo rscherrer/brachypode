@@ -120,3 +120,16 @@ BOOST_AUTO_TEST_CASE(noChangeIfRecombinationIsZero) {
     BOOST_CHECK_EQUAL(ind.getAlleleSum(), 0u);
 
 }
+
+// Make sure that founder individuals develop
+BOOST_AUTO_TEST_CASE(founderDevelops) {
+
+    // Create an individual with default parameters (initial allele frequency, number of loci, effect size, xmax and ymax, and trade-off)
+    Individual ind(1.0, 50u, 0.1, 5.0, 5.0, 0.1);
+    
+    // Check that all traits are nonzero (should be the case if has developed)
+    BOOST_CHECK(ind.getX() > 0.0);
+    BOOST_CHECK(ind.getY() > 0.0);
+    BOOST_CHECK(ind.getZ() > 0.0);
+
+}

@@ -30,7 +30,7 @@ int simulate(const std::vector<std::string> &args) {
         if (pars.savepars) pars.save();
 
         // Initialize a population of individuals
-        std::vector<Individual> pop(pars.popsize, {pars.allfreq, pars.nloci});
+        std::vector<Individual> pop(pars.popsize, {pars.allfreq, pars.nloci, pars.effect, pars.xmax, pars.ymax, pars.tradeoff});
 
         // Number of demes
         const size_t ndemes = pars.pgood.size();
@@ -234,10 +234,13 @@ int simulate(const std::vector<std::string> &args) {
                 else if (pars.type == 2u) fitness /= (1.0 + exp(pars.steep * (stress - x)));
                 else throw std::runtime_error("Invalid simulation type");
 
-                // Local competition within deme and patche
+                // Local competition within deme and patch
                 if (pars.type == 1u) fitness *= (1.0 - patchsizes[deme][patch] / capacity);
-                else if (pars.type == 2u) fitness *= (y / sumys[deme][patch] * capacity);
+                else if (pars.type == 2u) fitness *= (1.0 - exp(meany[deme][patch] - y) *  sumys[deme][patch] / capacity);
                 else throw std::runtime_error("Invalid simulation type");
+
+                // Correct for negative fitness values if needed
+                fitness = fitness < 0.0 ? 0.0 : fitness;
 
                 // Sample the number of surviving offspring
                 size_t noff = 0u;

@@ -14,7 +14,8 @@ class Individual {
 
 public:
 
-    Individual(const double& = 0.0, const size_t& = 0u);
+    // Individual(const double& = 0.0, const size_t& = 0u);
+    Individual(const double& = 0.0, const size_t& = 0u, const double& = 0.0, const double& = 0.0, const double& = 0.0, const double& = 0.0);
 
     void kill();
     void setDeme(const size_t&);

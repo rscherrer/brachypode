@@ -98,6 +98,7 @@ int simulate(const std::vector<std::string> &args) {
             else if (filename == "traitmeans") traitmeansFile = f;
             else if (filename == "individuals") individualsFile = f;
             else throw std::runtime_error("Invalid output requested in whattosave.txt");
+
         }
 
         std::cout << "Simulation started.\n";

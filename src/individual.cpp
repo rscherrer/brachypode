@@ -4,26 +4,6 @@
 #include "utilities.h"
 #include <cmath>
 
-/*
-Individual::Individual(const double &p, const size_t &n) :
-    deme(0u),
-    patch(1u),
-    x(0.0),
-    y(0.0),
-    z(0.0),
-    alive(true),
-    genome(std::bitset<1000>())
-{
-
-    // Throw mutations around
-    assert(genome.count() == 0u);
-    auto ismutation = rnd::bernoulli(p);
-    for (size_t i = 0u; i < n; ++i)
-        if (ismutation(rnd::rng)) genome.set(i);
-
-}
-*/
-
 Individual::Individual(const double &p, const size_t &n, const double &effect, const double &xmax, const double &ymax, const double &tradeoff) :
     deme(0u),
     patch(1u),

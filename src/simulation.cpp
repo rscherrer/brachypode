@@ -112,12 +112,13 @@ int simulate(const std::vector<std::string> &args) {
             // Compute useful population statistics
             size_t popsize = 0u;
             std::vector<size_t> demesizes(ndemes, 0u);
-            std::vector<std::vector<size_t>> patchsizes(ndemes, {0u, 0u});
+            std::vector<size_t> patchsizes(2u * ndemes, 0u);
 
             // Containers for mean traits in each deme and each patch
-            std::vector<std::vector<double> > meanx(ndemes, std::vector<double>(2u, 0.0));
-            std::vector<std::vector<double> > meany(ndemes, std::vector<double>(2u, 0.0));
-            std::vector<std::vector<double> > meanz(ndemes, std::vector<double>(2u, 0.0));
+            const size_t npatches = 2u * ndemes;
+            std::vector<double> meanx(npatches, 0.0);
+            std::vector<double> meany(npatches, 0.0);
+            std::vector<double> meanz(npatches, 0.0);
 
             // Loop through individuals to calculate them
             for (size_t i = 0u; i < pop.size(); ++i) {
@@ -145,10 +146,11 @@ int simulate(const std::vector<std::string> &args) {
                 // Update statistics
                 ++popsize;
                 ++demesizes[deme];
-                ++patchsizes[deme][patch];
-                meanx[deme][patch] += x;
-                meany[deme][patch] += y;
-                meanz[deme][patch] += z;
+                const size_t j = 2u * deme + patch;
+                ++patchsizes[j];
+                meanx[j] += x;
+                meany[j] += y;
+                meanz[j] += z;
 
             }
 
@@ -166,43 +168,48 @@ int simulate(const std::vector<std::string> &args) {
 
             // Save patch sizes if needed
             if (timetosave && patchsizesFile >= 0) {
+
                 for (size_t j = 0u; j < patchsizes.size(); ++j) {
-                    const double patchsize0_ = static_cast<double>(patchsizes[j][0u]);
-                    const double patchsize1_ = static_cast<double>(patchsizes[j][1u]);
-                    outfiles[patchsizesFile]->write((char *) &patchsize0_, sizeof(double));
-                    outfiles[patchsizesFile]->write((char *) &patchsize1_, sizeof(double));
+
+                    const double patchsize_ = static_cast<double>(patchsizes[j]);
+                    outfiles[patchsizesFile]->write((char *) &patchsize_, sizeof(double));
+
                 }
+
             }
 
             // Keep sums of competitiveness (y) for later
-            std::vector<std::vector<double>> sumys(meany);
+            std::vector<double> sumys(meany);
 
             // Convert sums into a mean...
-            for (size_t j = 0u; j < demesizes.size(); ++j) {
-                for (size_t k = 0u; k < 2u; ++k) {
+            for (size_t j = 0u; j < patchsizes.size(); ++j) {
 
-                    const size_t n = patchsizes[j][k];
+                const size_t n = patchsizes[j];
 
-                    if (n > 0u) {
-                        meanx[j][k] /= n;
-                        meany[j][k] /= n;
-                        meanz[j][k] /= n;
-                    }
+                if (n > 0u) {
 
-                    // Save trait means if needed
-                    if (timetosave && traitmeansFile >= 0) {
-                        outfiles[traitmeansFile]->write((char *) &meanx[j][k], sizeof(double));
-                        outfiles[traitmeansFile]->write((char *) &meany[j][k], sizeof(double));
-                        outfiles[traitmeansFile]->write((char *) &meanz[j][k], sizeof(double));
-                    }
+                    meanx[j] /= n;
+                    meany[j] /= n;
+                    meanz[j] /= n;
+
                 }
+
+                // Save trait means if needed
+                if (timetosave && traitmeansFile >= 0) {
+
+                    outfiles[traitmeansFile]->write((char *) &meanx[j], sizeof(double));
+                    outfiles[traitmeansFile]->write((char *) &meany[j], sizeof(double));
+                    outfiles[traitmeansFile]->write((char *) &meanz[j], sizeof(double));
+
+                }
+
             }
 
             // Verbose if needed
             if (pars.talkative) {
 
                 std::cout << "n = { ";
-                for (size_t j = 0u; j < ndemes; ++j) std::cout << demesizes[j] << ' ';
+                for (size_t j = 0u; j < demesizes.size(); ++j) std::cout << demesizes[j] << ' ';
                 std::cout << "} at t = " << t << '\n';
 
             }
@@ -236,8 +243,9 @@ int simulate(const std::vector<std::string> &args) {
                 else throw std::runtime_error("Invalid simulation type");
 
                 // Local competition within deme and patch
-                if (pars.type == 1u) fitness *= (1.0 - patchsizes[deme][patch] / capacity);
-                else if (pars.type == 2u) fitness *= (1.0 - exp(meany[deme][patch] - y) *  sumys[deme][patch] / capacity);
+                const size_t j = 2u * deme + patch;
+                if (pars.type == 1u) fitness *= (1.0 - patchsizes[j] / capacity);
+                else if (pars.type == 2u) fitness *= (1.0 - exp(meany[j] - y) *  sumys[j] / capacity);
                 else throw std::runtime_error("Invalid simulation type");
 
                 // Correct for negative fitness values if needed

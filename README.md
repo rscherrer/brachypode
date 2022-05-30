@@ -35,6 +35,7 @@ Note that by doing this we clone the `vcpkg` repository from Microsoft into our 
 ```bash
 module load CMake
 module load binutils
+module load git
 ```
 
 ```bash

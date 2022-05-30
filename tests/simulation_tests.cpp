@@ -595,8 +595,8 @@ BOOST_AUTO_TEST_CASE(writingTheRightStuff) {
 
 }
 
-// Test that providing a file with what to save works
-BOOST_AUTO_TEST_CASE(whatToSaveWorks) {
+// Test that saving data works
+BOOST_AUTO_TEST_CASE(savingWorks) {
 
     // Same as the previous test at the beginning
     std::ofstream file;
@@ -622,6 +622,59 @@ BOOST_AUTO_TEST_CASE(whatToSaveWorks) {
     // Check the new data does not have the same number of entries
     BOOST_CHECK(newtimepoints.size() < timepoints.size());
     BOOST_CHECK_EQUAL(newtimepoints.size(), 3u);
+
+}
+
+/*
+BOOST_AUTO_TEST_CASE(test) {
+
+    std::vector<std::string> filenames = {"time", "popsize", "patchsizes", "traitmeans", "individuals"};
+
+    std::cout << "hello\n";
+
+    // Read file where those are provided
+    std::ifstream infile("whattosave.txt");
+    if (!infile.is_open())
+        throw std::runtime_error("Could not read input file whattosave.txt");
+    std::vector<std::string> newfilenames;
+    std::string input;
+    while (infile >> input) newfilenames.push_back(input);
+    stf::check(newfilenames, filenames);
+    filenames.reserve(newfilenames.size());
+    filenames.resize(newfilenames.size());
+    for (size_t f = 0u; f < newfilenames.size(); ++f) filenames[f] = newfilenames[f];
+
+}
+*/
+
+// Test that providing a file with what to save works
+BOOST_AUTO_TEST_CASE(whatToSaveWorks) {
+
+    // Create parameters
+    std::ofstream file;
+    file.open("parameters.txt");
+    file << "tend 10\n";
+    file << "tsave 2\n";
+    file << "choose 1\n";
+    file.close();
+
+    // Create a what-to-save file
+    std::ofstream wtsfile;
+    wtsfile.open("whattosave.txt");
+    wtsfile << "time\n";
+    wtsfile << "popsize\n";
+    wtsfile.close();
+
+    // Simulate
+    simulate({"program_name", "parameters.txt"});
+
+    // Read back
+    std::vector<size_t> timepoints = readBinary("time.dat");
+    std::vector<size_t> popsizes = readBinary("popsize.dat");
+
+    // Check
+    BOOST_CHECK_EQUAL(timepoints.size(), 6u);
+    BOOST_CHECK_EQUAL(popsizes.size(), 6u);
 
 }
 

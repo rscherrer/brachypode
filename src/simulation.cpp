@@ -72,7 +72,7 @@ int simulate(const std::vector<std::string> &args) {
             std::ifstream infile("whattosave.txt");
             if (!infile.is_open())
                 throw std::runtime_error("Could not read input file whattosave.txt");
-            std::vector<std::string> newfilenames = { };
+            std::vector<std::string> newfilenames;
             std::string input;
             while (infile >> input) newfilenames.push_back(input);
             stf::check(newfilenames, filenames);

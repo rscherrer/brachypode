@@ -46,6 +46,7 @@ struct Parameters {
     size_t tend; // simulation time
     size_t tsave; // recording time
     size_t seed;
+    bool sow;
     bool loadarch;
     bool savepars;
     bool savelog;

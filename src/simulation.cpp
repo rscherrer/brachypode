@@ -103,6 +103,23 @@ int simulate(const std::vector<std::string> &args) {
 
         std::cout << "Simulation started.\n";
 
+        // Sow the individuals at random if needed
+        if (pars.sow) {
+
+            auto pickDeme = rnd::random(0u, ndemes - 1u);
+            auto pickPatch = rnd::bernoulli(0.5);
+
+            for (size_t i = 0u; i < pop.size(); ++i) {
+
+                const size_t newdeme = pickDeme(rnd::rng);
+                const size_t newpatch = pickPatch(rnd::rng);
+                pop[i].setDeme(newdeme);
+                pop[i].setPatch(newpatch);
+
+            }
+
+        }
+
         // At each time step...
         for (size_t t = 0u; t <= pars.tend; ++t) {
 

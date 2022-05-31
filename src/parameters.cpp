@@ -25,6 +25,7 @@ Parameters::Parameters() :
     tend(100u),
     tsave(20u),
     seed(makeDefaultSeed()),
+    sow(true),
     loadarch(false),
     savepars(true),
     savelog(false),
@@ -98,6 +99,7 @@ void Parameters::import(std::ifstream &file)
         else if (input == "tend") file >> tend;
         else if (input == "tsave") file >> tsave;
         else if (input == "seed") file >> seed;
+        else if (input == "sow") file >> sow;
         else if (input == "loadarch") file >> loadarch;
         else if (input == "savepars") file >> savepars;
         else if (input == "savelog") file >> savelog;
@@ -195,6 +197,7 @@ void Parameters::write(std::ofstream &file) const
     file << "tend " << tend << '\n';
     file << "tsave " << tsave << '\n';
     file << "seed " << seed << '\n';
+    file << "sow " << sow << '\n';
     file << "loadarch " << loadarch << '\n';
     file << "savepars " << savepars << '\n';
     file << "savelog " << savelog << '\n';

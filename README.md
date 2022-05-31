@@ -140,6 +140,7 @@ recombination 1
 tend 100
 tsave 20
 seed 12345
+sow 1
 loadarch 0
 savepars 1
 savelog 0
@@ -187,7 +188,8 @@ Note: hereafter "sites" refer to the demes and "patches" refer to facilitated an
 * `tend`: simulation time, in discrete generations.
 * `tsave`: frequency with which to save the data, in number of generations.
 * `seed`: the seed to use for the pseudo random number generator. If not supplied, the seed will be automatically set based on the exact time the simulation was launched. 
-* `loadarch`: whether or not (`0` or `1`) to load the genetic architecture from an existing file.
+* `sow`: whether or not (`1` or `0`, respectively) the founder individuals should be randomly scattered throughout demes and patches at the start of the simulation
+* `loadarch`: whether or not to load the genetic architecture from an existing file.
 * `savepars`: whether or not to save the parameters used in the simulation (including the automatically generated seed if applicable)
 * `savelog`: whether or not to redirect the screen output of the program to a file instead
 * `savearch`: whether or not to save the genetic architecture used in the simulation (if `loadarch` is `1` the architecture file will simply be overwritten with itself)

@@ -107,11 +107,11 @@ int simulate(const std::vector<std::string> &args) {
         if (pars.sow) {
 
             auto pickDeme = rnd::random(0u, ndemes - 1u);
-            auto pickPatch = rnd::bernoulli(0.5);
 
             for (size_t i = 0u; i < pop.size(); ++i) {
 
                 const size_t newdeme = pickDeme(rnd::rng);
+                auto pickPatch = rnd::bernoulli(pars.pgood[newdeme]);
                 const size_t newpatch = pickPatch(rnd::rng);
                 pop[i].setDeme(newdeme);
                 pop[i].setPatch(newpatch);

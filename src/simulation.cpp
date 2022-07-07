@@ -291,18 +291,34 @@ int simulate(const std::vector<std::string> &args) {
 
                     }
 
-                    // If the seed disperses...
-                    if (ndemes > 1u && rnd::bernoulli(pars.dispersal)(rnd::rng)) {
+                    // If the seed disperses to another site...
+                    if (ndemes > 1u && rnd::bernoulli(pars.longrange)(rnd::rng)) {
 
                         // Sample destination deme
                         size_t newdeme = rnd::random(1u, ndemes - 1u)(rnd::rng);
                         if (newdeme < deme) newdeme -= 1u;
                         pop.back().setDeme(newdeme);
 
-                    }
+                        // Lands in a random patch
+                        auto pickPatch = rnd::bernoulli(pars.pgood[pop.back().getDeme()]);
+                        pop.back().setPatch(pickPatch(rnd::rng));
 
-                    // Which patch does it land in?
-                    pop.back().setPatch(rnd::bernoulli(pars.pgood[pop.back().getDeme()])(rnd::rng));
+                    } else {
+
+                        // Otherwise, the seed may still disperse within the local site depending on the cover of the other patch
+                        const double cover = pars.pgood[pop.back().getDeme()];
+                        const double target = pop.back().getPatch() ? 1.0 - cover : cover; 
+
+                        // If that happens...
+                        if (rnd::bernoulli(pars.shortrange * target)(rnd::rng)) {
+
+                            // Change patch
+                            const size_t newpatch = (pop.back().getPatch() - 1u) % 2u;
+                            pop.back().setPatch(newpatch);
+
+                        }
+
+                    }
 
                     // Does it mutate?
                     pop.back().mutate(pars.mutation, pars.nloci);
@@ -354,4 +370,3 @@ int simulate(const std::vector<std::string> &args) {
     return 1;
 
 }
-

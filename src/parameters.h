@@ -32,7 +32,8 @@ struct Parameters {
     std::vector<double> zwidths; // niche width in each patch
     std::vector<double> capacities; // carrying capacity in each patch
     double steep; // steepness of tolerance function
-    double dispersal; // dispersal rate
+    double shortrange; // short-range dispersal rate
+    double longrange; // long-range dispersal rate
     double mutation; // mutation rate
     size_t nchrom; // number of chromosomes
     size_t nloci; // number of loci

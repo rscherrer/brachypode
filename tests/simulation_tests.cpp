@@ -30,7 +30,8 @@ BOOST_AUTO_TEST_CASE(runWithParameterFile) {
     file << "stress 5.0 1.0\n";
     file << "zwidths 1.0 3.0\n";
     file << "capacities 1000 100\n";
-    file << "dispersal 0.1\n";
+    file << "shortrange 0.1\n";
+    file << "longrange 0.1\n";
     file << "mutation 0.001\n";
     file << "nchrom 1\n";
     file << "nloci 20\n";
@@ -175,12 +176,12 @@ BOOST_AUTO_TEST_CASE(errorWhenSteepnessIsNegative) {
     BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
 }
 
-// Should error when dispersal is not between zero and one
-BOOST_AUTO_TEST_CASE(errorWhenDispersalNotBetweenZeroAndOne) {
+// Should error when longrange is not between zero and one
+BOOST_AUTO_TEST_CASE(errorWhenlongrangeNotBetweenZeroAndOne) {
 
     std::ofstream file;
     file.open("parameters.txt");
-    file << "dispersal -1\n";
+    file << "longrange -1\n";
     file.close();
 
     BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);

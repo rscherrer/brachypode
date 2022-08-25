@@ -4,12 +4,10 @@
 #include "utilities.h"
 #include <cmath>
 
-Individual::Individual(const double &p, const size_t &n, const double &effect, const double &xmax, const double &ymax, const double &tradeoff) :
+Individual::Individual(const double &p, const size_t &n, const double &effect) :
     deme(0u),
     patch(1u),
     x(0.0),
-    y(0.0),
-    z(0.0),
     alive(true),
     genome(std::bitset<1000>())
 {
@@ -21,7 +19,7 @@ Individual::Individual(const double &p, const size_t &n, const double &effect, c
         if (ismutation(rnd::rng)) genome.set(i);
 
     // Compute phenotypes
-    develop(n, effect, xmax, ymax, tradeoff);
+    develop(effect);
 
 }
 
@@ -44,16 +42,9 @@ void Individual::mutate(const double &mu, const size_t &n) {
     }
 
 }
-void Individual::develop(
-    const size_t &nloci, const double &effect, const double &xmax,
-    const double &ymax, const double &tradeoff
-) {
+void Individual::develop(const double &effect) {
 
-    const double zmin = 0.0;
-    const double zmax = nloci * effect;
-    z = genome.count() * effect;
-    x = xmax * exp(-tradeoff * utl::sqr(z - zmax));
-    y = ymax * exp(-tradeoff * utl::sqr(z - zmin));
+    x = genome.count() * effect;
 
 }
 void Individual::recombine(
@@ -135,8 +126,6 @@ void Individual::recombine(
 size_t Individual::getDeme() const { return deme; }
 size_t Individual::getPatch() const { return patch; }
 double Individual::getX() const { return x; }
-double Individual::getY() const { return y; }
-double Individual::getZ() const { return z; }
 bool Individual::isAlive() const { return alive; }
 size_t Individual::getAllele(const size_t &l) const { return genome.test(l); }
 size_t Individual::getAlleleSum() const { return genome.count(); }

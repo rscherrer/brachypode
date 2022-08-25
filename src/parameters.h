@@ -27,10 +27,10 @@ struct Parameters {
     size_t type; // simulation type (I or II)
     size_t popsize; // initial population size
     std::vector<double> pgood; // proportion of good patches in each deme
-    std::vector<double> maxgrowths; // maximum growth rate in each patch
     std::vector<double> stress; // stress level in each patch
     std::vector<double> zwidths; // niche width in each patch
     std::vector<double> capacities; // carrying capacity in each patch
+    double maxgrowth; // maximum growth rate
     double steep; // steepness of tolerance function
     double shortrange; // short-range dispersal rate
     double longrange; // long-range dispersal rate

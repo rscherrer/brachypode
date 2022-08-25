@@ -6,10 +6,10 @@ Parameters::Parameters() :
     type(1u),
     popsize(10u),
     pgood({0.8, 0.6, 0.5, 0.3, 0.1}),
-    maxgrowths({2.0, 3.0}),
     stress({4.0, 0.0}),
     zwidths({2.0, 4.0}),
     capacities({100.0, 10000.0}),
+    maxgrowth(4.0),
     steep(2.0),
     shortrange(0.3),
     longrange(0.01),
@@ -81,10 +81,10 @@ void Parameters::import(std::ifstream &file)
             for (size_t i = 0u; i < ndemes; ++i)
                 file >> pgood[i];
         }
-        else if (input == "maxgrowths") for (size_t i = 0u; i < 2u; ++i) file >> maxgrowths[i];
         else if (input == "zwidths") for (size_t i = 0u; i < 2u; ++i) file >> zwidths[i];
         else if (input == "capacities") for (size_t i = 0u; i < 2u; ++i) file >> capacities[i];
         else if (input == "stress") for (size_t i = 0u; i < 2u; ++i) file >> stress[i];
+        else if (input == "maxgrowth") file >> maxgrowth;
         else if (input == "steep") file >> steep;
         else if (input == "shortrange") file >> shortrange;
         else if (input == "longrange") file >> longrange;
@@ -138,11 +138,11 @@ void Parameters::check() const
         if (pgood[i] < 0.0 || pgood[i] > 1.0)
             throw std::runtime_error("Proportion of good patches should be between zero and one");
     for (size_t i = 0u; i < 2u; ++i) {
-        if (maxgrowths[i] < 0.0) throw std::runtime_error("Maximum growth rate cannot be negative");
         if (zwidths[i] < 0.0) throw std::runtime_error("Niche width cannot be negative");
         if (capacities[i] < 0.0) throw std::runtime_error("Carrying capacity cannot be negative");
         if (stress[i] < 0.0) throw std::runtime_error("Stress level cannot be negative");
     }
+    if (maxgrowth < 0.0) throw std::runtime_error("Maximum growth rate cannot be negative");
     if (steep < 0.0) throw std::runtime_error("Steepness of the tolerance function cannot be negative");
     if (shortrange < 0.0 || shortrange > 1.0) throw std::runtime_error("short-range dispersal rate should be between zero and one");
     if (longrange < 0.0 || longrange > 1.0) throw std::runtime_error("long-range dispersal rate should be between zero and one");
@@ -181,10 +181,10 @@ void Parameters::write(std::ofstream &file) const
     file << "pgood " << pgood.size();
     for (size_t i = 0u; i < pgood.size(); ++i) file << ' ' << pgood[i];
     file << '\n';
-    file << "maxgrowths " << maxgrowths[0u] << ' ' << maxgrowths[1u] << '\n';
     file << "zwidths " << zwidths[0u] << ' ' << zwidths[1u] << '\n';
     file << "capacities " << capacities[0u] << ' ' << capacities[1u] << '\n';
     file << "stress " << stress[0u] << ' ' << stress[1u] << '\n';
+    file << "maxgrowth " << maxgrowth << '\n';
     file << "steep " << steep << '\n';
     file << "shortrange " << shortrange << '\n';
     file << "longrange " << longrange << '\n';

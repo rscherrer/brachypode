@@ -79,32 +79,11 @@ BOOST_AUTO_TEST_CASE(fullMutationChangesTheWholeGenome) {
 BOOST_AUTO_TEST_CASE(development) {
 
     Individual ind;
-    ind.develop(20u, 1.0, 4.0, 4.0, 1.0); // nloci, effect, xmax, ymax, tradeoff
-    BOOST_CHECK_EQUAL(ind.getZ(), 0.0);
+    ind.develop(1.0); // effect size
+    BOOST_CHECK_EQUAL(ind.getX(), 0.0);
     ind.mutate(1.0, 20u); // mu = 1, nloci = 20
-    ind.develop(20u, 1.0, 4.0, 4.0, 1.0);
-    BOOST_CHECK_EQUAL(ind.getZ(), 20.0);
-
-}
-
-// Test type II development with maximum tolerance
-BOOST_AUTO_TEST_CASE(typeIIDevelopmentWithMaximumTolerance) {
-
-    Individual ind;
-    ind.mutate(1.0, 20u);
-    ind.develop(20u, 1.0, 1.0, 1.0, 1.0); // nloci, effect, xmax, ymax, tradeoff
-    BOOST_CHECK_EQUAL(ind.getZ(), 20.0);
-    BOOST_CHECK_EQUAL(ind.getX(), 1.0);
-
-}
-
-// Test type II development with maximum tolerance
-BOOST_AUTO_TEST_CASE(typeIIDevelopmentWithMaximumCompetitiveness) {
-
-    Individual ind;
-    ind.develop(20u, 1.0, 1.0, 1.0, 1.0); // nloci, effect, xmax, ymax, tradeoff
-    BOOST_CHECK_EQUAL(ind.getZ(), 0.0);
-    BOOST_CHECK_EQUAL(ind.getY(), 1.0);
+    ind.develop(1.0);
+    BOOST_CHECK_EQUAL(ind.getX(), 20.0);
 
 }
 
@@ -124,12 +103,10 @@ BOOST_AUTO_TEST_CASE(noChangeIfRecombinationIsZero) {
 // Make sure that founder individuals develop
 BOOST_AUTO_TEST_CASE(founderDevelops) {
 
-    // Create an individual with default parameters (initial allele frequency, number of loci, effect size, xmax and ymax, and trade-off)
-    Individual ind(1.0, 50u, 0.1, 5.0, 5.0, 0.1);
+    // Create an individual with default parameters (initial allele frequency, number of loci, effect size)
+    Individual ind(1.0, 50u, 0.1);
     
     // Check that all traits are nonzero (should be the case if has developed)
     BOOST_CHECK(ind.getX() > 0.0);
-    BOOST_CHECK(ind.getY() > 0.0);
-    BOOST_CHECK(ind.getZ() > 0.0);
 
 }

@@ -3,11 +3,9 @@
 #include "parameters.h"
 
 Parameters::Parameters() :
-    type(1u),
     popsize(10u),
     pgood({0.8, 0.6, 0.5, 0.3, 0.1}),
     stress({4.0, 0.0}),
-    zwidths({2.0, 4.0}),
     capacities({100.0, 10000.0}),
     maxgrowth(4.0),
     steep(2.0),
@@ -18,8 +16,6 @@ Parameters::Parameters() :
     nloci(50u),
     effect(0.1),
     allfreq(0.5),
-    xmax(5.0),
-    ymax(5.0),
     tradeoff(0.1),
     selfing(0.95),
     recombination(1.0),
@@ -72,8 +68,7 @@ void Parameters::import(std::ifstream &file)
 
     while (file >> input) {
 
-        if (input == "type") file >> type;
-        else if (input == "popsize") file >> popsize;
+        if (input == "popsize") file >> popsize;
         else if (input == "pgood") {
             file >> ndemes;
             if (!ndemes) throw std::runtime_error("Zero deme provided");
@@ -81,7 +76,6 @@ void Parameters::import(std::ifstream &file)
             for (size_t i = 0u; i < ndemes; ++i)
                 file >> pgood[i];
         }
-        else if (input == "zwidths") for (size_t i = 0u; i < 2u; ++i) file >> zwidths[i];
         else if (input == "capacities") for (size_t i = 0u; i < 2u; ++i) file >> capacities[i];
         else if (input == "stress") for (size_t i = 0u; i < 2u; ++i) file >> stress[i];
         else if (input == "maxgrowth") file >> maxgrowth;
@@ -93,8 +87,6 @@ void Parameters::import(std::ifstream &file)
         else if (input == "nloci") file >> nloci;
         else if (input == "effect") file >> effect;
         else if (input == "allfreq") file >> allfreq;
-        else if (input == "xmax") file >> xmax;
-        else if (input == "ymax") file >> ymax;
         else if (input == "tradeoff") file >> tradeoff;
         else if (input == "selfing") file >> selfing;
         else if (input == "recombination") file >> recombination;
@@ -132,13 +124,11 @@ void Parameters::check() const
 {
     std::string msg = "No error detected";
 
-    if (type == 0u || type > 2u) throw std::runtime_error("Invalid type");
     if (popsize == 0u) throw std::runtime_error("Initial population size cannot be zero");
     for (size_t i = 0u; i < pgood.size(); ++i)
         if (pgood[i] < 0.0 || pgood[i] > 1.0)
             throw std::runtime_error("Proportion of good patches should be between zero and one");
     for (size_t i = 0u; i < 2u; ++i) {
-        if (zwidths[i] < 0.0) throw std::runtime_error("Niche width cannot be negative");
         if (capacities[i] < 0.0) throw std::runtime_error("Carrying capacity cannot be negative");
         if (stress[i] < 0.0) throw std::runtime_error("Stress level cannot be negative");
     }
@@ -151,8 +141,6 @@ void Parameters::check() const
     if (nchrom == 0) throw std::runtime_error("There cannot be zero chromosomes");
     if (nloci == 0u) throw std::runtime_error("There cannot be zero loci");
     if (allfreq < 0.0 || allfreq > 1.0) throw std::runtime_error("Initial allele frequency should be between zero and one");
-    if (xmax < 0.0) throw std::runtime_error("Maximum tolerance cannot be negative");
-    if (ymax < 0.0) throw std::runtime_error("Maximum competitiveness cannot be negative");
     if (tradeoff < 0.0) throw std::runtime_error("Trade-off cannot be negative");
     if (selfing < 0.0 || selfing > 1.0) throw std::runtime_error("Rate of selfing must be between zero and one");
     if (recombination < 0.0) throw std::runtime_error("Recombination rate cannot be negative");
@@ -176,12 +164,10 @@ void Parameters::save() const
 void Parameters::write(std::ofstream &file) const
 {
 
-    file << "type " << type << '\n';
     file << "popsize " << popsize << '\n';
     file << "pgood " << pgood.size();
     for (size_t i = 0u; i < pgood.size(); ++i) file << ' ' << pgood[i];
     file << '\n';
-    file << "zwidths " << zwidths[0u] << ' ' << zwidths[1u] << '\n';
     file << "capacities " << capacities[0u] << ' ' << capacities[1u] << '\n';
     file << "stress " << stress[0u] << ' ' << stress[1u] << '\n';
     file << "maxgrowth " << maxgrowth << '\n';
@@ -193,8 +179,6 @@ void Parameters::write(std::ofstream &file) const
     file << "nloci " << nloci << '\n';
     file << "effect " << effect << '\n';
     file << "allfreq " << allfreq << '\n';
-    file << "xmax " << xmax << '\n';
-    file << "ymax " << ymax << '\n';
     file << "tradeoff " << tradeoff << '\n';
     file << "selfing " << selfing << '\n';
     file << "recombination " << recombination << '\n';

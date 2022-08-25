@@ -28,7 +28,6 @@ BOOST_AUTO_TEST_CASE(runWithParameterFile) {
     file << "pgood 3 0.5 0.5 0.5\n";
     file << "maxgrowth 3.0\n";
     file << "stress 5.0 1.0\n";
-    file << "zwidths 1.0 3.0\n";
     file << "capacities 1000 100\n";
     file << "shortrange 0.1\n";
     file << "longrange 0.1\n";
@@ -115,18 +114,7 @@ BOOST_AUTO_TEST_CASE(errorWhenMaxGrowthIsNegative) {
 
     std::ofstream file;
     file.open("parameters.txt");
-    file << "maxgrowths 1 -1\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when niche width is negative
-BOOST_AUTO_TEST_CASE(errorWhenNicheWidthIsNegative) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "xwidth 1 -1\n";
+    file << "maxgrowth -1\n";
     file.close();
 
     BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
@@ -149,17 +137,6 @@ BOOST_AUTO_TEST_CASE(errorWhenStressIsNegative) {
     std::ofstream file;
     file.open("parameters.txt");
     file << "stress 1 -1\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when growth is negative
-BOOST_AUTO_TEST_CASE(errorWhenGrowthIsNegative) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "growth -1\n";
     file.close();
 
     BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
@@ -231,28 +208,6 @@ BOOST_AUTO_TEST_CASE(errorWhenZeroLoci) {
     BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
 }
 
-// Should error when maximum tolerance is negative
-BOOST_AUTO_TEST_CASE(errorWhenMaxToleranceIsNegative) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "xmax -1\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when maximum competitiveness is negative
-BOOST_AUTO_TEST_CASE(errorWhenMaxCompetitivenessIsNegative) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "ymax -1\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
 // Should error when trade-off is negative
 BOOST_AUTO_TEST_CASE(errorWhenTradeOffIsNegative) {
 
@@ -295,36 +250,6 @@ BOOST_AUTO_TEST_CASE(errorWhenSimulationTimeIsZero) {
     file.close();
 
     BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Test that type II simulation works
-BOOST_AUTO_TEST_CASE(typeIISimulation) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "type 2\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 0);
-
-}
-
-// Should error when simulation type is not 1 or 2
-BOOST_AUTO_TEST_CASE(errorWhenSimulationTypeIsNot1or2) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "type 3\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-
-    file.open("parameters.txt");
-    file << "type 0\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-
 }
 
 // Test that parameters are saved properly
@@ -625,28 +550,6 @@ BOOST_AUTO_TEST_CASE(savingWorks) {
     BOOST_CHECK_EQUAL(newtimepoints.size(), 3u);
 
 }
-
-/*
-BOOST_AUTO_TEST_CASE(test) {
-
-    std::vector<std::string> filenames = {"time", "popsize", "patchsizes", "traitmeans", "individuals"};
-
-    std::cout << "hello\n";
-
-    // Read file where those are provided
-    std::ifstream infile("whattosave.txt");
-    if (!infile.is_open())
-        throw std::runtime_error("Could not read input file whattosave.txt");
-    std::vector<std::string> newfilenames;
-    std::string input;
-    while (infile >> input) newfilenames.push_back(input);
-    stf::check(newfilenames, filenames);
-    filenames.reserve(newfilenames.size());
-    filenames.resize(newfilenames.size());
-    for (size_t f = 0u; f < newfilenames.size(); ++f) filenames[f] = newfilenames[f];
-
-}
-*/
 
 // Test that providing a file with what to save works
 BOOST_AUTO_TEST_CASE(whatToSaveWorks) {

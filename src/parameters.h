@@ -24,11 +24,9 @@ struct Parameters {
     void check() const;
     size_t makeDefaultSeed();
 
-    size_t type; // simulation type (I or II)
     size_t popsize; // initial population size
     std::vector<double> pgood; // proportion of good patches in each deme
     std::vector<double> stress; // stress level in each patch
-    std::vector<double> zwidths; // niche width in each patch
     std::vector<double> capacities; // carrying capacity in each patch
     double maxgrowth; // maximum growth rate
     double steep; // steepness of tolerance function
@@ -39,8 +37,6 @@ struct Parameters {
     size_t nloci; // number of loci
     double effect; // locus effect size
     double allfreq; // initial frequency of allele 1
-    double xmax; // maximum level of tolerance
-    double ymax; // maximum level of competitiveness
     double tradeoff; // tradeoff between tolerance and competitiveness
     double selfing; // rate of selfing
     double recombination; // recombination rate

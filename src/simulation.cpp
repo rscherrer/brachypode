@@ -225,7 +225,7 @@ int simulate(const std::vector<std::string> &args) {
                 
                 // Parameters that apply to the current patch
                 const double stress = pars.stress[patch];
-                const double capacity = pars.capacities[patch];
+                const double capacity = pars.capacities[patch] * (patch ? pars.pgood[deme] : 1.0 - pars.pgood[deme]);
 
                 // Current local population size
                 const size_t n = patchsizes[2u * deme + patch];

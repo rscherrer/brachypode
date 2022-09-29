@@ -1,11 +1,5 @@
-# Data folder (where we store the simulations)
-data/
-
-# Results folder (where we store analysis scripts and figures)
-results/
-
-# Manuscript folder
-ms/
+# Ignore specific folders
+approx/
 
 ##### Windows
 # Windows thumbnail cache files

@@ -1,5 +1,6 @@
 # Ignore specific folders
 approx/
+ms/
 
 ##### Windows
 # Windows thumbnail cache files

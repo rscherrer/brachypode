@@ -9,20 +9,20 @@ theme_set(theme_classic())
 
 pars <- alist(
 
-  rmax <- 4, # maximum growth
-  s <- 0.5, # trade-off
-  a <- 5, # steepness
-  k1 <- 1000, # capacity 1
-  k2 <- 1000, # capacity 2
   m <- 0.5, # dispersal
-  theta1 <- 0, # stress 1
-  theta2 <- 4 # stress 2
+  d1 <- 0.001, # density-dependence in habitat 1
+  d2 <- 0.001, # density-dependence in habitat 2
+  bmax <- 10, # maximum number of seeds
+  s <- 0.4, # trade-off
+  a <- 5, # tolerance decay
+  theta1 <- 0, # stress in habitat 1
+  theta2 <- 4 # stress in habitat 2
 
 )
 
 pip <- plot_pip(seq(0, 6, 0.01), pars, init = c(1000, 1000))
 
-data <- map_dfr(paste0("data/sim", 1:4), function(dir) {
+data <- map_dfr(paste0("data/allfreq/sim", 1:4), function(dir) {
 
   read_trait_mean_data(dir) %>%
     mutate(allfreq = read_parameters(dir)$allfreq)

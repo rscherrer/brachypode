@@ -9,8 +9,7 @@ Parameters::Parameters() :
     capacities({100.0, 10000.0}),
     maxgrowth(4.0),
     steep(2.0),
-    shortrange(0.3),
-    longrange(0.01),
+    dispersal(0.01),
     mutation(0.0001),
     nchrom(1u),
     nloci(50u),
@@ -80,8 +79,7 @@ void Parameters::import(std::ifstream &file)
         else if (input == "stress") for (size_t i = 0u; i < 2u; ++i) file >> stress[i];
         else if (input == "maxgrowth") file >> maxgrowth;
         else if (input == "steep") file >> steep;
-        else if (input == "shortrange") file >> shortrange;
-        else if (input == "longrange") file >> longrange;
+        else if (input == "dispersal") file >> dispersal;
         else if (input == "mutation") file >> mutation;
         else if (input == "nchrom") file >> nchrom;
         else if (input == "nloci") file >> nloci;
@@ -134,8 +132,7 @@ void Parameters::check() const
     }
     if (maxgrowth < 0.0) throw std::runtime_error("Maximum growth rate cannot be negative");
     if (steep < 0.0) throw std::runtime_error("Steepness of the tolerance function cannot be negative");
-    if (shortrange < 0.0 || shortrange > 1.0) throw std::runtime_error("short-range dispersal rate should be between zero and one");
-    if (longrange < 0.0 || longrange > 1.0) throw std::runtime_error("long-range dispersal rate should be between zero and one");
+    if (dispersal < 0.0 || dispersal > 1.0) throw std::runtime_error("dispersal rate should be between zero and one");
     if (mutation < 0.0 || mutation > 1.0) throw std::runtime_error("Mutation rate should be between zero and one");
     if (nloci > 1000) throw std::runtime_error("There cannot be more than 1000 loci");
     if (nchrom == 0) throw std::runtime_error("There cannot be zero chromosomes");
@@ -172,8 +169,7 @@ void Parameters::write(std::ofstream &file) const
     file << "stress " << stress[0u] << ' ' << stress[1u] << '\n';
     file << "maxgrowth " << maxgrowth << '\n';
     file << "steep " << steep << '\n';
-    file << "shortrange " << shortrange << '\n';
-    file << "longrange " << longrange << '\n';
+    file << "dispersal " << dispersal << '\n';
     file << "mutation " << mutation << '\n';
     file << "nchrom " << nchrom << '\n';
     file << "nloci " << nloci << '\n';

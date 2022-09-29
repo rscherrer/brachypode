@@ -135,7 +135,7 @@ int simulate(const std::vector<std::string> &args) {
             const size_t npatches = 2u * ndemes;
             std::vector<double> meanx(npatches, 0.0);
 
-            // Loop through individuals to calculate them
+            // Loop through individuals to calculate means
             for (size_t i = 0u; i < pop.size(); ++i) {
 
                 // Get trait values and locations
@@ -209,9 +209,6 @@ int simulate(const std::vector<std::string> &args) {
 
             }
 
-            // Prepare to count the total number of offspring
-            size_t nseeds = 0u;
-
             // Number of adult plants
             const size_t nadults = pop.size();
 
@@ -230,26 +227,22 @@ int simulate(const std::vector<std::string> &args) {
                 // Current local population size
                 const size_t n = patchsizes[2u * deme + patch];
 
-                // Compute fitness
-                double fitness = pars.maxgrowth - pars.tradeoff * x;
-                fitness /= (1.0 + exp(pars.steep * (stress - x)));
-                fitness -= n / capacity;
+                // Population growth rate
+                const double r = pars.maxgrowth - pars.tradeoff * x;
 
-                // Fitness should be positive
-                assert(fitness > 0.0);
+                // Expected number of seeds
+                const double enseeds = exp((r > 0.0 ? r : 0.0) * (1.0 - n / capacity));
 
-                // Sample the number of surviving offspring
-                size_t noff = 0u;
-                if (fitness > 0.0) noff = rnd::poisson(fitness)(rnd::rng);
-                nseeds += noff;
+                // Realized number of seeds
+                const size_t nseeds = rnd::poisson(enseeds)(rnd::rng);
 
-                // For each surviving offspring...
-                for (size_t j = 0u; j < noff; ++j) {
+                // For each seed produced...
+                for (size_t j = 0u; j < nseeds; ++j) {
 
-                    // Add the clone to the population
+                    // Add a clone of the parent to the population
                     pop.push_back(pop[i]);
 
-                    // If it is the product of outcrossing...
+                    // If the seed is the product of outcrossing...
                     if (rnd::bernoulli(1.0 - pars.selfing)(rnd::rng)) {
 
                         // Select another adult at random to provide pollen
@@ -262,39 +255,32 @@ int simulate(const std::vector<std::string> &args) {
                     }
 
                     // If the seed disperses to another site...
-                    if (ndemes > 1u && rnd::bernoulli(pars.longrange)(rnd::rng)) {
+                    if (ndemes > 1u && rnd::bernoulli(pars.dispersal)(rnd::rng)) {
 
                         // Sample destination deme
                         size_t newdeme = rnd::random(1u, ndemes - 1u)(rnd::rng);
                         if (newdeme < deme) newdeme -= 1u;
+
+                        // Send the seed there
                         pop.back().setDeme(newdeme);
 
-                        // Lands in a random patch
-                        auto pickPatch = rnd::bernoulli(pars.pgood[pop.back().getDeme()]);
-                        pop.back().setPatch(pickPatch(rnd::rng));
+                    } 
 
-                    } else {
+                    // Within a site, the seed lands in a random patch depending on cover
+                    auto pickPatch = rnd::bernoulli(pars.pgood[pop.back().getDeme()]);
+                    pop.back().setPatch(pickPatch(rnd::rng));
 
-                        // Otherwise, the seed may still disperse within the local site depending on the cover of the other patch
-                        const double cover = pars.pgood[pop.back().getDeme()];
-                        const double target = pop.back().getPatch() ? 1.0 - cover : cover; 
-
-                        // If that happens...
-                        if (rnd::bernoulli(pars.shortrange * target)(rnd::rng)) {
-
-                            // Change patch
-                            const size_t newpatch = (pop.back().getPatch() - 1u) % 2u;
-                            pop.back().setPatch(newpatch);
-
-                        }
-
-                    }
-
-                    // Does it mutate?
+                    // Does the seed mutate?
                     pop.back().mutate(pars.mutation, pars.nloci);
 
                     // Update trait value based on its genes
                     pop.back().develop(pars.effect);
+
+                    // Compute the survival probability of the seedling
+                    const double prob = 1.0 / (1.0 + exp(pars.steep * (stress - pop.back().getX())));
+
+                    // Remove the seedling if it does not survive
+                    if (!rnd::bernoulli(prob)(rnd::rng)) pop.pop_back();
 
                 }
 

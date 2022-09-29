@@ -30,8 +30,7 @@ struct Parameters {
     std::vector<double> capacities; // carrying capacity in each patch
     double maxgrowth; // maximum growth rate
     double steep; // steepness of tolerance function
-    double shortrange; // short-range dispersal rate
-    double longrange; // long-range dispersal rate
+    double dispersal; // dispersal rate
     double mutation; // mutation rate
     size_t nchrom; // number of chromosomes
     size_t nloci; // number of loci

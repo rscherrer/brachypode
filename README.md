@@ -263,8 +263,8 @@ We developed an R package called [brachypoder](https://github.com/rscherrer/brac
 ## About the study
 
 This repository only contains the simulation program used in our study. Content for the full study can be accessed at the following links (presently private):
-* [data](https://github.com/rscherrer/brachypode-data) for the simulation data
-* [results](https://github.com/rscherrer/brachypode-results) for scripts and figures
+* [results](https://github.com/rscherrer/brachypode-results) for data, scripts and figures
 * [ms](https://github.com/rscherrer/brachypode-ms) for the manuscript
+* [approx](https://github.com/rscherrer/brachypode-approx) for Mathematica scripts detailing a deterministic approximation of the model
 
 For full reproducibility of the analyses we recommend that the aforementioned repositories be downloaded within the current repository and with names as shown above.

@@ -4,7 +4,7 @@
 #include "utilities.h"
 #include <cmath>
 
-Individual::Individual(const double &p, const size_t &n, const double &effect) :
+Individual::Individual(const double &p, const size_t &n, const std::vector<double> &effects) :
     deme(0u),
     patch(1u),
     x(0.0),
@@ -19,7 +19,7 @@ Individual::Individual(const double &p, const size_t &n, const double &effect) :
         if (ismutation(rnd::rng)) genome.set(i);
 
     // Compute phenotypes
-    develop(effect);
+    develop(effects);
 
 }
 
@@ -27,6 +27,7 @@ void Individual::kill() { alive = false; }
 void Individual::setDeme(const size_t &d) { deme = d; }
 void Individual::setPatch(const size_t &p) { patch = p; }
 void Individual::setX(const double &val) { x = val; }
+
 void Individual::mutate(const double &mu, const size_t &n) {
 
     if (mu == 0.0) return;
@@ -42,11 +43,16 @@ void Individual::mutate(const double &mu, const size_t &n) {
     }
 
 }
-void Individual::develop(const double &effect) {
 
-    x = genome.count() * effect;
+void Individual::develop(const std::vector<double> &effects) {
+
+    x = 0.0;
+    
+    for (size_t l = 0u; l < effects.size(); ++l)
+        x += genome.test(l) * effects[l];
 
 }
+
 void Individual::recombine(
     const double &rho, const Individual &pollen,
     const std::vector<double> &chromends, const std::vector<double> &locations

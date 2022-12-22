@@ -16,27 +16,26 @@ int simulate(const std::vector<std::string> &args) {
     try
     {
 
-        // Check arguments
-        if (args.size() > 2u)
-            throw std::runtime_error("Too many arguments");
-
         // Create a default parameter set
         Parameters pars;
 
+        // Error if two many arguments
+        if (args.size() > 2u) throw std::runtime_error("Two many arguments provided.");
+
         // Read parameters from a file if supplied
-        if (args.size() > 1u) pars.read(args[1u]);
+        if (args.size() == 2u) pars.read(args[1u]);
 
         // Save parameters if necessary
         if (pars.savepars) pars.save();
 
         // Initialize a population of individuals
-        std::vector<Individual> pop(pars.popsize, {pars.allfreq, pars.nloci, pars.effect});
+        std::vector<Individual> pop(pars.popsize, {pars.allfreq, pars.nloci, std::vector<double>(pars.nloci, pars.effect)});
 
         // Number of demes
         const size_t ndemes = pars.pgood.size();
 
         // Create a genetic architecture
-        Architecture arch(pars.nchrom, pars.nloci);
+        Architecture arch(pars.nchrom, pars.nloci, pars.effect);
 
         // If necessary...
         if (pars.loadarch) {
@@ -55,6 +54,11 @@ int simulate(const std::vector<std::string> &args) {
 
         // Save parameters if necessary
         if (pars.savepars) pars.save();
+
+        // Some extra parameters if needed
+        const double d = -log2(1.0 - pars.tradeoff); // useful exponent
+        double xmax = 0.0;
+        for (size_t l = 0u; l < arch.effects.size(); ++l) xmax += arch.effects[l];
 
         // Redirect output to log file if needed
         if (pars.savelog) pars.savelog = std::freopen("log.txt", "w", stdout);
@@ -122,6 +126,9 @@ int simulate(const std::vector<std::string> &args) {
 
         // At each time step...
         for (size_t t = 0u; t <= pars.tend; ++t) {
+
+            // Update climate if necessary
+            if (t >= pars.tchange) pars.changeClimate(pars.tchange + pars.twarming - t);
 
             // Flag to know if it is time to save some data
             const bool timetosave = t % pars.tsave == 0u;
@@ -220,18 +227,24 @@ int simulate(const std::vector<std::string> &args) {
                 const size_t patch = pop[i].getPatch();
                 const double x = pop[i].getX();
                 
-                // Parameters that apply to the current patch
-                const double stress = pars.stress[patch];
-                const double capacity = pars.capacities[patch] * (patch ? pars.pgood[deme] : 1.0 - pars.pgood[deme]);
-
                 // Current local population size
                 const size_t n = patchsizes[2u * deme + patch];
 
                 // Population growth rate
-                const double r = pars.maxgrowth - pars.tradeoff * x;
+                double r = pars.maxgrowth - pars.tradeoff * x;
+                if (pars.type == 2u) r = pars.maxgrowth * pow(1.0 - pow(x / xmax, 1.0 / d), d);
+
+                // Shrub cover in the current deme
+                const double pgood = pars.pgood[deme];
+
+                // Cover of the focal patch in the deme
+                const double cover = patch ? pgood : 1.0 - pgood;
+
+                // Total carrying capacity in the deme for the focal patch
+                const double Ktot = pars.capacities[patch] * cover;
 
                 // Expected number of seeds
-                const double enseeds = exp((r > 0.0 ? r : 0.0) * (1.0 - n / capacity));
+                const double enseeds = exp((r > 0.0 ? r : 0.0) * (1.0 - n / Ktot));
 
                 // Realized number of seeds
                 const size_t nseeds = rnd::poisson(enseeds)(rnd::rng);
@@ -274,10 +287,16 @@ int simulate(const std::vector<std::string> &args) {
                     pop.back().mutate(pars.mutation, pars.nloci);
 
                     // Update trait value based on its genes
-                    pop.back().develop(pars.effect);
+                    pop.back().develop(arch.effects);
+
+                    // Stress level in the patch where the seed has landed
+                    const double stress = pars.stress[pop.back().getPatch()];
+
+                    // Trait value of the seedling
+                    const double xoff = pop.back().getX();
 
                     // Compute the survival probability of the seedling
-                    const double prob = 1.0 / (1.0 + exp(pars.steep * (stress - pop.back().getX())));
+                    const double prob = 1.0 / (1.0 + exp(pars.steep * (stress - xoff)));
 
                     // Remove the seedling if it does not survive
                     if (!rnd::bernoulli(prob)(rnd::rng)) pop.pop_back();

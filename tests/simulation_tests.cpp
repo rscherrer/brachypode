@@ -43,17 +43,10 @@ BOOST_AUTO_TEST_CASE(runWithParameterFile) {
 
 }
 
-// Test that it fails when an even number of arguments is provided
-BOOST_AUTO_TEST_CASE(evenNumberOfArgs) {
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "-file"}), 1);
-
-}
-
 // Test that it fails when too many arguments are provided
 BOOST_AUTO_TEST_CASE(tooManyArgs) {
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt", "-extra"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "parameter.txt", "onetoomany.txt"}), 1);
 
 }
 
@@ -246,6 +239,36 @@ BOOST_AUTO_TEST_CASE(errorWhenSimulationTimeIsZero) {
     std::ofstream file;
     file.open("parameters.txt");
     file << "tend 0\n";
+    file.close();
+
+    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+}
+
+// Should error when invalid trade-off implementation type
+BOOST_AUTO_TEST_CASE(errorWhenInvalidType) {
+
+    std::ofstream file;
+    file.open("parameters.txt");
+    file << "type 3\n";
+    file.close();
+
+    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+}
+
+// Should error when trade-off is greater than one when type is II
+BOOST_AUTO_TEST_CASE(errorWhenTradeOffLargerThanOneOnlyIfTypeIsII) {
+
+    std::ofstream file;
+    file.open("parameters.txt");
+    file << "type 1\n";
+    file << "tradeoff 1.1\n";
+    file.close();
+
+    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 0);
+
+    file.open("parameters.txt");
+    file << "type 2\n";
+    file << "tradeoff 1.1\n";
     file.close();
 
     BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);

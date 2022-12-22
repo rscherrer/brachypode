@@ -2,9 +2,10 @@
 
 #include "architecture.h"
 
-Architecture::Architecture(const size_t &nchrom, const size_t& nloci) :
+Architecture::Architecture(const size_t &nchrom, const size_t& nloci, const double &effect) :
     chromends(std::vector<double>(nchrom, 0.0)),
-    locations(std::vector<double>(nloci, 0.0))
+    locations(std::vector<double>(nloci, 0.0)),
+    effects(std::vector<double>(nloci, effect))
 {
 
     // Generate ends of chromosomes (chromosomes have equal sizes)
@@ -84,6 +85,7 @@ void Architecture::load() {
 
     // Resize containers
     locations.resize(nloci);
+    effects.resize(nloci);
 
     // For each locus...
     for (size_t l = 0u; l < nloci; ++l) {
@@ -97,6 +99,14 @@ void Architecture::load() {
         // Check location
         if (locations[l] < 0.0) throw std::runtime_error("Locus location should be positive");
         if (locations[l] > chromends.back()) throw std::runtime_error("Locus location should not be beyond the end of the last chromosome");
+
+    }
+
+    // For each locus...
+    for (size_t l = 0u; l < nloci; ++l) {
+
+        // Read the effect size
+        file >> effects[l];
 
     }
 
@@ -114,14 +124,16 @@ void Architecture::save(const Parameters &pars) const
 
     // Write chromosome ends
     assert(pars.nchrom == chromends.size());
-    archfile << pars.nchrom;
+    archfile << pars.nchrom << '\n';
     for (size_t k = 0u; k < pars.nchrom; ++k) archfile << ' ' << chromends[k];
     archfile << '\n';
 
-    // Write locus locations
+    // Write locus number, locations and effect sizes
     assert(pars.nloci == locations.size());
-    archfile << pars.nloci;
+    archfile << pars.nloci << '\n';
     for (size_t l = 0u; l < pars.nloci; ++l) archfile << ' ' << locations[l];
+    archfile << '\n';
+    for (size_t l = 0u; l < pars.nloci; ++l) archfile << ' ' << effects[l];
     archfile << '\n';
 
     archfile.close();

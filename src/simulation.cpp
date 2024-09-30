@@ -16,27 +16,26 @@ int simulate(const std::vector<std::string> &args) {
     try
     {
 
-        // Check arguments
-        if (args.size() > 2u)
-            throw std::runtime_error("Too many arguments");
-
         // Create a default parameter set
         Parameters pars;
 
+        // Error if two many arguments
+        if (args.size() > 2u) throw std::runtime_error("Two many arguments provided.");
+
         // Read parameters from a file if supplied
-        if (args.size() > 1u) pars.read(args[1u]);
+        if (args.size() == 2u) pars.read(args[1u]);
 
         // Save parameters if necessary
         if (pars.savepars) pars.save();
 
         // Initialize a population of individuals
-        std::vector<Individual> pop(pars.popsize, {pars.allfreq, pars.nloci});
+        std::vector<Individual> pop(pars.popsize, {pars.allfreq, pars.nloci, std::vector<double>(pars.nloci, pars.effect)});
 
         // Number of demes
         const size_t ndemes = pars.pgood.size();
 
         // Create a genetic architecture
-        Architecture arch(pars.nchrom, pars.nloci);
+        Architecture arch(pars.nchrom, pars.nloci, pars.effect);
 
         // If necessary...
         if (pars.loadarch) {
@@ -56,6 +55,11 @@ int simulate(const std::vector<std::string> &args) {
         // Save parameters if necessary
         if (pars.savepars) pars.save();
 
+        // Some extra parameters if needed
+        const double d = -log2(1.0 - pars.tradeoff); // useful exponent
+        double xmax = 0.0;
+        for (size_t l = 0u; l < arch.effects.size(); ++l) xmax += arch.effects[l];
+
         // Redirect output to log file if needed
         if (pars.savelog) pars.savelog = std::freopen("log.txt", "w", stdout);
 
@@ -72,7 +76,7 @@ int simulate(const std::vector<std::string> &args) {
             std::ifstream infile("whattosave.txt");
             if (!infile.is_open())
                 throw std::runtime_error("Could not read input file whattosave.txt");
-            std::vector<std::string> newfilenames = { };
+            std::vector<std::string> newfilenames;
             std::string input;
             while (infile >> input) newfilenames.push_back(input);
             stf::check(newfilenames, filenames);
@@ -98,12 +102,33 @@ int simulate(const std::vector<std::string> &args) {
             else if (filename == "traitmeans") traitmeansFile = f;
             else if (filename == "individuals") individualsFile = f;
             else throw std::runtime_error("Invalid output requested in whattosave.txt");
+
         }
 
         std::cout << "Simulation started.\n";
 
+        // Sow the individuals at random if needed
+        if (pars.sow) {
+
+            auto pickDeme = rnd::random(0u, ndemes - 1u);
+
+            for (size_t i = 0u; i < pop.size(); ++i) {
+
+                const size_t newdeme = pickDeme(rnd::rng);
+                auto pickPatch = rnd::bernoulli(pars.pgood[newdeme]);
+                const size_t newpatch = pickPatch(rnd::rng);
+                pop[i].setDeme(newdeme);
+                pop[i].setPatch(newpatch);
+
+            }
+
+        }
+
         // At each time step...
         for (size_t t = 0u; t <= pars.tend; ++t) {
+
+            // Update climate if necessary
+            if (t >= pars.tchange) pars.changeClimate(pars.tchange + pars.twarming - t);
 
             // Flag to know if it is time to save some data
             const bool timetosave = t % pars.tsave == 0u;
@@ -111,20 +136,17 @@ int simulate(const std::vector<std::string> &args) {
             // Compute useful population statistics
             size_t popsize = 0u;
             std::vector<size_t> demesizes(ndemes, 0u);
-            std::vector<std::vector<size_t>> patchsizes(ndemes, {0u, 0u});
+            std::vector<size_t> patchsizes(2u * ndemes, 0u);
 
             // Containers for mean traits in each deme and each patch
-            std::vector<std::vector<double> > meanx(ndemes, std::vector<double>(2u, 0.0));
-            std::vector<std::vector<double> > meany(ndemes, std::vector<double>(2u, 0.0));
-            std::vector<std::vector<double> > meanz(ndemes, std::vector<double>(2u, 0.0));
+            const size_t npatches = 2u * ndemes;
+            std::vector<double> meanx(npatches, 0.0);
 
-            // Loop through individuals to calculate them
+            // Loop through individuals to calculate means
             for (size_t i = 0u; i < pop.size(); ++i) {
 
                 // Get trait values and locations
                 const double x = pop[i].getX();
-                const double y = pop[i].getY();
-                const double z = pop[i].getZ();
                 const size_t deme = pop[i].getDeme();
                 const size_t patch = pop[i].getPatch();
 
@@ -136,18 +158,15 @@ int simulate(const std::vector<std::string> &args) {
                     outfiles[individualsFile]->write((char *) &deme_, sizeof(double));
                     outfiles[individualsFile]->write((char *) &patch_, sizeof(double));
                     outfiles[individualsFile]->write((char *) &x, sizeof(double));
-                    outfiles[individualsFile]->write((char *) &y, sizeof(double));
-                    outfiles[individualsFile]->write((char *) &z, sizeof(double));
 
                 }
 
                 // Update statistics
                 ++popsize;
                 ++demesizes[deme];
-                ++patchsizes[deme][patch];
-                meanx[deme][patch] += x;
-                meany[deme][patch] += y;
-                meanz[deme][patch] += z;
+                const size_t j = 2u * deme + patch;
+                ++patchsizes[j];
+                meanx[j] += x;
 
             }
 
@@ -165,49 +184,37 @@ int simulate(const std::vector<std::string> &args) {
 
             // Save patch sizes if needed
             if (timetosave && patchsizesFile >= 0) {
+
                 for (size_t j = 0u; j < patchsizes.size(); ++j) {
-                    const double patchsize0_ = static_cast<double>(patchsizes[j][0u]);
-                    const double patchsize1_ = static_cast<double>(patchsizes[j][1u]);
-                    outfiles[patchsizesFile]->write((char *) &patchsize0_, sizeof(double));
-                    outfiles[patchsizesFile]->write((char *) &patchsize1_, sizeof(double));
+
+                    const double patchsize_ = static_cast<double>(patchsizes[j]);
+                    outfiles[patchsizesFile]->write((char *) &patchsize_, sizeof(double));
+
                 }
+
             }
 
-            // Keep sums of competitiveness (y) for later
-            std::vector<std::vector<double>> sumys(meany);
-
             // Convert sums into a mean...
-            for (size_t j = 0u; j < demesizes.size(); ++j) {
-                for (size_t k = 0u; k < 2u; ++k) {
+            for (size_t j = 0u; j < patchsizes.size(); ++j) {
 
-                    const size_t n = patchsizes[j][k];
+                const size_t n = patchsizes[j];
 
-                    if (n > 0u) {
-                        meanx[j][k] /= n;
-                        meany[j][k] /= n;
-                        meanz[j][k] /= n;
-                    }
+                if (n > 0u) meanx[j] /= n;
 
-                    // Save trait means if needed
-                    if (timetosave && traitmeansFile >= 0) {
-                        outfiles[traitmeansFile]->write((char *) &meanx[j][k], sizeof(double));
-                        outfiles[traitmeansFile]->write((char *) &meany[j][k], sizeof(double));
-                        outfiles[traitmeansFile]->write((char *) &meanz[j][k], sizeof(double));
-                    }
-                }
+                // Save trait means if needed
+                if (timetosave && traitmeansFile >= 0)
+                    outfiles[traitmeansFile]->write((char *) &meanx[j], sizeof(double));
+
             }
 
             // Verbose if needed
             if (pars.talkative) {
 
                 std::cout << "n = { ";
-                for (size_t j = 0u; j < ndemes; ++j) std::cout << demesizes[j] << ' ';
+                for (size_t j = 0u; j < demesizes.size(); ++j) std::cout << demesizes[j] << ' ';
                 std::cout << "} at t = " << t << '\n';
 
             }
-
-            // Prepare to count the total number of offspring
-            size_t nseeds = 0u;
 
             // Number of adult plants
             const size_t nadults = pop.size();
@@ -215,42 +222,40 @@ int simulate(const std::vector<std::string> &args) {
             // For each adult plant...
             for (size_t i = 0u; i < nadults; ++i) {
 
+                // Extract relevant information
                 const size_t deme = pop[i].getDeme();
                 const size_t patch = pop[i].getPatch();
                 const double x = pop[i].getX();
-                const double y = pop[i].getY();
-                const double z = pop[i].getZ();
-                const double maxgrowth = pars.type == 1u ? pars.maxgrowths[patch] : pars.maxgrowths[0u];
-                const double stress = pars.stress[patch];
-                const double zwidth = pars.zwidths[patch];
-                const double cover = patch == 0u ? 1.0 - pars.pgood[deme] : pars.pgood[deme];
-                const double capacity = pars.capacities[patch] * cover;
+                
+                // Current local population size
+                const size_t n = patchsizes[2u * deme + patch];
 
-                // Initialize fitness
-                double fitness = maxgrowth;
+                // Population growth rate
+                double r = pars.maxgrowth - pars.tradeoff * x;
+                if (pars.type == 2u) r = pars.maxgrowth * pow(1.0 - pow(x / xmax, 1.0 / d), d);
 
-                // Compute realized growth rate
-                if (pars.type == 1u) fitness *= exp(-utl::sqr((z - stress) / zwidth));
-                else if (pars.type == 2u) fitness /= (1.0 + exp(pars.steep * (stress - x)));
-                else throw std::runtime_error("Invalid simulation type");
+                // Shrub cover in the current deme
+                const double pgood = pars.pgood[deme];
 
-                // Local competition within deme and patche
-                if (pars.type == 1u) fitness *= (1.0 - patchsizes[deme][patch] / capacity);
-                else if (pars.type == 2u) fitness *= (y / sumys[deme][patch] * capacity);
-                else throw std::runtime_error("Invalid simulation type");
+                // Cover of the focal patch in the deme
+                const double cover = patch ? pgood : 1.0 - pgood;
 
-                // Sample the number of surviving offspring
-                size_t noff = 0u;
-                if (fitness > 0.0) noff = rnd::poisson(fitness)(rnd::rng);
-                nseeds += noff;
+                // Total carrying capacity in the deme for the focal patch
+                const double Ktot = pars.capacities[patch] * cover;
 
-                // For each surviving offspring...
-                for (size_t j = 0u; j < noff; ++j) {
+                // Expected number of seeds
+                const double enseeds = exp((r > 0.0 ? r : 0.0) * (1.0 - n / Ktot));
 
-                    // Add the clone to the population
+                // Realized number of seeds
+                const size_t nseeds = rnd::poisson(enseeds)(rnd::rng);
+
+                // For each seed produced...
+                for (size_t j = 0u; j < nseeds; ++j) {
+
+                    // Add a clone of the parent to the population
                     pop.push_back(pop[i]);
 
-                    // If it is the product of outcrossing...
+                    // If the seed is the product of outcrossing...
                     if (rnd::bernoulli(1.0 - pars.selfing)(rnd::rng)) {
 
                         // Select another adult at random to provide pollen
@@ -262,24 +267,39 @@ int simulate(const std::vector<std::string> &args) {
 
                     }
 
-                    // If the seed disperses...
+                    // If the seed disperses to another site...
                     if (ndemes > 1u && rnd::bernoulli(pars.dispersal)(rnd::rng)) {
 
                         // Sample destination deme
                         size_t newdeme = rnd::random(1u, ndemes - 1u)(rnd::rng);
                         if (newdeme < deme) newdeme -= 1u;
+
+                        // Send the seed there
                         pop.back().setDeme(newdeme);
 
-                    }
+                    } 
 
-                    // Which patch does it land in?
-                    pop.back().setPatch(rnd::bernoulli(pars.pgood[pop.back().getDeme()])(rnd::rng));
+                    // Within a site, the seed lands in a random patch depending on cover
+                    auto pickPatch = rnd::bernoulli(pars.pgood[pop.back().getDeme()]);
+                    pop.back().setPatch(pickPatch(rnd::rng));
 
-                    // Does it mutate?
+                    // Does the seed mutate?
                     pop.back().mutate(pars.mutation, pars.nloci);
 
                     // Update trait value based on its genes
-                    pop.back().develop(pars.nloci, pars.effect, pars.xmax, pars.ymax, pars.tradeoff);
+                    pop.back().develop(arch.effects);
+
+                    // Stress level in the patch where the seed has landed
+                    const double stress = pars.stress[pop.back().getPatch()];
+
+                    // Trait value of the seedling
+                    const double xoff = pop.back().getX();
+
+                    // Compute the survival probability of the seedling
+                    const double prob = 1.0 / (1.0 + exp(pars.steep * (stress - xoff)));
+
+                    // Remove the seedling if it does not survive
+                    if (!rnd::bernoulli(prob)(rnd::rng)) pop.pop_back();
 
                 }
 
@@ -325,4 +345,3 @@ int simulate(const std::vector<std::string> &args) {
     return 1;
 
 }
-

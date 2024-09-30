@@ -57,7 +57,7 @@ void stf::check(const std::vector<std::string> &v1, const std::vector<std::strin
     for (size_t i = 0u; i < v1.size(); ++i) {
 
         // Match it to each file name in the default list...
-        for (size_t j = 0u; j < v2.size(); ++i) {
+        for (size_t j = 0u; j < v2.size(); ++j) {
 
             // If there is one match, the provided name is valid
             if (v1[i] == v2[j]) {

@@ -1,5 +1,8 @@
-#define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MAIN
+#define BOOST_TEST_DYNAMIC_LINK
+#define BOOST_TEST_MODULE Main
+
+// On QtCreator:
+// #define BOOST_TEST_DYN_LINK
 
 // Here we test all the uses and misuses of the program. These mostly have to
 // with calling the program, passing arguments, reading from and writing to
@@ -23,9 +26,8 @@ BOOST_AUTO_TEST_CASE(runWithParameterFile) {
     file.open("parameters.txt");
     file << "popsize 10\n";
     file << "pgood 3 0.5 0.5 0.5\n";
-    file << "maxgrowths 1.0 2.0\n";
+    file << "maxgrowth 3.0\n";
     file << "stress 5.0 1.0\n";
-    file << "zwidths 1.0 3.0\n";
     file << "capacities 1000 100\n";
     file << "dispersal 0.1\n";
     file << "mutation 0.001\n";
@@ -41,17 +43,10 @@ BOOST_AUTO_TEST_CASE(runWithParameterFile) {
 
 }
 
-// Test that it fails when an even number of arguments is provided
-BOOST_AUTO_TEST_CASE(evenNumberOfArgs) {
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "-file"}), 1);
-
-}
-
 // Test that it fails when too many arguments are provided
 BOOST_AUTO_TEST_CASE(tooManyArgs) {
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt", "-extra"}), 1);
+    BOOST_CHECK_EQUAL(simulate({"program_name", "parameter.txt", "onetoomany.txt"}), 1);
 
 }
 
@@ -111,18 +106,7 @@ BOOST_AUTO_TEST_CASE(errorWhenMaxGrowthIsNegative) {
 
     std::ofstream file;
     file.open("parameters.txt");
-    file << "maxgrowths 1 -1\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when niche width is negative
-BOOST_AUTO_TEST_CASE(errorWhenNicheWidthIsNegative) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "xwidth 1 -1\n";
+    file << "maxgrowth -1\n";
     file.close();
 
     BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
@@ -145,17 +129,6 @@ BOOST_AUTO_TEST_CASE(errorWhenStressIsNegative) {
     std::ofstream file;
     file.open("parameters.txt");
     file << "stress 1 -1\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when growth is negative
-BOOST_AUTO_TEST_CASE(errorWhenGrowthIsNegative) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "growth -1\n";
     file.close();
 
     BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
@@ -227,28 +200,6 @@ BOOST_AUTO_TEST_CASE(errorWhenZeroLoci) {
     BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
 }
 
-// Should error when maximum tolerance is negative
-BOOST_AUTO_TEST_CASE(errorWhenMaxToleranceIsNegative) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "xmax -1\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when maximum competitiveness is negative
-BOOST_AUTO_TEST_CASE(errorWhenMaxCompetitivenessIsNegative) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "ymax -1\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
 // Should error when trade-off is negative
 BOOST_AUTO_TEST_CASE(errorWhenTradeOffIsNegative) {
 
@@ -293,20 +244,8 @@ BOOST_AUTO_TEST_CASE(errorWhenSimulationTimeIsZero) {
     BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
 }
 
-// Test that type II simulation works
-BOOST_AUTO_TEST_CASE(typeIISimulation) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "type 2\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 0);
-
-}
-
-// Should error when simulation type is not 1 or 2
-BOOST_AUTO_TEST_CASE(errorWhenSimulationTypeIsNot1or2) {
+// Should error when invalid trade-off implementation type
+BOOST_AUTO_TEST_CASE(errorWhenInvalidType) {
 
     std::ofstream file;
     file.open("parameters.txt");
@@ -314,13 +253,25 @@ BOOST_AUTO_TEST_CASE(errorWhenSimulationTypeIsNot1or2) {
     file.close();
 
     BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+}
+
+// Should error when trade-off is greater than one when type is II
+BOOST_AUTO_TEST_CASE(errorWhenTradeOffLargerThanOneOnlyIfTypeIsII) {
+
+    std::ofstream file;
+    file.open("parameters.txt");
+    file << "type 1\n";
+    file << "tradeoff 1.1\n";
+    file.close();
+
+    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 0);
 
     file.open("parameters.txt");
-    file << "type 0\n";
+    file << "type 2\n";
+    file << "tradeoff 1.1\n";
     file.close();
 
     BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-
 }
 
 // Test that parameters are saved properly
@@ -592,8 +543,8 @@ BOOST_AUTO_TEST_CASE(writingTheRightStuff) {
 
 }
 
-// Test that providing a file with what to save works
-BOOST_AUTO_TEST_CASE(whatToSaveWorks) {
+// Test that saving data works
+BOOST_AUTO_TEST_CASE(savingWorks) {
 
     // Same as the previous test at the beginning
     std::ofstream file;
@@ -619,6 +570,37 @@ BOOST_AUTO_TEST_CASE(whatToSaveWorks) {
     // Check the new data does not have the same number of entries
     BOOST_CHECK(newtimepoints.size() < timepoints.size());
     BOOST_CHECK_EQUAL(newtimepoints.size(), 3u);
+
+}
+
+// Test that providing a file with what to save works
+BOOST_AUTO_TEST_CASE(whatToSaveWorks) {
+
+    // Create parameters
+    std::ofstream file;
+    file.open("parameters.txt");
+    file << "tend 10\n";
+    file << "tsave 2\n";
+    file << "choose 1\n";
+    file.close();
+
+    // Create a what-to-save file
+    std::ofstream wtsfile;
+    wtsfile.open("whattosave.txt");
+    wtsfile << "time\n";
+    wtsfile << "popsize\n";
+    wtsfile.close();
+
+    // Simulate
+    simulate({"program_name", "parameters.txt"});
+
+    // Read back
+    std::vector<size_t> timepoints = readBinary("time.dat");
+    std::vector<size_t> popsizes = readBinary("popsize.dat");
+
+    // Check
+    BOOST_CHECK_EQUAL(timepoints.size(), 6u);
+    BOOST_CHECK_EQUAL(popsizes.size(), 6u);
 
 }
 

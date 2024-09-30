@@ -4,12 +4,10 @@
 #include "utilities.h"
 #include <cmath>
 
-Individual::Individual(const double &p, const size_t &n) :
+Individual::Individual(const double &p, const size_t &n, const std::vector<double> &effects) :
     deme(0u),
     patch(1u),
     x(0.0),
-    y(0.0),
-    z(0.0),
     alive(true),
     genome(std::bitset<1000>())
 {
@@ -20,12 +18,16 @@ Individual::Individual(const double &p, const size_t &n) :
     for (size_t i = 0u; i < n; ++i)
         if (ismutation(rnd::rng)) genome.set(i);
 
+    // Compute phenotypes
+    develop(effects);
+
 }
 
 void Individual::kill() { alive = false; }
 void Individual::setDeme(const size_t &d) { deme = d; }
 void Individual::setPatch(const size_t &p) { patch = p; }
 void Individual::setX(const double &val) { x = val; }
+
 void Individual::mutate(const double &mu, const size_t &n) {
 
     if (mu == 0.0) return;
@@ -41,18 +43,16 @@ void Individual::mutate(const double &mu, const size_t &n) {
     }
 
 }
-void Individual::develop(
-    const size_t &nloci, const double &effect, const double &xmax,
-    const double &ymax, const double &tradeoff
-) {
 
-    const double zmin = 0.0;
-    const double zmax = nloci * effect;
-    z = genome.count() * effect;
-    x = xmax * exp(-tradeoff * utl::sqr(z - zmax));
-    y = ymax * exp(-tradeoff * utl::sqr(z - zmin));
+void Individual::develop(const std::vector<double> &effects) {
+
+    x = 0.0;
+    
+    for (size_t l = 0u; l < effects.size(); ++l)
+        x += genome.test(l) * effects[l];
 
 }
+
 void Individual::recombine(
     const double &rho, const Individual &pollen,
     const std::vector<double> &chromends, const std::vector<double> &locations
@@ -132,8 +132,6 @@ void Individual::recombine(
 size_t Individual::getDeme() const { return deme; }
 size_t Individual::getPatch() const { return patch; }
 double Individual::getX() const { return x; }
-double Individual::getY() const { return y; }
-double Individual::getZ() const { return z; }
 bool Individual::isAlive() const { return alive; }
 size_t Individual::getAllele(const size_t &l) const { return genome.test(l); }
 size_t Individual::getAlleleSum() const { return genome.count(); }

@@ -77,7 +77,7 @@ The user can choose which variables to save from the simulation. Those have to b
 * [brachypoder](https://github.com/rscherrer/brachypoder): package to read the simulations in R
 * [brachypode-results](https://github.com/rscherrer/brachypode-results): generated data and analyses of the results
 * [brachypode-ms](https://github.com/rscherrer/brachypode-ms): manuscript
-* [brachypde-approx](https://github.com/rscherrer/brachypode-approx): [Mathematica](https://www.wolfram.com/mathematica/) notebooks used for some derivations
+* [brachypode-approx](https://github.com/rscherrer/brachypode-approx): [Mathematica](https://www.wolfram.com/mathematica/) notebooks used for some derivations
 
 ## Permissions
 

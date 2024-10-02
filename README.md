@@ -62,15 +62,15 @@ talkative 0
 choose 0
 ```
 
-and should be present within the working directory where the simulation is launched. Click [here](docs/PARAMETERS.md) for a detailed description of the parameters and their meaning.
+and should be present within the working directory where the simulation is launched. Click [here](doc/PARAMETERS.md) for a detailed description of the parameters and their meaning.
 
 ### Genetic architecture
 
-For parameters that have to do with the genetic architecture of the evolving traits in this simulation, see [here](docs/ARCHITECTURE).
+For parameters that have to do with the genetic architecture of the evolving traits in this simulation, see [here](doc/ARCHITECTURE).
 
 ### Output
 
-The user can choose which variables to save from the simulation. Those have to be encoded in the `whattosave.txt` file provided that parameter `choose` is set to `1` within the `parameters.txt` file, as explained [here](docs/OUTPUT.md). Output data are saved into binary files with the `.dat` extension, which can be read by the custom-made [R](https://www.r-project.org/) package [brachypoder](https://github.com/rscherrer/brachypoder).
+The user can choose which variables to save from the simulation. Those have to be encoded in the `whattosave.txt` file provided that parameter `choose` is set to `1` within the `parameters.txt` file, as explained [here](doc/OUTPUT.md). Output data are saved into binary files with the `.dat` extension, which can be read by the custom-made [R](https://www.r-project.org/) package [brachypoder](https://github.com/rscherrer/brachypoder).
 
 ## Links
 

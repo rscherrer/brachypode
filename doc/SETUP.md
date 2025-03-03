@@ -39,7 +39,7 @@ set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR})
 add_subdirectory(src)
 ```
 
-Make sure to save that file as `CMakeFile.txt` in the root directory of the repository.
+Make sure to save that file as `CMakeLists.txt` in the root directory of the repository.
 
 ### Build the program
 

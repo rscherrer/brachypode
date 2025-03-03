@@ -6,6 +6,14 @@ In this guide we show how to build the program using CMake. We provide a ready-m
 - Build system: [CMake](https://cmake.org/) (>= 3.16)
 - Source retrieval: git (optional)
 
+### Download the code
+
+You can download the source code using `git`:
+
+```shell
+git clone https://github.com:rscherrer/brachypode
+```
+
 ### Configure CMake
 
 Our setup uses the following `CMakeLists.txt` configuration file:
@@ -32,14 +40,6 @@ add_subdirectory(src)
 ```
 
 Make sure to save that file as `CMakeFile.txt` in the root directory of the repository.
-
-### Download the code
-
-You can download the source code using `git`:
-
-```shell
-git clone https://github.com:rscherrer/brachypode
-```
 
 ### Build the program
 

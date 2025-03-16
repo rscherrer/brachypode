@@ -14,6 +14,12 @@ You can download the source code using `git`:
 git clone https://github.com/rscherrer/brachypode
 ```
 
+Make sure you run the following commands from within the root directory of the repo by using:
+
+```bash
+cd brachypode
+```
+
 ### Configure CMake
 
 Our setup uses the following `CMakeLists.txt` configuration file. Make sure to have it saved in the root directory of the repository.

@@ -1,4 +1,4 @@
-In this guide we show how to modify our [main CMake setup](SETUP.md) in order to run the tests that come with the program. Those tests were written with the [Boost.Test](https://www.boost.org/doc/libs/1_86_0/libs/test/doc/html/index.html) C++ library, and here we show how to build them as separate executables that can be used to check the proper behavior of the program. Check out [this page](https://en.wikipedia.org/wiki/Test-driven_development) for more information about _unit testing_ and _test-driven development_ (TDD).
+In this guide we show how to modify our [main CMake setup](SETUP.md) in order to run the tests that come with the program. Those tests were written with the [Boost.Test](https://www.boost.org/doc/libs/1_86_0/libs/test/doc/html/index.html) C++ library, and here we show how to build them as separate executables that can be used to check the proper behavior of the program. Check out [this page](https://en.wikipedia.org/wiki/Test-driven_development) for more information about **_unit testing_** and **_test-driven development_** (TDD).
 
 ### Prerequisites
 

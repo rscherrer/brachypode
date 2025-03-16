@@ -11,7 +11,7 @@ In this guide we show how to build the program using CMake. We provide a ready-m
 You can download the source code using `git`:
 
 ```shell
-git clone https://github.com:rscherrer/brachypode
+git clone https://github.com/rscherrer/brachypode
 ```
 
 ### Configure CMake

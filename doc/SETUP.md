@@ -16,7 +16,7 @@ git clone https://github.com:rscherrer/brachypode
 
 ### Configure CMake
 
-Our setup uses the following `CMakeLists.txt` configuration file:
+Our setup uses the following `CMakeLists.txt` configuration file. Make sure to have it saved in the root directory of the repository.
 
 ```cmake
 # CMakeLists.txt
@@ -39,14 +39,29 @@ set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR})
 add_subdirectory(src)
 ```
 
-Make sure to save that file as `CMakeLists.txt` in the root directory of the repository.
+Then, make sure to have this other `CMakeLists.txt` file, this time saved in the `src/` folder:
+
+```cmake
+# src/CMakeLists.txt
+
+# Collect source and header files
+file(GLOB_RECURSE src 
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.hpp
+)
+
+# Instruct CMake to build the binary
+add_executable(setupp "${CMAKE_SOURCE_DIR}/main.cpp" ${src})
+
+# Place the binary into ./bin/
+set_target_properties(setupp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/$<0:>)
+```
 
 ### Build the program
 
-Then, the following code sets the repository as working directory, creates a build folder and instructs CMake to build the program in release mode according to the instructions given in the `CMakeLists.txt` configuration file.
+Then, run the following code from within the repository to create a build folder and instruct CMake to build the program in release mode according to the instructions given in the `CMakeLists.txt` configuration file.
 
 ```shell 
-cd brachypode
 mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..

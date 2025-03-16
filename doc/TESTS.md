@@ -62,6 +62,47 @@ This file is substantially longer than the one used in our main setup, as it now
 
 Note: the source code for the tests is located in `tests/`.
 
+On top of that file, make sure to have the following `CMakeLists.txt` file saved in the `src/` directory (it is the same one as in our [main setup](SETUP.md)):
+
+```cmake
+# src/CMakeLists.txt
+
+# Collect source and header files
+file(GLOB_RECURSE src 
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.hpp
+)
+
+# Instruct CMake to build the binary
+add_executable(setupp "${CMAKE_SOURCE_DIR}/main.cpp" ${src})
+
+# Place the binary into ./bin/
+set_target_properties(setupp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/$<0:>)
+```
+
+Finally, make sure that the following `CMakeLists.txt` file is saved in the `tests/` directory:
+
+```cmake
+# tests/CMakeLists.txt
+
+# Find Boost
+find_package(Boost COMPONENTS unit_test_framework REQUIRED)
+
+# Model 'unit' files
+file(GLOB_RECURSE unit ${CMAKE_SOURCE_DIR}/src/*.cpp)
+
+# Names of the test executables
+set(TESTS architecture_tests individual_tests simulation_tests)
+
+# Build each executable
+foreach(TEST IN LISTS TESTS)
+	add_executable(${TEST} ${CMAKE_SOURCE_DIR}/tests/${TEST}.cpp ${unit})
+	target_include_directories(${TEST} PRIVATE ${CMAKE_SOURE_DIR})
+	target_link_libraries(${TEST} PUBLIC Boost::unit_test_framework)
+	set_target_properties(${TEST} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/tests/$<0:>)
+endforeach()
+```
+
 ### Install Boost
 
 Run the following from within the root of the repo to install the testing framework through `git`:

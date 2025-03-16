@@ -1,10 +1,12 @@
-In this guide we show how to modify our [main CMake setup](SETUP.md) in order to test the program.
+In this guide we show how to modify our [main CMake setup](SETUP.md) in order to run the tests that come with the program. Those tests were written with the [Boost.Test](https://www.boost.org/doc/libs/1_86_0/libs/test/doc/html/index.html) C++ library, and here we show how to build them as separate executables that can be used to check the proper behavior of the program. Check out [this page](https://en.wikipedia.org/wiki/Test-driven_development) for more information about _unit testing_ and _test-driven development_ (TDD).
 
 ### Prerequisites
 
-- Any modern C++ compiler (e.g. GCC, Clang or MGCV)
+- Any modern C++ compiler (e.g. [GCC](https://gcc.gnu.org/), [Clang](https://clang.llvm.org/) or [MSVC](https://visualstudio.microsoft.com/vs/features/cplusplus/))
 - Build system: [CMake](https://cmake.org/) (>= 3.16)
-- Source retrieval: git
+- Source retrieval: [git](https://git-scm.com/)
+
+([Boost.Test](https://www.boost.org/doc/libs/1_86_0/libs/test/doc/html/index.html) and [vcpkg](https://vcpkg.io/) will be downloaded in the process.)
 
 ### Download the code 
 
@@ -56,18 +58,22 @@ add_subdirectory(src)
 add_subdirectory(tests)
 ```
 
-This file now contains all the build information to download the necessary tools from the Boost library and compile the tests using CMake. 
+This file is substantially longer than the one used in our main setup, as it now contains all the build information needed to download the necessary tools from the [Boost](https://www.boost.org/) library for unit tests, and compile those tests using CMake. 
+
+Note: the source code for the tests is located in `tests/`.
 
 ### Install Boost
 
-Run the following to install the testing framework through `git`:
+Run the following from within the root of the repo to install the testing framework through `git`:
 
 ```shell
 git submodule add --force https://github.com/microsoft/vcpkg
 git submodule update --init --remote
 ```
 
-These steps will connect the repo to Microsoft's [vcpkg](https://vcpkg.io/) installer, and set it up to download the required elements from the [Boost C++ library](https://www.boost.org/) necessary for unit testing (instructions for that are given in the file `vcpkg.json`). This setup has the advantage of integrating well with CMake and working well across platforms, so the steps are the same on Windows, Linux or MacOS. In case of errors during this installation process, please refer to the log files created by `vcpkg` (some dependencies may be missing).
+These steps will connect the repo to Microsoft's [vcpkg](https://vcpkg.io/) installer, whose job will be to download the required elements from [Boost](https://www.boost.org/) necessary for unit testing (instructions for that are given in the file `vcpkg.json`). 
+
+This setup has the advantage of integrating well with CMake and working well across platforms, so the steps are **the same on Windows, Linux or MacOS**. However, in case errors occur during this installation process, we recommend to refer to the log files created by `vcpkg` (some dependencies may be missing and they will be listed there if that is the case).
 
 ### Build the tests
 

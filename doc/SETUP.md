@@ -1,10 +1,10 @@
-In this guide we show how to build the program using CMake. We provide a ready-made `CMakeLists.txt` list of instructions but the user is free to use any custom configuration.
+In this guide we show how to build the program using the [CMake](https://cmake.org/) build system. Below we provide a ready-made CMake configuration file but the user is free to use any custom configuration.
 
 ### Prerequisites
 
-- Any modern C++ compiler (e.g. GCC, Clang or MGCV)
+- Any modern C++ compiler (e.g. [GCC](https://gcc.gnu.org/), [Clang](https://clang.llvm.org/) or [MSVC](https://visualstudio.microsoft.com/vs/features/cplusplus/))
 - Build system: [CMake](https://cmake.org/) (>= 3.16)
-- Source retrieval: git (optional)
+- Source retrieval: [git](https://git-scm.com/) (optional)
 
 ### Download the code
 
@@ -70,11 +70,11 @@ cmake --build .
 
 This setup places the compiled executable in the `bin/` folder.
 
-(Note that the steps are the same on Windows, MacOS and Linux.)
+(Note that the steps are **the same on Windows, MacOS and Linux**.)
 
 ### IDEs
 
-Many IDEs such as Visual Studio or XCode support CMake out of the box. "Open folder" should do the trick...
+Many IDEs such as [Visual Studio](https://visualstudio.microsoft.com/) or [XCode](https://developer.apple.com/xcode/) support CMake out of the box. "Open folder" should do the trick...
 
 You can use CMake to generate the input files for your favorite IDE too. For example, running the following from within the recently created `build/` folder will generate Visual Studio project files:
 

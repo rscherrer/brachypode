@@ -71,11 +71,14 @@ BOOST_AUTO_TEST_CASE(bufferFlushesAutomatically) {
     // Store another one
     buffer.store(42.0);
 
+    // And another one
+    buffer.store(1066.0);
+
     // Check that the buffer now only contains one value
     BOOST_CHECK_EQUAL(buffer.nstored(), 1u);
 
     // Check the value
-    BOOST_CHECK_EQUAL(buffer.last(), 42.0);
+    BOOST_CHECK_EQUAL(buffer.last(), 1066.0);
 
     // Close the file
     buffer.close();
@@ -83,8 +86,9 @@ BOOST_AUTO_TEST_CASE(bufferFlushesAutomatically) {
     // Read the saved file
     std::vector<double> values = tst::readBinary("values.dat");
 
-    // Check the saved value
-    BOOST_CHECK_EQUAL(values.size(), 1u);
+    // Check the saved values
+    BOOST_CHECK_EQUAL(values.size(), 2u);
     BOOST_CHECK_EQUAL(values[0u], 3.14);
+    BOOST_CHECK_EQUAL(values[1u], 42.0);
 
 }

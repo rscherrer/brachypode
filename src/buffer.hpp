@@ -11,8 +11,8 @@
 
 #include <vector>
 #include <fstream>
-#include <string>
 #include <memory>
+#include <string>
 
 class Buffer {
 
@@ -26,6 +26,8 @@ public:
     size_t nstored() const;
 
     // Setters
+    void reserve(const size_t&);
+    void open(const std::string&);
     void store(const double&);
     void flush();
     void close();

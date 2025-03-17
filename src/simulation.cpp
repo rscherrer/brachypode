@@ -3,6 +3,53 @@
 // can be tested in different use cases in our tests.
 
 #include "simulation.hpp"
+#include "buffer.hpp"
+
+// Function to set the output file names
+std::vector<std::string> setFileNames(const bool &choose, const std::string &ext = ".dat") {
+
+    // choose: whether output files are user defined
+    // ext: the extension to add
+
+    // TODO: Improve this function
+
+    // Default files
+    std::vector<std::string> filenames = {"time", "popsize", "patchsizes", "traitmeans", "individuals"};
+
+    // If needed...
+    if (choose) {
+
+        // Open file with user defined output
+        std::ifstream infile("whattosave.txt");
+
+        // Make sure the file is open
+        if (!infile.is_open())
+            throw std::runtime_error("Could not read input file whattosave.txt");
+
+        // Prepare to read in
+        std::vector<std::string> newfilenames;
+        std::string input;
+
+        // Read entries from file
+        while (infile >> input) newfilenames.push_back(input);
+
+        // Check that the given files are as expected
+        stf::check(newfilenames, filenames);
+
+        // TODO: This is going to go wrong
+
+        // Reshape the container for file names
+        filenames.reserve(newfilenames.size());
+        filenames.resize(newfilenames.size());
+
+        // Update file names and add file extension
+        for (size_t f = 0u; f < newfilenames.size(); ++f)
+            filenames[f] = newfilenames[f] + ext;
+
+    }
+
+    return filenames;
+}
 
 // Lambda for removing dead individuals
 auto burry = [](Individual ind) -> bool
@@ -63,32 +110,33 @@ int simulate(const std::vector<std::string> &args) {
         // Redirect output to log file if needed
         if (pars.savelog) pars.savelog = std::freopen("log.txt", "w", stdout);
 
+        // TODO: Remove that maybe
+
         // Create a vector of output file streams (using smart pointers)
         std::vector<std::shared_ptr<std::ofstream> > outfiles;
 
-        // Which data files to save
-        std::vector<std::string> filenames = {"time", "popsize", "patchsizes", "traitmeans", "individuals"};
-
-        // Update the files to save if needed...
-        if (pars.choose) {
-
-            // Read file where those are provided
-            std::ifstream infile("whattosave.txt");
-            if (!infile.is_open())
-                throw std::runtime_error("Could not read input file whattosave.txt");
-            std::vector<std::string> newfilenames;
-            std::string input;
-            while (infile >> input) newfilenames.push_back(input);
-            stf::check(newfilenames, filenames);
-            filenames.reserve(newfilenames.size());
-            filenames.resize(newfilenames.size());
-            for (size_t f = 0u; f < newfilenames.size(); ++f)
-                filenames[f] = newfilenames[f];
-
-        }
+        // Prepare names of output files
+        const std::vector<std::string> filenames = setFileNames(pars.choose);
 
         // Open the file streams
         stf::open(outfiles, filenames);
+
+        // TODO: Remove that maybe
+
+        // Create a vector of output buffers
+        std::vector<Buffer> buffers;
+
+        // Allocate space for buffers
+        buffers.reserve(filenames.size());
+
+        // Open all buffers
+        for (size_t f = 0u; f < filenames.size(); ++f) 
+            buffers.push_back(Buffer(1000u, filenames[f]));
+
+        // TODO: Make buffer size user defined
+
+        // Open the streams to output files
+        for (size_t f = 0u; f < filenames.size(); ++f) buffers[f].open(filenames[f]);
 
         // Set up flags for which data to save
         int timeFile(-1), popsizeFile(-1), patchsizesFile(-1), traitmeansFile(-1), individualsFile(-1);
@@ -323,13 +371,22 @@ int simulate(const std::vector<std::string> &args) {
             }
         }
 
+        // End of simulation
         std::cout << "Simulation ended.\n";
+
+        // Close the log file if needed
         if (pars.savelog) std::fclose(stdout);
 
         // Close output file streams
         stf::close(outfiles);
 
+        // TODO: Remove that maybe
+        
+        // Close the streams to output files
+        for (size_t f = 0u; f < filenames.size(); ++f) buffers[f].close();
+
         return 0;
+
     }
     catch (const std::exception& err)
     {

@@ -6,7 +6,7 @@
 #include <algorithm>
 
 // Constructor
-Buffer::Buffer(const size_t &n, const std::string &filename) : 
+Buffer::Buffer(const size_t &n, const std::string &filename) :
     maxsize(n),
     head(std::make_unique<std::vector<double> >()),
     tail(std::make_unique<std::vector<double> >()),
@@ -14,31 +14,18 @@ Buffer::Buffer(const size_t &n, const std::string &filename) :
 {
 
     // n: size of the buffer
+    // filename: name of the ouput file 
 
-    // Reserve space
-    head->reserve(maxsize);
-    tail->reserve(maxsize);
+    // Reserve space in the containers
+    reserve(maxsize);
 
     // Check that the containers are empty
     assert(head->size() == 0u);
     assert(tail->size() == 0u);
 
-    // Check that the containers have reserved space
-    assert(head->capacity() == maxsize);
-    assert(tail->capacity() == maxsize);
-
     // Open the output file stream
-    file.open(filename.c_str(), std::ios::binary);
+    open(filename);
 
-    // If the stream failed to open...
-    if (!file.is_open()) {
-
-        // Prepare error message
-        const std::string msg = "Unable to open output file " + filename;
-
-        // Error
-        throw std::runtime_error(msg);
-    }
 }
 
 // Function to return the last value stored
@@ -55,6 +42,41 @@ size_t Buffer::nstored() const {
     // Get size
     return head->size();
 
+}
+
+// Function to reserve space in the buffer
+void Buffer::reserve(const size_t &n) {
+
+    // n: size of the buffer
+
+    // Reserve space
+    head->reserve(n);
+    tail->reserve(n);
+
+    // Check that the containers have reserved space
+    assert(head->capacity() == n);
+    assert(tail->capacity() == n);
+
+}
+
+// Function to open the output file
+void Buffer::open(const std::string &filename) {
+
+    // filename: name of the ouput file 
+
+    // Open the output file stream
+    file.open(filename.c_str(), std::ios::binary);
+
+    // If the stream failed to open...
+    if (!file.is_open()) {
+
+        // Prepare error message
+        const std::string msg = "Unable to open output file " + filename;
+
+        // Error
+        throw std::runtime_error(msg);
+        
+    }
 }
 
 // Function to store a new value

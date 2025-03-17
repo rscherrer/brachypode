@@ -1,5 +1,5 @@
-#ifndef BRACHYPODE_RANDOM_H
-#define BRACHYPODE_RANDOM_H
+#ifndef BRACHYPODE_RANDOM_HPP
+#define BRACHYPODE_RANDOM_HPP
 
 // This header contains aliases for various kinds of probability distributions
 // as well as a random number generator. Include this header in other scripts

@@ -2,33 +2,43 @@
 
 #include "buffer.hpp"
 #include <cassert>
+#include <fstream>
+#include <algorithm>
 
 // Constructor
-Buffer::Buffer(const size_t &n) : 
-    first(std::vector<double>()),
-    second(std::vector<double>()),
-    head(&first),
-    tail(&second)
+Buffer::Buffer(const size_t &n, const std::string &filename) : 
+    maxsize(n),
+    head(std::make_unique<std::vector<double> >()),
+    tail(std::make_unique<std::vector<double> >()),
+    file(std::ofstream())
 {
 
     // n: size of the buffer
 
     // Reserve space
-    first.reserve(n);
-    second.reserve(n);
+    head->reserve(maxsize);
+    tail->reserve(maxsize);
 
     // Check that the containers are empty
-    assert(first.size() == 0u);
-    assert(second.size() == 0u);
+    assert(head->size() == 0u);
+    assert(tail->size() == 0u);
 
     // Check that the containers have reserved space
-    assert(first.capacity() == n);
-    assert(second.capacity() == n);
+    assert(head->capacity() == maxsize);
+    assert(tail->capacity() == maxsize);
 
-    // Check that the references are well established
-    assert(head->capacity() == n);
-    assert(tail->capacity() == n);
+    // Open the output file stream
+    file.open(filename.c_str(), std::ios::binary);
 
+    // If the stream failed to open...
+    if (!file.is_open()) {
+
+        // Prepare error message
+        const std::string msg = "Unable to open output file " + filename;
+
+        // Error
+        throw std::runtime_error(msg);
+    }
 }
 
 // Function to return the last value stored
@@ -52,8 +62,48 @@ void Buffer::store(const double &x) {
 
     // x: the value to store
 
+    // Check that we are below storage capacity
+    assert(head->size() < maxsize);
+
     // Add the value to the active container
     head->push_back(x);
 
+    // If the maximum allowed capacity is reached...
+    if (head->size() == maxsize) flush();
+
 }
 
+// Function to write all the content of the buffer to file
+void Buffer::flush() {
+
+    // Make sure the file is open
+    assert(file.is_open());
+
+    // Swap the head and tail of the buffer
+    std::swap(head, tail);
+
+    // Write every stored value to file
+    file.write((char *) tail->data(), tail->size() * sizeof(double));
+
+    // Empty the tail
+    tail->clear();
+
+    // Make sure the buffer is empty
+    assert(head->size() == 0u);
+    assert(tail->size() == 0u);
+
+}
+
+// Function to close the output data file
+void Buffer::close() {
+
+    // Check that the file is open
+    assert(file.is_open());
+
+    // Close the file
+    file.close();
+
+    // Check that the file is closed
+    assert(!file.is_open());
+
+}

@@ -92,7 +92,7 @@ find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 file(GLOB_RECURSE unit ${CMAKE_SOURCE_DIR}/src/*.cpp)
 
 # Names of the test executables
-set(TESTS architecture_tests individual_tests simulation_tests)
+set(TESTS architecture_tests individual_tests simulation_tests buffer_tests)
 
 # Build each executable
 foreach(TEST IN LISTS TESTS)

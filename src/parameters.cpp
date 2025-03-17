@@ -1,6 +1,6 @@
 // This script contains all the functions of the Parameters structure.
 
-#include "parameters.h"
+#include "parameters.hpp"
 
 Parameters::Parameters() :
     popsize(10u),

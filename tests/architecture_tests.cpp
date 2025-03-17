@@ -5,7 +5,7 @@
 // test that the architecture, whether generated or loaded from a file, has
 // the expected attributes.
 
-#include "../src/architecture.h"
+#include "../src/architecture.hpp"
 #include <boost/test/unit_test.hpp>
 
 // Check that a generated architecture has the right attributes

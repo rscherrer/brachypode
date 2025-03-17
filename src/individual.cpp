@@ -1,7 +1,7 @@
 // This script contains all the functions of the Individual class
 
-#include "individual.h"
-#include "utilities.h"
+#include "individual.hpp"
+#include "utilities.hpp"
 #include <cmath>
 
 Individual::Individual(const double &p, const size_t &n, const std::vector<double> &effects) :

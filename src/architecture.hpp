@@ -1,5 +1,5 @@
-#ifndef BRACHYPODE_ARCHITECTURE_H
-#define BRACHYPODE_ARCHITECTURE_H
+#ifndef BRACHYPODE_ARCHITECTURE_HPP
+#define BRACHYPODE_ARCHITECTURE_HPP
 
 // This is the header for the Architecture structure. An Architecture object
 // contains all the details of the genotype-phenotype map that take too much
@@ -8,7 +8,7 @@
 // can be generated randomly (this is the default upon construction) or loaded
 // from an architecture file ("architecture.txt").
 
-#include "parameters.h"
+#include "parameters.hpp"
 #include <vector>
 
 struct Architecture {

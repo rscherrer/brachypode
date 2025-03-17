@@ -1,6 +1,6 @@
-//
+// Functions pertaining to the printer name space.
 
-#include "printer.h"
+#include "printer.hpp"
 
 // Function to add and open output file streams to a vector of streams
 void stf::open(

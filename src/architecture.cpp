@@ -1,6 +1,6 @@
 // This script contains all the functions of the Architecture structure.
 
-#include "architecture.h"
+#include "architecture.hpp"
 
 Architecture::Architecture(const size_t &nchrom, const size_t& nloci, const double &effect) :
     chromends(std::vector<double>(nchrom, 0.0)),

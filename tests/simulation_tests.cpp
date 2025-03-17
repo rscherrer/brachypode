@@ -1,14 +1,11 @@
 #define BOOST_TEST_DYNAMIC_LINK
 #define BOOST_TEST_MODULE Main
 
-// On QtCreator:
-// #define BOOST_TEST_DYN_LINK
-
 // Here we test all the uses and misuses of the program. These mostly have to
 // with calling the program, passing arguments, reading from and writing to
 // files, and error handling.
 
-#include "../src/simulation.h"
+#include "../src/simulation.hpp"
 #include <boost/test/unit_test.hpp>
 
 // Test that the simulation runs

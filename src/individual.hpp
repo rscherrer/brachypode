@@ -1,11 +1,11 @@
-#ifndef BRACHYPODE_INDIVIDUAL_H
-#define BRACHYPODE_INDIVIDUAL_H
+#ifndef BRACHYPODE_INDIVIDUAL_HPP
+#define BRACHYPODE_INDIVIDUAL_HPP
 
 // This is the header for the Individual class.
 
-#include "random.h"
-#include "parameters.h"
-#include "architecture.h"
+#include "random.hpp"
+#include "parameters.hpp"
+#include "architecture.hpp"
 #include <vector>
 #include <cassert>
 #include <bitset>

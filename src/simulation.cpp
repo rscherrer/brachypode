@@ -2,7 +2,7 @@
 // encapsulated into a function called simulate(), so its proper behavior
 // can be tested in different use cases in our tests.
 
-#include "simulation.h"
+#include "simulation.hpp"
 
 // Lambda for removing dead individuals
 auto burry = [](Individual ind) -> bool
@@ -155,6 +155,7 @@ int simulate(const std::vector<std::string> &args) {
 
                     const double deme_ = static_cast<double>(pop[i].getDeme());
                     const double patch_ = static_cast<double>(pop[i].getPatch());
+
                     outfiles[individualsFile]->write((char *) &deme_, sizeof(double));
                     outfiles[individualsFile]->write((char *) &patch_, sizeof(double));
                     outfiles[individualsFile]->write((char *) &x, sizeof(double));

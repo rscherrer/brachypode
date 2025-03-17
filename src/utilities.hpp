@@ -1,5 +1,5 @@
-#ifndef BRACHYPODE_UTILITIES_H
-#define BRACHYPODE_UTILITIES_H
+#ifndef BRACHYPODE_UTILITIES_HPP
+#define BRACHYPODE_UTILITIES_HPP
 
 // This header contains a set of miscellaneous utility functions
 

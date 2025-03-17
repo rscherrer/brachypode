@@ -1,11 +1,11 @@
-#ifndef BRACHYPODE_PARAMETERS_H
-#define BRACHYPODE_PARAMETERS_H
+#ifndef BRACHYPODE_PARAMETERS_HPP
+#define BRACHYPODE_PARAMETERS_HPP
 
 // Parameter set. Contains values of the parameters of the simulation.
 // All parameters have default values that can be modified by calling
 // the program with a parameter file name as unique argument.
 
-#include "random.h"
+#include "random.hpp"
 #include <fstream>
 #include <iostream>
 #include <chrono>

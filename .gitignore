@@ -10,6 +10,9 @@ vcpkg/
 CMakeLists.txt
 */CMakeLists.txt
 
+# VS Code
+.vscode/tasks.json
+
 ##### Windows
 # Windows thumbnail cache files
 Thumbs.db

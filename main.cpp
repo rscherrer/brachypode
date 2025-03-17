@@ -1,4 +1,4 @@
-#include "src/simulation.h"
+#include "src/simulation.hpp"
 
 int main(int argc, char * argv[]) {
 

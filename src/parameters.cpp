@@ -43,8 +43,8 @@ Parameters::Parameters() :
     savepars(true),
     savelog(false),
     savearch(true),
-    savedat(true),
-    choose(true),
+    savedat(false),
+    choose(false),
     verbose(false)
 {
 
@@ -62,16 +62,9 @@ void Parameters::read(const std::string &filename)
     // Open input file stream
     std::ifstream file(filename.c_str());
 
-    // If the file cannot open...
-    if (!file.is_open()) {
-
-        // Prepare an error message
-        std::string msg = "Unable to open file ";
-
-        // Throw an exception
-        throw std::runtime_error(msg + filename);
-
-    }
+    // Check that the file is open
+    if (!file.is_open()) 
+        throw std::runtime_error("Unable to open file " + filename);
 
     // Prepare to read in
     std::string input;
@@ -81,6 +74,9 @@ void Parameters::read(const std::string &filename)
 
     // For each line in the file...
     while (file >> input) {
+
+        // Note: this loop conditions itself on the success of reading the input.
+        // No need to check for failure.
 
         // Read in the parameter value(s)
         if (input == "popsize") file >> popsize;
@@ -147,7 +143,7 @@ double lincrement(const double &x, const double &xfinal, const int &t, const int
     // x: current value of the parameter
     // xfinal: final value the parameter is supposed to reach
     // t: current time step
-    // xfinal: time step when the parameter should reach its final value
+    // tfinal: time step when the parameter should reach its final value
 
     // Compute new value
     return xfinal - x / (tfinal - t - 1.0);
@@ -241,21 +237,8 @@ void Parameters::save() const
     std::ofstream file(filename);
     
     // Check if the file is open
-    if (!file.is_open())
+    if (!file.is_open()) 
         throw std::runtime_error("Unable to open file " + filename);
-
-    // Write parameters to the file
-    write(file);
-
-    // Close the file
-    file.close();
-}
-
-// Write parameters to a file stream
-void Parameters::write(std::ofstream &file) const
-{
-
-    // file: output file stream
 
     // Write parameters to the file
     file << "popsize " << popsize << '\n';
@@ -294,5 +277,8 @@ void Parameters::write(std::ofstream &file) const
     file << "savedat " << savedat << '\n';
     file << "choose " << choose << '\n';
     file << "talkative " << verbose << '\n';
+
+    // Close the file
+    file.close();
 
 }

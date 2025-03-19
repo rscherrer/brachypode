@@ -1,4 +1,4 @@
-// Functions pertaining to the test utility name space.
+// Functions pertaining to the tst namespace.
 
 #include "testutils.hpp"
 #include <fstream>

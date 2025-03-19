@@ -74,10 +74,10 @@ file(GLOB_RECURSE src
 )
 
 # Instruct CMake to build the binary
-add_executable(setupp "${CMAKE_SOURCE_DIR}/main.cpp" ${src})
+add_executable(brachypode "${CMAKE_SOURCE_DIR}/main.cpp" ${src})
 
 # Place the binary into ./bin/
-set_target_properties(setupp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/$<0:>)
+set_target_properties(brachypode PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/$<0:>)
 ```
 
 Finally, make sure that the following `CMakeLists.txt` file is saved in the `tests/` directory:

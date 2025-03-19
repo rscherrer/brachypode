@@ -1,4 +1,4 @@
-// This script defines the random number generator used in the rnd namespace
+// Source code of the rnd namespace.
 
 #include "random.hpp"
 

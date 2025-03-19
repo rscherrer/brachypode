@@ -23,16 +23,9 @@ Buffer::Buffer(const size_t &n, const std::string &filename) :
     assert(head->size() == 0u);
     assert(tail->size() == 0u);
 
-    // If the stream failed to open...
-    if (!file.is_open()) {
-
-        // Prepare error message
-        const std::string msg = "Unable to open output file " + filename;
-
-        // Error
-        throw std::runtime_error(msg);
-        
-    }
+    // Check that the file is open
+    if (!file.is_open()) 
+        throw std::runtime_error("Unable to open file " + filename);
 
 }
 
@@ -45,7 +38,7 @@ double Buffer::last() const {
 }
 
 // Function to return the number of values stored
-size_t Buffer::nstored() const {
+size_t Buffer::size() const {
 
     // Get size
     return head->size();

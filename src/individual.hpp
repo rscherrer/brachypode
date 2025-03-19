@@ -1,7 +1,9 @@
 #ifndef BRACHYPODE_INDIVIDUAL_HPP
 #define BRACHYPODE_INDIVIDUAL_HPP
 
-// This is the header for the Individual class.
+// This is the header for the Individual class. It contains all the basic elements an 
+// individual organism needs in the simulation such as trait values, genetic information,
+// and location in the landscape.
 
 #include "random.hpp"
 #include "parameters.hpp"
@@ -14,8 +16,10 @@ class Individual {
 
 public:
 
-    Individual(const double&, const size_t&, const std::vector<double>&);
+    // Constructor
+    Individual(const double&, const std::vector<double>&);
 
+    // Setters
     void kill();
     void setDeme(const size_t&);
     void setPatch(const size_t&);
@@ -24,6 +28,7 @@ public:
     void develop(const std::vector<double>&);
     void recombine(const double&, const Individual&, const std::vector<double>&, const std::vector<double>&);
 
+    // Getters
     size_t getDeme() const;
     size_t getPatch() const;
     double getX() const;
@@ -33,6 +38,7 @@ public:
 
 private:
 
+    // Member variables
     size_t deme;
     size_t patch;
     double x;

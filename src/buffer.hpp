@@ -23,7 +23,7 @@ public:
 
     // Getters
     double last() const;
-    size_t nstored() const;
+    size_t size() const;
 
     // Setters
     void reserve(const size_t&);

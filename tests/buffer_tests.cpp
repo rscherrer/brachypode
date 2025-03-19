@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(bufferCanStoreData) {
     buffer.store(42.0);
 
     // Check the number of stored values
-    BOOST_CHECK_EQUAL(buffer.nstored(), 2u);
+    BOOST_CHECK_EQUAL(buffer.size(), 2u);
 
     // Check the stored values
     BOOST_CHECK_EQUAL(buffer.last(), 42.0);
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(bufferCanWriteToFile) {
     buffer.flush();
 
     // Check that the head buffer is now empty (and ready to store new data)
-    BOOST_CHECK_EQUAL(buffer.nstored(), 0u);
+    BOOST_CHECK_EQUAL(buffer.size(), 0u);
 
     // Close the output stream to the file
     buffer.close();
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(bufferFlushesAutomatically) {
     buffer.store(1066.0);
 
     // Check that the buffer now only contains one value
-    BOOST_CHECK_EQUAL(buffer.nstored(), 1u);
+    BOOST_CHECK_EQUAL(buffer.size(), 1u);
 
     // Check the value
     BOOST_CHECK_EQUAL(buffer.last(), 1066.0);

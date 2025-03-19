@@ -7,7 +7,6 @@
 #include "individual.hpp"
 #include "architecture.hpp"
 #include "printer.hpp"
-#include "utilities.hpp"
 
 // Main simulation function
 int simulate(const std::vector<std::string>&);

@@ -1,7 +1,7 @@
 #ifndef BRACHYPODE_BUFFER_HPP
 #define BRACHYPODE_BUFFER_HPP
 
-// This is the header for the data buffer class, which stores data in temporary containers
+// This is the header for the Buffer class, which stores data in temporary containers
 // before flusing it into some output file. One instance of this object has actually two
 // internal containers, a head buffer and a tail buffer. The data are first saved in the 
 // head buffer, then its content is moved to the tail buffer by swapping the two containers,
@@ -27,7 +27,6 @@ public:
 
     // Setters
     void reserve(const size_t&);
-    void open(const std::string&);
     void store(const double&);
     void flush();
     void close();

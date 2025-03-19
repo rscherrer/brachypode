@@ -1,6 +1,21 @@
-// Functions pertaining to the printer name space.
+// Functions pertaining to the printer class.
 
 #include "printer.hpp"
+
+// Constructor
+Printer::Printer(const bool &on) : 
+    time(false), 
+    popsize(false), 
+    patchsizes(false), 
+    traitmeans(false), 
+    individuals(false) 
+{
+
+    // on: is the printer on (i.e. are we saving anything)?
+
+}
+
+/* DELETE
 
 // Function to add and open output file streams to a vector of streams
 void stf::open(
@@ -71,3 +86,5 @@ void stf::check(const std::vector<std::string> &v1, const std::vector<std::strin
     }
 
 }
+
+*/

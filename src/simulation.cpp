@@ -6,7 +6,7 @@
 #include "buffer.hpp"
 
 // Function to set the output file names
-std::vector<std::string> setFileNames(const bool &choose, const std::string &ext = ".dat") {
+std::vector<std::string> getOutputs(const bool &choose) {
 
     // choose: whether output files are user defined
     // ext: the extension to add
@@ -42,9 +42,9 @@ std::vector<std::string> setFileNames(const bool &choose, const std::string &ext
         filenames.reserve(newfilenames.size());
         filenames.resize(newfilenames.size());
 
-        // Update file names and add file extension
+        // Update file names
         for (size_t f = 0u; f < newfilenames.size(); ++f)
-            filenames[f] = newfilenames[f] + ext;
+            filenames[f] = newfilenames[f];
 
     }
 
@@ -71,6 +71,9 @@ int simulate(const std::vector<std::string> &args) {
 
         // Read parameters from a file if supplied
         if (args.size() == 2u) pars.read(args[1u]);
+
+        // Seed the random number generator
+        rnd::rng.seed(pars.seed);
 
         // Save parameters if necessary
         if (pars.savepars) pars.save();
@@ -102,7 +105,7 @@ int simulate(const std::vector<std::string> &args) {
         // Save parameters if necessary
         if (pars.savepars) pars.save();
 
-        // Some extra parameters if needed
+        // Some extra parameters that may be needed
         const double d = -log2(1.0 - pars.tradeoff); // useful exponent
         double xmax = 0.0;
         for (size_t l = 0u; l < arch.effects.size(); ++l) xmax += arch.effects[l];
@@ -110,47 +113,46 @@ int simulate(const std::vector<std::string> &args) {
         // Redirect output to log file if needed
         if (pars.savelog) pars.savelog = std::freopen("log.txt", "w", stdout);
 
-        // TODO: Remove that maybe
+        // Create a printer but only open it if needed
+        Printer save(pars.savedat);
 
-        // Create a vector of output file streams (using smart pointers)
-        std::vector<std::shared_ptr<std::ofstream> > outfiles;
+        // Check which variables to save if needed
+        if (pars.choose) save.read("whattosave.txt");
+
+        // What is the default behavior? Save everything or nothing?
 
         // Prepare names of output files
-        const std::vector<std::string> filenames = setFileNames(pars.choose);
+        const std::vector<std::string> outputs = getOutputs(pars.choose);
 
-        // Open the file streams
-        stf::open(outfiles, filenames);
-
-        // TODO: Remove that maybe
-
-        // Create a vector of output buffers
-        std::vector<Buffer> buffers;
+        // Create an unordered map to store the output buffers
+        std::unordered_map<std::string, Buffer> buffers;
 
         // Allocate space for buffers
         buffers.reserve(filenames.size());
 
-        // Open all buffers
-        for (size_t f = 0u; f < filenames.size(); ++f) 
-            buffers.push_back(Buffer(1000u, filenames[f]));
+        // Initialize all buffers (and open file streams)
+        for (const std::string &filename : filenames) 
+            buffers[filename] = Buffer(1000u, filename + ".dat");
 
         // TODO: Make buffer size user defined
 
-        // Open the streams to output files
-        for (size_t f = 0u; f < filenames.size(); ++f) buffers[f].open(filenames[f]);
-
         // Set up flags for which data to save
         int timeFile(-1), popsizeFile(-1), patchsizesFile(-1), traitmeansFile(-1), individualsFile(-1);
+        
+        // For each output file...
         for (size_t f = 0u; f < filenames.size(); ++f) {
 
+            // Get file name
             const std::string filename = filenames[f];
 
-            if (filename == "time") timeFile = f;
-            else if (filename == "popsize") popsizeFile = f;
-            else if (filename == "patchsizes") patchsizesFile = f;
-            else if (filename == "traitmeans") traitmeansFile = f;
-            else if (filename == "individuals") individualsFile = f;
+            // Set up flags for whether to save it
+            if (filename == "time") save.time = true;
+            else if (filename == "popsize") save.popsize;
+            else if (filename == "patchsizes") save.patchsizes;
+            else if (filename == "traitmeans") save.traitmeans;
+            else if (filename == "individuals") save.individuals;
             else throw std::runtime_error("Invalid output requested in whattosave.txt");
-
+            
         }
 
         std::cout << "Simulation started.\n";
@@ -198,15 +200,17 @@ int simulate(const std::vector<std::string> &args) {
                 const size_t deme = pop[i].getDeme();
                 const size_t patch = pop[i].getPatch();
 
-                // Save individual-level data if needed
-                if (timetosave && individualsFile >= 0) {
+                // If needed...
+                if (timetosave && saveIndividuals) {
 
+                    // Convert to doubles
                     const double deme_ = static_cast<double>(pop[i].getDeme());
                     const double patch_ = static_cast<double>(pop[i].getPatch());
 
-                    outfiles[individualsFile]->write((char *) &deme_, sizeof(double));
-                    outfiles[individualsFile]->write((char *) &patch_, sizeof(double));
-                    outfiles[individualsFile]->write((char *) &x, sizeof(double));
+                    // Store individual-level data
+                    buffers["individuals"].store(deme_);
+                    buffers["individuals"].store(patch_);
+                    buffers["individuals"].store(x);
 
                 }
 
@@ -219,25 +223,37 @@ int simulate(const std::vector<std::string> &args) {
 
             }
 
-            // Save time if needed
-            if (timetosave && timeFile >= 0) {
+            // If needed...
+            if (timetosave && saveTime) {
+
+                // Convert to double
                 const double t_ = static_cast<double>(t);
-                outfiles[timeFile]->write((char *) &(t_), sizeof(double));
+
+                // Save time point
+                buffers["time"].store(t_);
             }
 
-            // Save population size if needed
-            if (timetosave && popsizeFile >= 0) {
+            // If needed...
+            if (timetosave && savePopSize) {
+
+                // Convert to double
                 const double popsize_ = static_cast<double>(popsize);
-                outfiles[popsizeFile]->write((char *) &popsize_, sizeof(double));
+
+                // Save population size
+                buffers["popsize"].store(popsize_);
             }
 
-            // Save patch sizes if needed
-            if (timetosave && patchsizesFile >= 0) {
+            // If needed...
+            if (timetosave && savePatchSizes) {
 
+                // For each patch...
                 for (size_t j = 0u; j < patchsizes.size(); ++j) {
 
+                    // Convert to double
                     const double patchsize_ = static_cast<double>(patchsizes[j]);
-                    outfiles[patchsizesFile]->write((char *) &patchsize_, sizeof(double));
+
+                    // Save patch size
+                    buffers["patchsizes"].store(patchsize_);
 
                 }
 
@@ -251,8 +267,7 @@ int simulate(const std::vector<std::string> &args) {
                 if (n > 0u) meanx[j] /= n;
 
                 // Save trait means if needed
-                if (timetosave && traitmeansFile >= 0)
-                    outfiles[traitmeansFile]->write((char *) &meanx[j], sizeof(double));
+                if (timetosave && saveTraitMeans >= 0) buffers["traitmeans"].store(meanx[j]);
 
             }
 

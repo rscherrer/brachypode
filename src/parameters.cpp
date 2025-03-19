@@ -2,6 +2,17 @@
 
 #include "parameters.hpp"
 
+// Create a default seed based on clock
+size_t clockseed() {
+
+    // Use the current time to generate a seed
+    auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+
+    // Convert the seed to integer and return
+    return static_cast<size_t>(seed);
+}
+
+// Constructor
 Parameters::Parameters() :
     popsize(10u),
     pgood({0.8, 0.6, 0.5, 0.3, 0.1}),
@@ -26,53 +37,52 @@ Parameters::Parameters() :
     tchange(100000),
     twarming(1),
     type(1u),
-    seed(makeDefaultSeed()),
+    seed(clockseed()),
     sow(true),
     loadarch(false),
     savepars(true),
     savelog(false),
     savearch(true),
-    talkative(false),
-    choose(false)
+    savedat(true),
+    choose(true),
+    verbose(false)
 {
 
-    // Make sure parameter values make sense
+    // Check that the parameter values are valid
     check();
 
-    // Seed the random number generator
-    rnd::rng.seed(seed);
-}
-
-// Create a default seed based on clock
-size_t Parameters::makeDefaultSeed()
-{
-    return static_cast<size_t>(std::chrono::high_resolution_clock::now().
-     time_since_epoch().count());
 }
 
 // Read parameters from a file
 void Parameters::read(const std::string &filename)
 {
-    std::ifstream inputfile;
-    inputfile.open(filename);
-    if (!inputfile.is_open()) {
-        std::string msg = "Unable to open parameter file ";
+
+    // filename: name of the file to read parameters from
+
+    // Open input file stream
+    std::ifstream file(filename.c_str());
+
+    // If the file cannot open...
+    if (!file.is_open()) {
+
+        // Prepare an error message
+        std::string msg = "Unable to open file ";
+
+        // Throw an exception
         throw std::runtime_error(msg + filename);
+
     }
 
-    import(inputfile);
-    inputfile.close();
-}
-
-// Import parameters from a file stream
-void Parameters::import(std::ifstream &file)
-{
-
+    // Prepare to read in
     std::string input;
+
+    // We need to know the number of demes
     size_t ndemes = pgood.size();
 
+    // For each line in the file...
     while (file >> input) {
 
+        // Read in the parameter value(s)
         if (input == "popsize") file >> popsize;
         else if (input == "pgood") {
             file >> ndemes;
@@ -112,53 +122,85 @@ void Parameters::import(std::ifstream &file)
         else if (input == "savepars") file >> savepars;
         else if (input == "savelog") file >> savelog;
         else if (input == "savearch") file >> savearch;
-        else if (input == "talkative") file >> talkative;
+        else if (input == "savedat") file >> savedat;
         else if (input == "choose") file >> choose;
+        else if (input == "verbose") file >> verbose;
         else
             throw std::runtime_error("Invalid parameter name: " + input);
 
     }
 
-    // Now update interactive parameters
-    update();
+    // Close the file
+    file.close();
 
+    // Check that the parameter values are valid
+    check();
+
+    // Verbose
     std::cout << "Parameters were read in succesfully.\n";
 
 }
 
-// Update the system after having read new parameters
-void Parameters::update()
-{
-    rnd::rng.seed(seed);
-    check();
-}
+// Function to linearly update a parameter value upon time step increment
+double lincrement(const double &x, const double &xfinal, const int &t, const int &tfinal) {
 
-// Function to update a parameter value during climate change
-void updatePar(double &x, const double &xend, const double &dt) {
+    // x: current value of the parameter
+    // xfinal: final value the parameter is supposed to reach
+    // t: current time step
+    // xfinal: time step when the parameter should reach its final value
 
-    const double dx = dt == 0.0 ? 0.0 : (xend - x) / dt;
-    x += dx;
+    // Compute new value
+    return xfinal - x / (tfinal - t - 1.0);
+
+    // Note: this follows from the equation of a line.
 
 }
 
 // Update climate-related parameters
-void Parameters::changeClimate(const double &dt) {
+void Parameters::update(const int &t) {
 
-    assert(dt >= 0.0);
+    // t: time step
 
-    for (size_t i = 0u; i < pgood.size(); ++i) updatePar(pgood[i], pgoodEnd[i], dt);
+    // Early exit if warming has not started
+    if (t <= tchange) return;
+
+    // Time at which climate change ends
+    const int tfinal = tchange + twarming;
+
+    // Early exit if warming is over
+    if (t > tfinal) return;
+
+    // For each patch...
     for (size_t i = 0u; i < 2u; ++i) {
-        updatePar(stress[i], stressEnd[i], dt);
-        updatePar(capacities[i], capacitiesEnd[i], dt);
+
+        // Update the stress level and carrying capacity
+        stress[i] = lincrement(stress[i], stressEnd[i], t, tfinal);
+        capacities[i] = lincrement(capacities[i], capacitiesEnd[i], t, tfinal);
+
+        // Check that they are still positive
+        assert(stress[i] >= 0.0);
+        assert(capacities[i] >= 0.0);
+
     }
 
+    // For each deme...
+    for (size_t i = 0u; i < pgood.size(); ++i) {
+
+        // Update the cover of good patches
+        pgood[i] = lincrement(pgood[i], pgoodEnd[i], t, tfinal);
+
+        // Make sure it is still between zero and one
+        assert(pgood[i] >= 0.0);
+        assert(pgood[i] <= 1.0);
+
+    }
 }
 
 // Check that the parameter values are valid
 void Parameters::check() const
 {
-    std::string msg = "No error detected";
 
+    // Check that the parameter values are valid
     if (popsize == 0u) throw std::runtime_error("Initial population size cannot be zero");
     for (size_t i = 0u; i < pgood.size(); ++i) {
         if (pgood[i] < 0.0 || pgood[i] > 1.0) throw std::runtime_error("Proportion of good patches should be between zero and one");
@@ -191,11 +233,21 @@ void Parameters::check() const
 // Save parameters to a file
 void Parameters::save() const
 {
+
+    // Parameter output file name
     const std::string filename = "paramlog.txt";
+
+    // Create output file stream
     std::ofstream file(filename);
+    
+    // Check if the file is open
     if (!file.is_open())
         throw std::runtime_error("Unable to open file " + filename);
+
+    // Write parameters to the file
     write(file);
+
+    // Close the file
     file.close();
 }
 
@@ -203,6 +255,9 @@ void Parameters::save() const
 void Parameters::write(std::ofstream &file) const
 {
 
+    // file: output file stream
+
+    // Write parameters to the file
     file << "popsize " << popsize << '\n';
     file << "pgood " << pgood.size();
     for (size_t i = 0u; i < pgood.size(); ++i) file << ' ' << pgood[i];
@@ -236,7 +291,8 @@ void Parameters::write(std::ofstream &file) const
     file << "savepars " << savepars << '\n';
     file << "savelog " << savelog << '\n';
     file << "savearch " << savearch << '\n';
-    file << "talkative " << talkative << '\n';
+    file << "savedat " << savedat << '\n';
     file << "choose " << choose << '\n';
+    file << "talkative " << verbose << '\n';
 
 }

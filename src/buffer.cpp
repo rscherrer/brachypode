@@ -10,7 +10,7 @@ Buffer::Buffer(const size_t &n, const std::string &filename) :
     maxsize(n),
     head(std::make_unique<std::vector<double> >()),
     tail(std::make_unique<std::vector<double> >()),
-    file(std::ofstream())
+    file(std::ofstream(filename.c_str(), std::ios::binary))
 {
 
     // n: size of the buffer
@@ -23,8 +23,16 @@ Buffer::Buffer(const size_t &n, const std::string &filename) :
     assert(head->size() == 0u);
     assert(tail->size() == 0u);
 
-    // Open the output file stream
-    open(filename);
+    // If the stream failed to open...
+    if (!file.is_open()) {
+
+        // Prepare error message
+        const std::string msg = "Unable to open output file " + filename;
+
+        // Error
+        throw std::runtime_error(msg);
+        
+    }
 
 }
 
@@ -57,26 +65,6 @@ void Buffer::reserve(const size_t &n) {
     assert(head->capacity() == n);
     assert(tail->capacity() == n);
 
-}
-
-// Function to open the output file
-void Buffer::open(const std::string &filename) {
-
-    // filename: name of the ouput file 
-
-    // Open the output file stream
-    file.open(filename.c_str(), std::ios::binary);
-
-    // If the stream failed to open...
-    if (!file.is_open()) {
-
-        // Prepare error message
-        const std::string msg = "Unable to open output file " + filename;
-
-        // Error
-        throw std::runtime_error(msg);
-        
-    }
 }
 
 // Function to store a new value

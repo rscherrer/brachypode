@@ -1,21 +1,32 @@
 #ifndef BRACHYPODE_PRINTER_HPP
 #define BRACHYPODE_PRINTER_HPP
 
-// This header contains functions for writing data to output file.
+// This header is for the Printer class. The Printer class is used to save data
+// from the simulation into output files. The class has flags to know which data
+// to save, and it has methods to save the data. The data are saved in binary format
+// to speed up the process.
 
 #include <fstream>
 #include <vector>
 #include <memory>
 
-namespace stf
-{
+class Printer {
 
-    // Printing functions (stf stands for "save to file")
-    void open(std::vector<std::shared_ptr<std::ofstream> >&, const std::vector<std::string>&);
-    void close(std::vector<std::shared_ptr<std::ofstream> >&);
-    void check(const std::vector<std::string>&, const std::vector<std::string>&);
+public:
 
-}
+    // Constructor
+    Printer(const bool&);
+
+private:
+
+    // Flags for the different types of data to save
+    bool time;
+    bool popsize;
+    bool patchsizes;
+    bool traitmeans;
+    bool individuals;
+
+};
 
 #endif
 

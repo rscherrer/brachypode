@@ -2,15 +2,26 @@
 
 #include "architecture.hpp"
 
+// Constructor
 Architecture::Architecture(const size_t &nchrom, const size_t& nloci, const double &effect) :
     chromends(std::vector<double>(nchrom, 0.0)),
     locations(std::vector<double>(nloci, 0.0)),
     effects(std::vector<double>(nloci, effect))
 {
 
-    // Generate ends of chromosomes (chromosomes have equal sizes)
+    // nchrom: number of chromosomes
+    // nloci: number of loci
+    // effect: effect size per locus
+
+    // For each chromosome...
     for (size_t k = 0u; k < nchrom; ++k) {
+
+        // Set the end of the chromosome
         chromends[k] = (k + 1.0) / nchrom;
+
+        // Note: chromosomes have equal length.
+
+        // Check bounds
         assert(chromends[k] >= 0.0);
         assert(chromends[k] <= 1.0);
     }
@@ -18,18 +29,23 @@ Architecture::Architecture(const size_t &nchrom, const size_t& nloci, const doub
     // Extra check
     assert(chromends.size() == nchrom);
 
-    // Sample random gene locations
+    // Prepare a location sampler
     auto getlocation = rnd::uniform(0.0, 1.0);
 
+    // Sample locus locations
     for (size_t l = 0u; l < nloci; ++l)
         locations[l] = getlocation(rnd::rng);
 
     // Now sort the vector of locations
     std::sort(locations.begin(), locations.end());
 
-    // Check the locus locations
+    // Check the number of locations
     assert(locations.size() == nloci);
+
+    // For each locus...
     for (size_t l = 1u; l < nloci; ++l) {
+
+        // Check its location
         assert(locations[l] > locations[l - 1u]);
         assert(locations[l] <= 1.0);
         assert(locations[l] >= 0.0);
@@ -37,12 +53,16 @@ Architecture::Architecture(const size_t &nchrom, const size_t& nloci, const doub
 
 }
 
+// Function to load the genetic architecture from a file
 void Architecture::load() {
 
+    // Name of the architecture file
     const std::string filename = "architecture.txt";
 
     // Open the architecture file
     std::ifstream file(filename.c_str());
+
+    // Check if the file is open
     if (!file.is_open())
         throw std::runtime_error("Unable to open file " + filename + '\n');
 
@@ -53,6 +73,8 @@ void Architecture::load() {
 
     // Read the number of chromosomes
     file >> nchrom;
+
+    // Error if no chromosome
     if (nchrom == 0u) throw std::runtime_error("There should be at least one chromosome");
 
     // Resize container
@@ -81,6 +103,8 @@ void Architecture::load() {
 
     // Read the number of loci
     file >> nloci;
+
+    // Error if no loci
     if (nloci == 0) throw std::runtime_error("There should be at least one locus");
 
     // Resize containers
@@ -102,39 +126,56 @@ void Architecture::load() {
 
     }
 
-    // For each locus...
-    for (size_t l = 0u; l < nloci; ++l) {
+    // Read each effect size
+    for (size_t l = 0u; l < nloci; ++l) file >> effects[l];
 
-        // Read the effect size
-        file >> effects[l];
-
-    }
-
+    // Close the file
     file.close();
 
 }
 
-void Architecture::save(const Parameters &pars) const
+// Function to save the genetic architecture to a file
+void Architecture::save() const
 {
+
+    // Name of the architecture file
     const std::string filename = "architecture.txt";
+
+    // Open the output architecture file
     std::ofstream archfile(filename);
 
+    // Check if the file is open
     if (!archfile.is_open())
         throw std::runtime_error("Unable to open file " + filename + '\n');
 
-    // Write chromosome ends
-    assert(pars.nchrom == chromends.size());
-    archfile << pars.nchrom << '\n';
-    for (size_t k = 0u; k < pars.nchrom; ++k) archfile << ' ' << chromends[k];
+    // Number of chromosomes and loci
+    const size_t nchrom = chromends.size();
+    const size_t nloci = locations.size();
+
+    // Write the number of chromosomes
+    archfile << nchrom << '\n';
+
+    // Write the ends of chromosomes
+    for (size_t k = 0u; k < nchrom; ++k) archfile << ' ' << chromends[k];
+
+    // End of line
     archfile << '\n';
 
-    // Write locus number, locations and effect sizes
-    assert(pars.nloci == locations.size());
-    archfile << pars.nloci << '\n';
-    for (size_t l = 0u; l < pars.nloci; ++l) archfile << ' ' << locations[l];
+    // Write the number of loci
+    archfile << nloci << '\n';
+    
+    // Write the locations of loci
+    for (size_t l = 0u; l < nloci; ++l) archfile << ' ' << locations[l];
+    
+    // End of line
     archfile << '\n';
-    for (size_t l = 0u; l < pars.nloci; ++l) archfile << ' ' << effects[l];
+    
+    // Write the effect sizes
+    for (size_t l = 0u; l < nloci; ++l) archfile << ' ' << effects[l];
+    
+    // End of line
     archfile << '\n';
 
+    // Close the file
     archfile.close();
 }

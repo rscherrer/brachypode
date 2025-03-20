@@ -365,7 +365,7 @@ int simulate(const std::vector<std::string> &args) {
         if (pars.savelog) std::fclose(stdout);
         
         // Close the streams to output files
-        stf::close(buffers);
+        if (pars.savedat) stf::close(buffers);
 
         return 0;
 

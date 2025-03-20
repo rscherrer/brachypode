@@ -22,13 +22,15 @@ Architecture::Architecture(const size_t &nchrom, const size_t& nloci, const doub
 
         // Note: chromosomes have equal length.
 
-        // Check bounds
-        assert(chromends[k] >= 0.0);
-        assert(chromends[k] <= 1.0);
+        // Check increasing order
+        if (k > 0u) assert(chromends[k] > chromends[k - 1u]);
+
     }
 
-    // Extra check
+    // Extra checks
     assert(chromends.size() == nchrom);
+    assert(chromends[0u] == 0.0);
+    assert(chromends.back() == 1.0);
 
     // Prepare a location sampler
     auto getLocation = rnd::uniform(0.0, 1.0);
@@ -43,22 +45,19 @@ Architecture::Architecture(const size_t &nchrom, const size_t& nloci, const doub
     // Check the number of locations
     assert(locations.size() == nloci);
 
-    // For each locus...
-    for (size_t l = 1u; l < nloci; ++l) {
-
-        // Check its location
-        assert(locations[l] > locations[l - 1u]);
-        assert(locations[l] <= 1.0);
-        assert(locations[l] >= 0.0);
-        
-    }
+    // Check increasing order
+    for (size_t l = 1u; l < nloci; ++l) assert(locations[l] > locations[l - 1u]);
+    
+    // Check bounds
+    assert(locations[0u] >= 0.0);
+    assert(locations.back() <= chromends.back());
+    
 }
 
 // Function to load the genetic architecture from a file
-void Architecture::load() {
+void Architecture::load(const std::string &filename) {
 
-    // Name of the architecture file
-    const std::string filename = "architecture.txt";
+    // filename: name of the file to read from
 
     // Open the architecture file
     std::ifstream file(filename.c_str());
@@ -76,11 +75,11 @@ void Architecture::load() {
 
     // Error if could not read
     if (file.fail())
-        throw std::runtime_error("Could not read the number of chromosomes");
+        throw std::runtime_error("Could not read the number of chromosomes in architecture file");
 
     // Error if no chromosome
     if (nchrom == 0u) 
-        throw std::runtime_error("There should be at least one chromosome");
+        throw std::runtime_error("There should be at least one chromosome in architecture file");
 
     // Resize container
     chromends.resize(nchrom);
@@ -93,21 +92,21 @@ void Architecture::load() {
 
         // Check if could not read
         if (file.fail())
-            throw std::runtime_error("Could not read the end of chromosome " + std::to_string(k));
+            throw std::runtime_error("Could not read the end of chromosome " + std::to_string(k) + " in architecture file");
 
         // Check order
         if (k > 0u && chromends[k] <= chromends[k - 1u])
-            throw std::runtime_error("Chromosome ends should be in increasing order");
-
-        // Check bounds
-        if (chromends[k] < 0.0) 
-            throw std::runtime_error("Chromosome ends should be positive");
+            throw std::runtime_error("Chromosome ends should be in increasing order in architecture file");
 
     }
 
+    // Check end of the first chromosome
+    if (chromends[0u] < 0.0)
+        throw std::runtime_error("Chromosome ends should be positive in architecture file");
+
     // Check end of the last chromosome
     if (chromends.back() != 1.0) 
-        throw std::runtime_error("End of the last chromosome should be one");
+        throw std::runtime_error("End of the last chromosome should be one in architecture file");
 
     // Check size
     assert(chromends.size() == nchrom);
@@ -117,11 +116,11 @@ void Architecture::load() {
 
     // Error if could not read
     if (file.fail())
-        throw std::runtime_error("Could not read the number of loci");
+        throw std::runtime_error("Could not read the number of loci in architecture file");
 
     // Error if no loci
     if (nloci == 0)
-         throw std::runtime_error("There should be at least one locus");
+         throw std::runtime_error("There should be at least one locus in architecture file");
 
     // Resize containers
     locations.resize(nloci);
@@ -135,17 +134,17 @@ void Architecture::load() {
 
         // Check if could not read
         if (file.fail())
-            throw std::runtime_error("Could not read the location of locus " + std::to_string(l));
+            throw std::runtime_error("Could not read the location of locus " + std::to_string(l) + " in architecture file");
 
         // Check order
         if (l > 0u && locations[l] <= locations[l - 1]) 
-            throw std::runtime_error("Locus locations should be in increasing order");
-
-        // Check location
-        if (locations[l] < 0.0) throw std::runtime_error("Locus location should be positive");
-        if (locations[l] > chromends.back()) throw std::runtime_error("Locus location should not be beyond the end of the last chromosome");
+            throw std::runtime_error("Locus locations should be in increasing order in architecture file");
 
     }
+
+    // Check bounds
+    if (locations[0u] < 0.0) throw std::runtime_error("Locus location should be positive in architecture file");
+    if (locations.back() > chromends.back()) throw std::runtime_error("Locus location should not be beyond the end of the last chromosome in architecture file");
 
     // Read each effect size
     for (size_t l = 0u; l < nloci; ++l) file >> effects[l];
@@ -156,11 +155,10 @@ void Architecture::load() {
 }
 
 // Function to save the genetic architecture to a file
-void Architecture::save() const
+void Architecture::save(const std::string &filename) const
 {
 
-    // Name of the architecture file
-    const std::string filename = "architecture.txt";
+    // filename: name of the file to save to
 
     // Open the output architecture file
     std::ofstream file(filename);

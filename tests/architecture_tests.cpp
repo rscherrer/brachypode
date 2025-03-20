@@ -5,6 +5,7 @@
 // test that the architecture, whether generated or loaded from a file, has
 // the expected attributes.
 
+#include "testutils.hpp"
 #include "../src/architecture.hpp"
 #include <boost/test/unit_test.hpp>
 
@@ -49,18 +50,21 @@ BOOST_AUTO_TEST_CASE(loadedArchitectureHasRightAttributes) {
     // Create an architecture
     Architecture arch(3u, 3u, 0.1);
 
+    // Prepare content of architecture file
+    std::ostringstream content;
+
+    // Add lines
+    content << "2\n";                // no. chromosomes
+    content << "0.5 1\n";            // ends of chromosomes
+    content << "4\n";                // no. loci
+    content << "0.1 0.2 0.6 0.8\n";  // locations of loci
+    content << "0.1 0.1 0.2 0.1\n";  // locus effect sizes
+
     // Write a new architecture file
-    std::ofstream archfile;
-    archfile.open("architecture.txt");
-    archfile << "2\n"; // no. chromosomes
-    archfile << "0.5 1\n"; // ends of chromosomes
-    archfile << "4\n"; // no. loci
-    archfile << "0.1 0.2 0.6 0.8\n"; // locations of loci
-    archfile << "0.1 0.1 0.2 0.1\n"; // locus effect sizes
-    archfile.close();
+    tst::write("architecture.txt", content.str());
 
     // Overwrite the architecture with the one we just saved
-    arch.load();
+    arch.load("architecture.txt");
 
     // Check no. of chromosomes and loci
     BOOST_CHECK_EQUAL(arch.chromends.size(), 2u);
@@ -81,3 +85,187 @@ BOOST_AUTO_TEST_CASE(loadedArchitectureHasRightAttributes) {
 
 }
 
+// Test that error when cannot read the file
+BOOST_AUTO_TEST_CASE(errorWhenCannotReadArchitectureFile) {
+
+    // Create an architecture
+    Architecture arch(3u, 3u, 0.1);
+
+    // Check that error when loading non-existing file
+    tst::checkError([&] { arch.load("nonexistant.txt"); }, "Unable to open file architecture.txt");
+
+}
+
+// Test that error when cannot read the number of chromosomes
+BOOST_AUTO_TEST_CASE(errorWhenCannotReadNumberOfChromosomes) {
+
+    // Create an architecture
+    Architecture arch(3u, 3u, 0.1);
+
+    // The first thing shoulld be the number of chromosomes 
+    tst::write("architecture.txt", "hello\n");
+
+    // Check error
+    tst::checkError([&] { arch.load("architecture.txt"); }, "Could not read the number of chromosomes in architecture file");
+
+}
+
+// Test that error if the number of chromosomes is zero
+BOOST_AUTO_TEST_CASE(errorWhenZeroChromosomesInArchitecture) {
+
+    // Create an architecture
+    Architecture arch(3u, 3u, 0.1);
+
+    // Write architecture file
+    tst::write("architecture.txt", "0\n");
+
+    // Check error
+    tst::checkError([&] { arch.load("architecture.txt"); }, "There should be at least one chromosome in architecture file");
+
+}
+
+// Test that error if cannot read the end of a chromosome
+BOOST_AUTO_TEST_CASE(errorWhenCannotReadChromosomeEnd) {
+
+    // Create an architecture
+    Architecture arch(3u, 3u, 0.1);
+
+    // Write architecture file
+    tst::write("architecture.txt", "1 hello\n");
+
+    // Check error
+    tst::checkError([&] { arch.load("architecture.txt"); }, "Could not read the end of chromosome 0 in architecture file");
+
+}
+
+// Test that error when chromosome ends are not in increasing order
+BOOST_AUTO_TEST_CASE(errorWhenChromosomeEndsNotInIncreasingOrder) {
+
+    // Create an architecture
+    Architecture arch(3u, 3u, 0.1);
+
+    // Write architecture file
+    tst::write("architecture.txt", "3 0.1 0.8 0.3\n");
+
+    // Check error
+    tst::checkError([&] { arch.load("architecture.txt"); }, "Chromosome ends should be in increasing order in architecture file");
+
+}
+
+// Test that error if chromosomes start before zero
+BOOST_AUTO_TEST_CASE(errorWhenChromosomesStartBeforeZero) {
+
+    // Create an architecture
+    Architecture arch(3u, 3u, 0.1);
+
+    // Write architecture file
+    tst::write("architecture.txt", "3 -0.1 0.3 1.0\n");
+
+    // Check error
+    tst::checkError([&] { arch.load("architecture.txt"); }, "Chromosome ends should be positive in architecture file");
+
+}
+
+// Test that error if chromosomes do not end at one
+BOOST_AUTO_TEST_CASE(errorWhenChromosomesDoNotEndAtOne) {
+
+    // Create an architecture
+    Architecture arch(3u, 3u, 0.1);
+
+    // Write architecture file
+    tst::write("architecture.txt", "3 0.1 0.3 0.8\n");
+
+    // Check error
+    tst::checkError([&] { arch.load("architecture.txt"); }, "End of the last chromosome should be one in architecture file");
+
+    // Write another
+    tst::write("architecture.txt", "3 0.1 0.3 1.1\n");
+
+    // Check error
+    tst::checkError([&] { arch.load("architecture.txt"); }, "End of the last chromosome should be one in architecture file");
+
+}
+
+// Test that error if the number of loci cannot be read
+BOOST_AUTO_TEST_CASE(errorWhenCannotReadNumberOfLoci) {
+
+    // Create an architecture
+    Architecture arch(3u, 3u, 0.1);
+
+    // Write architecture file
+    tst::write("architecture.txt", "3 0.1 0.3 1.0\nhello");
+
+    // Check error
+    tst::checkError([&] { arch.load("architecture.txt"); }, "Could not read the number of loci in architecture file");
+
+}
+
+// Test that error if the number of loci is zero
+BOOST_AUTO_TEST_CASE(errorWhenZeroLociInArchitecture) {
+
+    // Create an architecture
+    Architecture arch(3u, 3u, 0.1);
+
+    // Write architecture file
+    tst::write("architecture.txt", "3 0.1 0.3 1.0\n0");
+
+    // Check error
+    tst::checkError([&] { arch.load("architecture.txt"); }, "There should be at least one locus in architecture file");
+
+}
+
+// Test that error when locus location cannot be read
+BOOST_AUTO_TEST_CASE(errorWhenCannotReadLocusLocation) {
+
+    // Create an architecture
+    Architecture arch(3u, 3u, 0.1);
+
+    // Write architecture file
+    tst::write("architecture.txt", "3 0.1 0.3 1.0\n3 0.1 0.2 hello");
+
+    // Check error
+    tst::checkError([&] { arch.load("architecture.txt"); }, "Could not read the location of locus 2 in architecture file");
+
+}
+
+// Test that error when loci are not in increasing order of location
+BOOST_AUTO_TEST_CASE(errorWhenLocusLocationsNotInIncreasingOrder) {
+
+    // Create an architecture
+    Architecture arch(3u, 3u, 0.1);
+
+    // Write architecture file
+    tst::write("architecture.txt", "3 0.1 0.3 1.0\n3 0.1 0.3 0.2");
+
+    // Check error
+    tst::checkError([&] { arch.load("architecture.txt"); }, "Locus locations should be in increasing order in architecture file");
+
+}
+
+// Test that error when loci start before zero
+BOOST_AUTO_TEST_CASE(errorWhenLociStartBeforeZero) {
+
+    // Create an architecture
+    Architecture arch(3u, 3u, 0.1);
+
+    // Write architecture file
+    tst::write("architecture.txt", "3 0.1 0.3 1.0\n3 -0.1 0.2 0.3");
+
+    // Check error
+    tst::checkError([&] { arch.load("architecture.txt"); }, "Locus location should be positive in architecture file");
+
+}
+
+// Test that error when loci go beyond one
+BOOST_AUTO_TEST_CASE(errorWhenLociGoBeyondOne) {
+
+    // Create an architecture
+    Architecture arch(3u, 3u, 0.1);
+
+    // Write architecture file
+    tst::write("architecture.txt", "3 0.1 0.3 1.0\n3 0.1 0.2 1.3");
+
+    // Check error
+    tst::checkError([&] { arch.load("architecture.txt"); }, "Locus location should not be beyond the end of the last chromosome in architecture file");
+
+}

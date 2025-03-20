@@ -24,6 +24,7 @@ public:
     // Getters
     double last() const;
     size_t size() const;
+    bool isopen() const;
 
     // Setters
     void reserve(const size_t&);

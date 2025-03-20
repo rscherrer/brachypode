@@ -45,6 +45,14 @@ size_t Buffer::size() const {
 
 }
 
+// Function to check if the file is open
+bool Buffer::isopen() const {
+
+    // Check if the file is open
+    return file.is_open();
+
+}
+
 // Function to reserve space in the buffer
 void Buffer::reserve(const size_t &n) {
 

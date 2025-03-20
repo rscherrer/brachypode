@@ -5,12 +5,15 @@
 
 #include <vector>
 #include <string>
+#include <functional>
 
 namespace tst
 {
 
     // Functions used in unit tests
-    std::vector<double> readBinary(const std::string&);
+    std::vector<double> read(const std::string&);
+    void write(const std::string&, const std::string&);
+    void checkError(const std::function<void()>&, const std::string&);
 
 }
 

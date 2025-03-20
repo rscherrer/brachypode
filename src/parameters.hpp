@@ -19,8 +19,7 @@ struct Parameters {
     // Functions
     void read(const std::string&);
     void update(const int&);
-    void save() const;
-    void check() const;
+    void save(const std::string&) const;
 
     // Parameters
     size_t popsize;                    // initial population size

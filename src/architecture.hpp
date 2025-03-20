@@ -17,8 +17,8 @@ struct Architecture {
     Architecture(const size_t&, const size_t&, const double&);
 
     // Functions
-    void load();
-    void save() const;
+    void load(const std::string&);
+    void save(const std::string&) const;
 
     // Parameters
     std::vector<double> chromends; // ends of chromosomes

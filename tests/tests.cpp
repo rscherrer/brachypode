@@ -501,7 +501,7 @@ BOOST_AUTO_TEST_CASE(writingTheRightStuff) {
     simulate({"program_name", "parameters.txt"});
 
     // Read back one saved output data file
-    std::vector<double> timepoints = tst::readBinary("time.dat");
+    std::vector<double> timepoints = tst::read("time.dat");
 
     // Check the right number of entries have been saved
     BOOST_CHECK_EQUAL(timepoints.size(), 11u);
@@ -518,7 +518,7 @@ BOOST_AUTO_TEST_CASE(savingWorks) {
     file << "tsave 1\n";
     file.close();
     simulate({"program_name", "parameters.txt"});
-    std::vector<double> timepoints = tst::readBinary("time.dat");
+    std::vector<double> timepoints = tst::read("time.dat");
 
     // Now change the number of entries to save
     file.open("parameters.txt");
@@ -530,7 +530,7 @@ BOOST_AUTO_TEST_CASE(savingWorks) {
     simulate({"program_name", "parameters.txt"});
 
     // Read the new data back
-    std::vector<double> newtimepoints = tst::readBinary("time.dat");
+    std::vector<double> newtimepoints = tst::read("time.dat");
 
     // Check the new data does not have the same number of entries
     BOOST_CHECK(newtimepoints.size() < timepoints.size());
@@ -560,8 +560,8 @@ BOOST_AUTO_TEST_CASE(whatToSaveWorks) {
     simulate({"program_name", "parameters.txt"});
 
     // Read back
-    std::vector<double> timepoints = tst::readBinary("time.dat");
-    std::vector<double> popsizes = tst::readBinary("popsize.dat");
+    std::vector<double> timepoints = tst::read("time.dat");
+    std::vector<double> popsizes = tst::read("popsize.dat");
 
     // Check
     BOOST_CHECK_EQUAL(timepoints.size(), 6u);

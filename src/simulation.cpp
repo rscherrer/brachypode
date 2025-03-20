@@ -45,7 +45,7 @@ int simulate(const std::vector<std::string> &args) {
         if (pars.loadarch) {
 
             // Load the genetic architecture from a file
-            arch.load();
+            arch.load("architecture.txt");
 
             // Update hyperparameters accordingly
             pars.nchrom = arch.chromends.size();
@@ -54,10 +54,10 @@ int simulate(const std::vector<std::string> &args) {
         }
 
         // Save the architecture if necessary
-        if (pars.savearch) arch.save();
+        if (pars.savearch) arch.save("architecture.txt");
 
         // Save parameters if necessary
-        if (pars.savepars) pars.save();
+        if (pars.savepars) pars.save("paramlog.txt");
 
         // Prepare a population of individuals
         std::vector<Individual> pop;

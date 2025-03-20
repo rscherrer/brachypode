@@ -11,7 +11,7 @@
 BOOST_AUTO_TEST_CASE(bufferCanStoreData) {
 
     // Create a fresh buffer
-    Buffer buffer(10u, "values.dat");
+    Buffer buffer(10u, "output.dat");
 
     // Store a value into it
     buffer.store(3.14);
@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(bufferCanStoreData) {
 BOOST_AUTO_TEST_CASE(bufferCanWriteToFile) {
 
     // Create a buffer
-    Buffer buffer(10u, "values.dat");
+    Buffer buffer(10u, "output.dat");
 
     // Store some values
     buffer.store(3.14);
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(bufferCanWriteToFile) {
     buffer.close();
 
     // Read the saved file
-    std::vector<double> values = tst::readBinary("values.dat");
+    std::vector<double> values = tst::read("output.dat");
 
     // Check the saved value
     BOOST_CHECK_EQUAL(values.size(), 2u);
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(bufferCanWriteToFile) {
 BOOST_AUTO_TEST_CASE(bufferFlushesAutomatically) {
 
     // Create a buffer with a limit of two
-    Buffer buffer(2u, "values.dat");
+    Buffer buffer(2u, "output.dat");
 
     // Store a value
     buffer.store(3.14);
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(bufferFlushesAutomatically) {
     buffer.close();
 
     // Read the saved file
-    std::vector<double> values = tst::readBinary("values.dat");
+    std::vector<double> values = tst::read("output.dat");
 
     // Check the saved values
     BOOST_CHECK_EQUAL(values.size(), 2u);

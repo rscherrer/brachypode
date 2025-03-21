@@ -95,7 +95,7 @@ file(GLOB_RECURSE unit ${CMAKE_SOURCE_DIR}/src/*.cpp)
 include_directories(${CMAKE_SOURCE_DIR}/tests)
 
 # Names of the test executables
-set(TESTS tests architecture_tests individual_tests buffer_tests)
+set(TESTS tests architecture_tests individual_tests buffer_tests printer_tests parameters_tests)
 
 # Build each executable
 foreach(TEST IN LISTS TESTS)

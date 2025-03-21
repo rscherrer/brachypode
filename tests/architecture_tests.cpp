@@ -12,35 +12,30 @@
 // Check that a generated architecture has the right attributes
 BOOST_AUTO_TEST_CASE(architectureHasRightAttributes) {
 
-    // Create an architecture with 3 chromosomes and 3 loci
-    Architecture arch(3u, 3u, 0.1);
-    BOOST_CHECK_EQUAL(arch.chromends.size(), 3u); // number of chromosomes
-    BOOST_CHECK_EQUAL(arch.locations.size(), 3u); // number of loci
-    BOOST_CHECK_EQUAL(arch.effects.size(), 3u); // number of loci
+    // Create an architecture with 4 chromosomes and 3 loci
+    Architecture arch(4u, 3u, 0.1);
 
-    // For each chromosome...
-    for (size_t k = 0u; k < arch.chromends.size(); ++k) {
+    // Check sizes
+    BOOST_CHECK_EQUAL(arch.chromends.size(), 4u);
+    BOOST_CHECK_EQUAL(arch.locations.size(), 3u);
+    BOOST_CHECK_EQUAL(arch.effects.size(), 3u);
 
-        // Check the order of chromosome ends
-        if (k > 0u) BOOST_CHECK(arch.chromends[k] > arch.chromends[k - 1u]);
+    // Check chromosome ends
+    BOOST_CHECK_EQUAL(arch.chromends[0u], 0.25);
+    BOOST_CHECK_EQUAL(arch.chromends[1u], 0.5);
+    BOOST_CHECK_EQUAL(arch.chromends[2u], 0.75);
+    BOOST_CHECK_EQUAL(arch.chromends[3u], 1.0);
 
-        // Check the bounds
-        BOOST_CHECK(arch.chromends[k] >= 0.0);
-        BOOST_CHECK(arch.chromends[k] <= 1.0);
-
-    }
-
-    // For each locus...
-    for (size_t l = 0u; l < arch.locations.size(); ++l) {
-
-        // Check the order of the locations
-        if (l > 0u) BOOST_CHECK(arch.locations[l] > arch.locations[l - 1u]);
-
-        // Check the bounds
-        BOOST_CHECK(arch.locations[l] >= 0.0);
-        BOOST_CHECK(arch.chromends[l] <= arch.chromends.back());
-
-    }
+    // Check locus locations
+    BOOST_CHECK(arch.locations[0u] >= 0.0);
+    BOOST_CHECK(arch.locations[1u] > arch.locations[0u]);
+    BOOST_CHECK(arch.locations[2u] >= arch.locations[1u]);
+    BOOST_CHECK(arch.locations[2u] <= 1.0);
+    
+    // Check effect sizes
+    BOOST_CHECK_EQUAL(arch.effects[0u], 0.1);
+    BOOST_CHECK_EQUAL(arch.effects[1u], 0.1);
+    BOOST_CHECK_EQUAL(arch.effects[2u], 0.1);
 
 }
 
@@ -71,7 +66,7 @@ BOOST_AUTO_TEST_CASE(loadedArchitectureHasRightAttributes) {
     BOOST_CHECK_EQUAL(arch.locations.size(), 4u);
     BOOST_CHECK_EQUAL(arch.effects.size(), 4u);
 
-    // Check each chromosome end and each locus position
+    // Check each chromosome end, locus position and effect size
     BOOST_CHECK_EQUAL(arch.chromends[0u], 0.5);
     BOOST_CHECK_EQUAL(arch.chromends[1u], 1.0);
     BOOST_CHECK_EQUAL(arch.locations[0u], 0.1);
@@ -92,7 +87,7 @@ BOOST_AUTO_TEST_CASE(errorWhenCannotReadArchitectureFile) {
     Architecture arch(3u, 3u, 0.1);
 
     // Check that error when loading non-existing file
-    tst::checkError([&] { arch.load("nonexistant.txt"); }, "Unable to open file architecture.txt");
+    tst::checkError([&] { arch.load("nonexistent.txt"); }, "Unable to open file nonexistent.txt");
 
 }
 

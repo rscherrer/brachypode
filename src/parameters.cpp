@@ -49,41 +49,39 @@ Parameters::Parameters() :
 {
 
     // Check that the parameter values are valid
-    assert(popsize == 0u);
-    assert(pgood.size() == 0u);
+    assert(popsize != 0u);
+    assert(pgood.size() != 0u);
     assert(pgood.size() == pgoodEnd.size());
     for (size_t i = 0u; i < pgood.size(); ++i) {
-        assert(pgood[i] < 0.0);
-        assert(pgood[i] > 1.0);
-        assert(pgoodEnd[i] < 0.0);
-        assert(pgoodEnd[i] > 1.0);
+        assert(pgood[i] >= 0.0);
+        assert(pgood[i] <= 1.0);
+        assert(pgoodEnd[i] >= 0.0);
+        assert(pgoodEnd[i] <= 1.0);
     }
     for (size_t i = 0u; i < 2u; ++i) {
-        assert(capacities[i] < 0.0);
-        assert(capacitiesEnd[i] < 0.0);
-        assert(stress[i] < 0.0);
-        assert(stressEnd[i] < 0.0);
+        assert(capacities[i] > 0.0);
+        assert(capacitiesEnd[i] > 0.0);
+        assert(stress[i] >= 0.0);
+        assert(stressEnd[i] >= 0.0);
     }
-    assert(maxgrowth < 0.0);
-    assert(steep < 0.0);
-    assert(dispersal < 0.0);
-    assert(dispersal > 1.0);
-    assert(mutation < 0.0);
-    assert(mutation > 1.0);
-    assert(nloci > 1000);
-    assert(nchrom == 0);
-    assert(nloci == 0u);
-    assert(allfreq < 0.0);
-    assert(allfreq > 1.0);
-    assert(tradeoff < 0.0);
-    assert(selfing < 0.0);
-    assert(selfing > 1.0);
-    assert(recombination < 0.0);
-    assert(tend == 0u);
-    assert(tsave == 0u);
-    assert(type == 0u);
-    assert(type > 2u);
-    assert(type == 2u && tradeoff > 1.0);
+    assert(maxgrowth >= 0.0);
+    assert(steep >= 0.0);
+    assert(dispersal >= 0.0);
+    assert(dispersal <= 1.0);
+    assert(mutation >= 0.0);
+    assert(mutation <= 1.0);
+    assert(nloci <= 1000u);
+    assert(nchrom != 0u);
+    assert(nloci != 0u);
+    assert(allfreq >= 0.0);
+    assert(allfreq <= 1.0);
+    assert(tradeoff >= 0.0);
+    assert(selfing >= 0.0);
+    assert(selfing <= 1.0);
+    assert(recombination >= 0.0);
+    assert(tend != 0u);
+    assert(tsave != 0u);
+    assert(type == 1u || type == 2u && tradeoff <= 1.0);
 
 }
 
@@ -267,15 +265,15 @@ void Parameters::read(const std::string &filename)
         if (pgoodEnd[i] > 1.0) throw std::runtime_error("Proportion of good patches after warming should be between zero and one");
     }
     for (size_t i = 0u; i < 2u; ++i) {
-        if (capacities[i] < 0.0) throw std::runtime_error("Carrying capacity cannot be negative");
-        if (capacitiesEnd[i] < 0.0) throw std::runtime_error("Carrying capacity after warming cannot be negative");
+        if (capacities[i] <= 0.0) throw std::runtime_error("Carrying capacity must be positive");
+        if (capacitiesEnd[i] <= 0.0) throw std::runtime_error("Carrying capacity after warming must be positive");
         if (stress[i] < 0.0) throw std::runtime_error("Stress level cannot be negative");
         if (stressEnd[i] < 0.0) throw std::runtime_error("Stress level after warming cannot be negative");
     }
     if (maxgrowth < 0.0) throw std::runtime_error("Maximum growth rate cannot be negative");
     if (steep < 0.0) throw std::runtime_error("Steepness of the tolerance function cannot be negative");
-    if (dispersal < 0.0) throw std::runtime_error("dispersal rate should be between zero and one");
-    if (dispersal > 1.0) throw std::runtime_error("dispersal rate should be between zero and one");
+    if (dispersal < 0.0) throw std::runtime_error("Dispersal rate should be between zero and one");
+    if (dispersal > 1.0) throw std::runtime_error("Dispersal rate should be between zero and one");
     if (mutation < 0.0) throw std::runtime_error("Mutation rate should be between zero and one");
     if (mutation > 1.0) throw std::runtime_error("Mutation rate should be between zero and one");
     if (nloci > 1000) throw std::runtime_error("There cannot be more than 1000 loci");
@@ -307,7 +305,7 @@ double lincrement(const double &x, const double &xfinal, const int &t, const int
     // tfinal: time step when the parameter should reach its final value
 
     // Compute new value
-    return xfinal - x / (tfinal - t - 1.0);
+    return x + (xfinal - x) / (tfinal - t + 1.0);
 
     // Note: this follows from the equation of a line.
 
@@ -336,7 +334,7 @@ void Parameters::update(const int &t) {
 
         // Check that they are still positive
         assert(stress[i] >= 0.0);
-        assert(capacities[i] >= 0.0);
+        assert(capacities[i] > 0.0);
 
     }
 

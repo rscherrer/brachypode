@@ -16,8 +16,13 @@ Buffer::Buffer(const size_t &n, const std::string &filename) :
     // n: size of the buffer
     // filename: name of the ouput file 
 
-    // Reserve space in the containers
-    reserve(maxsize);
+    // Reserve space
+    head->reserve(maxsize);
+    tail->reserve(maxsize);
+
+    // Check that the containers have reserved space
+    assert(head->capacity() == maxsize);
+    assert(tail->capacity() == maxsize);
 
     // Check that the containers are empty
     assert(head->size() == 0u);
@@ -37,6 +42,14 @@ double Buffer::last() const {
 
 }
 
+// Function to return the maximum capacity
+size_t Buffer::capacity() const {
+
+    // Get capacity
+    return head->capacity();
+
+}
+
 // Function to return the number of values stored
 size_t Buffer::size() const {
 
@@ -53,23 +66,8 @@ bool Buffer::isopen() const {
 
 }
 
-// Function to reserve space in the buffer
-void Buffer::reserve(const size_t &n) {
-
-    // n: size of the buffer
-
-    // Reserve space
-    head->reserve(n);
-    tail->reserve(n);
-
-    // Check that the containers have reserved space
-    assert(head->capacity() == n);
-    assert(tail->capacity() == n);
-
-}
-
 // Function to store a new value
-void Buffer::store(const double &x) {
+void Buffer::save(const double &x) {
 
     // x: the value to store
 
@@ -110,6 +108,9 @@ void Buffer::close() {
 
     // Check that the file is open
     assert(file.is_open());
+
+    // Flush whatever is left
+    flush();
 
     // Close the file
     file.close();

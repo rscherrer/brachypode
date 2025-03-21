@@ -13,13 +13,8 @@ BOOST_AUTO_TEST_CASE(updatingRequestedOutputs) {
     // Set the list of valid outputs
     std::vector<std::string> valid = {"foo", "bar", "baz"};
 
-    // Open a file stream
-    std::ofstream file("whattosave.txt");
-
-    // Write some requested outputs to the file
-    file << "foo\n";
-    file << "bar\n";
-    file.close();
+    // Write some requested outputs to a file
+    tst::write("whattosave.txt", "foo\nbar");
 
     // Set a list of requested outputs so far
     std::vector<std::string> outputs = {"time", "popsize", "patchsizes"};
@@ -56,14 +51,8 @@ BOOST_AUTO_TEST_CASE(updatingFailsWhenInvalidOutputRequested) {
     // Set the list of valid outputs
     std::vector<std::string> valid = {"foo", "bar", "baz"};
 
-    // Open a file stream
-    std::ofstream file("whattosave.txt");
-
-    // Write some requested outputs to the file
-    file << "foo\n";
-    file << "bar\n";
-    file << "qux\n";
-    file.close();
+    // Write some requested outputs to file
+    tst::write("whattosave.txt", "foo\nbar\nqux");
 
     // Set a list of requested outputs so far
     std::vector<std::string> outputs = {"time", "popsize", "patchsizes"};
@@ -75,8 +64,8 @@ BOOST_AUTO_TEST_CASE(updatingFailsWhenInvalidOutputRequested) {
 
 }
 
-// Test that opening and closing buffers works
-BOOST_AUTO_TEST_CASE(openingBuffersAndClosingThem) {
+// Test that opening buffers works
+BOOST_AUTO_TEST_CASE(openingBuffers) {
 
     // Set the list of buffer names
     std::vector<std::string> names = {"foo", "bar", "baz"};
@@ -97,6 +86,20 @@ BOOST_AUTO_TEST_CASE(openingBuffersAndClosingThem) {
     BOOST_CHECK(buffers["foo"]->isopen());
     BOOST_CHECK(buffers["bar"]->isopen());
     BOOST_CHECK(buffers["baz"]->isopen());
+
+}
+
+// Test that closing buffers works
+BOOST_AUTO_TEST_CASE(closingBuffers) {
+
+    // Set the list of buffer names
+    std::vector<std::string> names = {"foo", "bar", "baz"};
+
+    // Set up a map of buffers
+    std::unordered_map<std::string, std::optional<Buffer> > buffers;
+
+    // Open the buffers
+    stf::open(buffers, names);
 
     // Close the buffers
     stf::close(buffers);

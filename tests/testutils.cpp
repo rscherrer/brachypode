@@ -14,6 +14,10 @@ std::vector<double> tst::read(const std::string &filename)
     // Open the input file
     std::ifstream file(filename.c_str(), std::ios::in | std::ios::binary);
 
+    // Check if the file is open
+    if (!file.is_open())
+        throw std::runtime_error("Unable to open file " + filename);
+
     // Prepare storage for values
     double x;
     std::vector<double> v;
@@ -40,6 +44,32 @@ std::vector<double> tst::read(const std::string &filename)
     file.close();
 
     return v;
+
+}
+
+// Function to read a text file into a string
+std::string tst::readtext(const std::string &filename) {
+
+    // filename: the name of the file
+
+    // Open the input file
+    std::ifstream file(filename.c_str(), std::ios::in);
+
+    // Check if the file is open
+    if (!file.is_open())
+        throw std::runtime_error("Unable to open file " + filename);
+
+    // Create a string stream to hold the file content
+    std::stringstream content;
+
+    // Read the file content into the string stream
+    content << file.rdbuf();
+
+    // Close the file
+    file.close();
+
+    // Return the content as a string
+    return content.str();
 
 }
 

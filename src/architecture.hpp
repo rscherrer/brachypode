@@ -20,10 +20,17 @@ struct Architecture {
     void load(const std::string&);
     void save(const std::string&) const;
 
+    // Hyperparameters
+    size_t nchrom;
+    size_t nloci;
+    
     // Parameters
     std::vector<double> chromends; // ends of chromosomes
     std::vector<double> locations; // gene locations
     std::vector<double> effects;   // effect sizes
+
+    // Maximum trait value
+    double tolmax;
 
 };
 

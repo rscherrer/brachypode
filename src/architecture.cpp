@@ -3,15 +3,20 @@
 #include "architecture.hpp"
 #include "random.hpp"
 
+// TODO: Say in the documentation that architecture loading will overwrite parameters
+
 // Constructor
-Architecture::Architecture(const size_t &nchrom, const size_t& nloci, const double &effect) :
+Architecture::Architecture(const size_t &nc, const size_t& nl, const double &effect) :
+    nchrom(nc),
+    nloci(nl),
     chromends(std::vector<double>(nchrom, 0.0)),
     locations(std::vector<double>(nloci, 0.0)),
-    effects(std::vector<double>(nloci, effect))
+    effects(std::vector<double>(nloci, effect)),
+    tolmax(0.0)
 {
 
-    // nchrom: number of chromosomes
-    // nloci: number of loci
+    // nc: number of chromosomes
+    // nl: number of loci
     // effect: effect size per locus
 
     // For each chromosome...
@@ -29,7 +34,7 @@ Architecture::Architecture(const size_t &nchrom, const size_t& nloci, const doub
 
     // Extra checks
     assert(chromends.size() == nchrom);
-    assert(chromends[0u] == 0.0);
+    assert(chromends[0u] > 0.0);
     assert(chromends.back() == 1.0);
 
     // Prepare a location sampler
@@ -51,6 +56,9 @@ Architecture::Architecture(const size_t &nchrom, const size_t& nloci, const doub
     // Check bounds
     assert(locations[0u] >= 0.0);
     assert(locations.back() <= chromends.back());
+
+    // Compute maximum trait value
+    for (double &effect : effects) tolmax += effect;
     
 }
 
@@ -66,9 +74,9 @@ void Architecture::load(const std::string &filename) {
     if (!file.is_open())
         throw std::runtime_error("Unable to open file " + filename);
 
-    // Prepare to read parameters
-    size_t nchrom = 1u;
-    size_t nloci = 0u;
+    // Reset hyperparameters
+    nchrom = 1u;
+    nloci = 0u;
 
     // Read the number of chromosomes
     file >> nchrom;
@@ -152,6 +160,16 @@ void Architecture::load(const std::string &filename) {
     // Close the file
     file.close();
 
+    // Check sizes
+    assert(locations.size() == nloci);
+    assert(effects.size() == nloci);
+
+    // Reset maximum trait value
+    tolmax = 0.0;
+
+    // Re-compute maximum trait value
+    for (double &effect : effects) tolmax += effect;
+
 }
 
 // Function to save the genetic architecture to a file
@@ -166,10 +184,6 @@ void Architecture::save(const std::string &filename) const
     // Check if the file is open
     if (!file.is_open())
         throw std::runtime_error("Unable to open file " + filename);
-
-    // Number of chromosomes and loci
-    const size_t nchrom = chromends.size();
-    const size_t nloci = locations.size();
 
     // Write the number of chromosomes
     file << nchrom << '\n';

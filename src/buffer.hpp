@@ -23,13 +23,12 @@ public:
 
     // Getters
     double last() const;
+    size_t capacity() const;
     size_t size() const;
     bool isopen() const;
 
     // Setters
-    void reserve(const size_t&);
-    void store(const double&);
-    void flush();
+    void save(const double&);
     void close();
 
 private:
@@ -43,6 +42,9 @@ private:
 
     // Smart pointer to an output file stream
     std::ofstream file;
+
+    // Internal setter
+    void flush();
 
 };
 

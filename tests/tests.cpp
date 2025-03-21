@@ -6,579 +6,274 @@
 // files, and error handling.
 
 #include "testutils.hpp"
-#include "../src/simulation.hpp"
+#include "../src/MAIN.hpp"
 #include <boost/test/unit_test.hpp>
+
+// TODO: Check screen output?
 
 // Test that the simulation runs
 BOOST_AUTO_TEST_CASE(useCase) {
 
-    // Check that the main simulation function works
-    BOOST_CHECK_EQUAL(simulate({"program_name"}), 0);
-
-}
-
-// Test that it works when a parameter file is supplied
-BOOST_AUTO_TEST_CASE(runWithParameterFile) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "popsize 10\n";
-    file << "pgood 3 0.5 0.5 0.5\n";
-    file << "maxgrowth 3.0\n";
-    file << "stress 5.0 1.0\n";
-    file << "capacities 1000 100\n";
-    file << "dispersal 0.1\n";
-    file << "mutation 0.001\n";
-    file << "nchrom 1\n";
-    file << "nloci 20\n";
-    file << "effect 0.3\n";
-    file << "selfing 0.95\n";
-    file << "recombination 1\n";
-    file << "tend 100\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 0);
+    // Check that the program runs
+    BOOST_CHECK_NO_THROW(doMain({"program"}));
 
 }
 
 // Test that it fails when too many arguments are provided
-BOOST_AUTO_TEST_CASE(tooManyArgs) {
+BOOST_AUTO_TEST_CASE(abuseTooManyArgs) {
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameter.txt", "onetoomany.txt"}), 1);
+    // Check error
+    tst::checkError([&] { 
+        doMain({"program", "parameter.txt", "onetoomany.txt"});
+    }, "Too many arguments provided");
+}
+
+// Test that the simulation runs with a parameter file
+BOOST_AUTO_TEST_CASE(useCaseWithParameterFile) {
+
+    // TODO: Maybe try with all the flags off
+
+    // Write a parameter file
+    tst::write("parameters.txt", "popsize 9");
+
+    // Check that the program runs
+    BOOST_CHECK_NO_THROW(doMain({"program", "parameters.txt"}));
 
 }
 
-// Test that it fails if the parameter file name is invalid
-BOOST_AUTO_TEST_CASE(invalidFileName) {
+// Test that error when invalid parameter file
+BOOST_AUTO_TEST_CASE(abuseInvalidParameterFile) {
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "paraaameters.txt"}), 1);
+    // Check error
+    tst::checkError([&] {
+        doMain({"program", "nonexistent.txt"});
+    }, "Unable to open parameters.txt");
 
 }
 
-// Should error when no demes are provided
-BOOST_AUTO_TEST_CASE(errorWhenNoDeme) {
+// Test that screen output can be rerouted properly
+BOOST_AUTO_TEST_CASE(useCaseWithScreenToLog) {
 
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "pgood 0\n";
-    file.close();
+    // Write a parameter file specifying to reroute
+    tst::write("parameters.txt", "savelog 1");
 
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
+    // Run the program
+    doMain({"program", "parameters.txt"});
 
-// Should error when invalid parameter name
-BOOST_AUTO_TEST_CASE(errorWhenInvalidParameterName) {
+    // Read the log file
+    const std::string log = tst::readtext("log.txt");
 
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "pgoooood 0\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when initial population size is zero
-BOOST_AUTO_TEST_CASE(errorWhenInitPopSizeIsZero) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "popsize 0\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when proportion of good patches is not between zero and one
-BOOST_AUTO_TEST_CASE(errorWhenPropGoodNotBetweenZeroAndOne) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "pgood 3 1.5 -4 2\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when maximum growth rate is negative
-BOOST_AUTO_TEST_CASE(errorWhenMaxGrowthIsNegative) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "maxgrowth -1\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when carrying capacity is negative
-BOOST_AUTO_TEST_CASE(errorWhenCapacityIsNegative) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "capacities 1 -1\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when stress level is negative
-BOOST_AUTO_TEST_CASE(errorWhenStressIsNegative) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "stress 1 -1\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when steepness is negative
-BOOST_AUTO_TEST_CASE(errorWhenSteepnessIsNegative) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "steep -1\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when dispersal is not between zero and one
-BOOST_AUTO_TEST_CASE(errorWhenDispersalNotBetweenZeroAndOne) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "dispersal -1\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when mutation is not between zero and one
-BOOST_AUTO_TEST_CASE(errorWhenMutationNotBetweenZeroAndOne) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "mutation -1\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when too many loci
-BOOST_AUTO_TEST_CASE(errorWhenTooManyLoci) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "nloci 2000\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when zero chromosomes
-BOOST_AUTO_TEST_CASE(errorWhenZeroChromosomes) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "nchrom 0\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when zero loci
-BOOST_AUTO_TEST_CASE(errorWhenZeroLoci) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "nloci 0\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when trade-off is negative
-BOOST_AUTO_TEST_CASE(errorWhenTradeOffIsNegative) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "tradeoff -1\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when selfing is not between zero and one
-BOOST_AUTO_TEST_CASE(errorWhenSelfingNotBetweenZeroAndOne) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "selfing -1\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when recombination is negative
-BOOST_AUTO_TEST_CASE(errorWhenRecombinationIsNegative) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "recombination -1\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when simulation time is zero
-BOOST_AUTO_TEST_CASE(errorWhenSimulationTimeIsZero) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "tend 0\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when invalid trade-off implementation type
-BOOST_AUTO_TEST_CASE(errorWhenInvalidType) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "type 3\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Should error when trade-off is greater than one when type is II
-BOOST_AUTO_TEST_CASE(errorWhenTradeOffLargerThanOneOnlyIfTypeIsII) {
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "type 1\n";
-    file << "tradeoff 1.1\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 0);
-
-    file.open("parameters.txt");
-    file << "type 2\n";
-    file << "tradeoff 1.1\n";
-    file.close();
-
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-}
-
-// Test that parameters are saved properly
-BOOST_AUTO_TEST_CASE(paramSavedProperly) {
-
-    // Prepare a parameter file
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "savepars 1\n";
-    file.close();
-
-    // First run where we save the parameters
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 0);
-
-    // Second run where we provide the saved parameters from the first one
-    BOOST_CHECK_EQUAL(simulate({"program_name", "paramlog.txt"}), 0);
-
-    // Check the seed was saved too
-    std::ifstream infile;
-    infile.open("paramlog.txt");
-    std::string input;
-    size_t seed = 0u;
-    while (infile >> input) if (input == "seed") infile >> seed;
-    infile.close();
-
-    BOOST_CHECK(seed > 0u); // check that a random (nonzero) seed was saved
+    // Check screen output
+    BOOST_CHECK_EQUAL(log, "Hello!");
 
 }
 
-// Test that architecture can be loaded
-BOOST_AUTO_TEST_CASE(architectureFileLoadedProperly) {
+// Test that it works when reading an architecture
+BOOST_AUTO_TEST_CASE(useCaseWithArchitectureLoading) {
 
-    std::ofstream archfile;
-    archfile.open("architecture.txt");
-    archfile << "3 0.1 0.33 1\n"; // no. of chromosomes and chromosome ends
-    archfile << "4 0.1 0.2 0.5 0.8\n"; // no. of loci and locus locations
-    archfile.close();
+    // Write a parameter file specifying to load architecture
+    tst::write("parameters.txt", "loadarch 1");
 
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "savepars 1\n"; // make sure to save the parameters
-    file << "loadarch 1\n";
-    file.close();
+    // Write an achitecture file
+    tst::write("architecture.txt", "1\n1\n3\n0.1 0.2 0.3\n0.1 0.1 0.1\n");
 
-    // First run where we save the parameters
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 0);
+    // Check that the simulation runs
+    BOOST_CHECK_NO_THROW(doMain({"program", "parameters.txt"}));
 
-    // Read the numbers of chromosomes and loci from parameters that were saved
-    std::ifstream infile;
-    infile.open("paramlog.txt");
-    std::string input;
-    size_t nchrom, nloci;
-    while (infile >> input) {
-        if (input == "nchrom") infile >> nchrom;
-        if (input == "nloci") infile >> nloci;
-    }
-    infile.close();
-
-    // Check they are right
-    BOOST_CHECK_EQUAL(nchrom, 3u);
-    BOOST_CHECK_EQUAL(nloci, 4u);
+    // Note: we do not check that the architecture was properly loaded here.
+    // That stuff is tested in the relevant test file for architectures.
+    // Same for other tests below: we only focus on the high-level
+    // behavior of the program in this file.
 
 }
 
-// Should error if zero chromosomes in loaded architecture
-BOOST_AUTO_TEST_CASE(errorWhenZeroChromosomesInArchitecture) {
+// Test that error when architecture file not found
+BOOST_AUTO_TEST_CASE(abuseArchitectureFileNotFound) {
 
-    std::ofstream archfile;
-    archfile.open("architecture.txt");
-    archfile << "0 0.1 0.33 1\n"; // no. of chromosomes and chromosome ends
-    archfile << "4 0.1 0.2 0.5 0.8\n"; // no. of loci and locus locations
-    archfile.close();
+    // Write a parameter file specifying to load the architecture
+    tst::write("parameters.txt", "loadarch 1");
 
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "loadarch 1\n";
-    file.close();
-
-    // First run where we save the parameters
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    // Check that error if no architecture was created
+    tst::checkError([&] {
+        doMain({"program", "parameters.txt"});
+    }, "Unable to open file architecture.txt");
 
 }
 
-// Should error if zero chromosomes in loaded architecture
-BOOST_AUTO_TEST_CASE(errorWhenChromosomeEndsInWrongOrder) {
+// Test that it works when saving the architecture
+BOOST_AUTO_TEST_CASE(useCaseWithArchitectureSaving) {
 
-    std::ofstream archfile;
-    archfile.open("architecture.txt");
-    archfile << "3 0.33 0.1 1\n"; // no. of chromosomes and chromosome ends
-    archfile << "4 0.1 0.2 0.5 0.8\n"; // no. of loci and locus locations
-    archfile.close();
+    // Write a parameter file specifying to save the architecture
+    tst::write("parameters.txt", "savearch 1");
+    
+    // Run a simulation
+    doMain({"program", "parameters.txt"});
 
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "loadarch 1\n";
-    file.close();
+    // Update parameter file to only read provided architecture
+    tst::write("parameters.txt", "loadarch 1\nsavearch 0");
 
-    // First run where we save the parameters
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
+    // New simulation should read the architecture if present
+    BOOST_CHECK_NO_THROW(doMain({"program", "parameters.txt"}));
 
 }
 
-// Should error when negative chromosomme ends
-BOOST_AUTO_TEST_CASE(errorWhenNegativeChromosomeEnds) {
+// Test that it works when saving the parameters
+BOOST_AUTO_TEST_CASE(useCaseWithParameterSaving) {
 
-    std::ofstream archfile;
-    archfile.open("architecture.txt");
-    archfile << "3 0.1 -0.33 1\n"; // no. of chromosomes and chromosome ends
-    archfile << "4 0.1 0.2 0.5 0.8\n"; // no. of loci and locus locations
-    archfile.close();
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "loadarch 1\n";
-    file.close();
-
-    // First run where we save the parameters
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-
-}
-
-// Should error when the last chromosome end is not one
-BOOST_AUTO_TEST_CASE(errorWhenLastChromosomeEndIsNotOne) {
-
-    std::ofstream archfile;
-    archfile.open("architecture.txt");
-    archfile << "3 0.1 0.33 0.9\n"; // no. of chromosomes and chromosome ends
-    archfile << "4 0.1 0.2 0.5 0.8\n"; // no. of loci and locus locations
-    archfile.close();
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "loadarch 1\n";
-    file.close();
-
-    // First run where we save the parameters
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-
-}
-
-// Should error when zero loci in loaded architecture
-BOOST_AUTO_TEST_CASE(errorWhenZeroLociInArchitecture) {
-
-    std::ofstream archfile;
-    archfile.open("architecture.txt");
-    archfile << "3 0.1 0.33 1\n"; // no. of chromosomes and chromosome ends
-    archfile << "0 0.1 0.2 0.5 0.8\n"; // no. of loci and locus locations
-    archfile.close();
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "loadarch 1\n";
-    file.close();
-
-    // First run where we save the parameters
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-
-}
-
-// Should error when loci locations are not in increasing order
-BOOST_AUTO_TEST_CASE(errorWhenZeroLociInWrongOrder) {
-
-    std::ofstream archfile;
-    archfile.open("architecture.txt");
-    archfile << "3 0.1 0.33 1\n"; // no. of chromosomes and chromosome ends
-    archfile << "4 0.2 0.1 0.5 0.8\n"; // no. of loci and locus locations
-    archfile.close();
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "loadarch 1\n";
-    file.close();
-
-    // First run where we save the parameters
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-
-}
-
-// Should error when negative loci locations
-BOOST_AUTO_TEST_CASE(errorWhenNegativeLocusLocation) {
-
-    std::ofstream archfile;
-    archfile.open("architecture.txt");
-    archfile << "3 0.1 0.33 1\n"; // no. of chromosomes and chromosome ends
-    archfile << "4 -0.2 0.1 0.5 0.8\n"; // no. of loci and locus locations
-    archfile.close();
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "loadarch 1\n";
-    file.close();
-
-    // First run where we save the parameters
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-
-}
-
-// Should error when locus beyond last chromosome end
-BOOST_AUTO_TEST_CASE(errorWhenLocusBeyondLastChromosomeEnd) {
-
-    std::ofstream archfile;
-    archfile.open("architecture.txt");
-    archfile << "3 0.1 0.33 1\n"; // no. of chromosomes and chromosome ends
-    archfile << "4 0.2 0.1 0.5 1.1\n"; // no. of loci and locus locations
-    archfile.close();
-
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "loadarch 1\n";
-    file.close();
-
-    // First run where we save the parameters
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 1);
-
-}
-#include <vector>
-
-// Test that simulation is writing the right stuff to files
-BOOST_AUTO_TEST_CASE(writingTheRightStuff) {
-
-    // Set up parameters with a known frequency of recording the data
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "tend 10\n";
-    file << "tsave 1\n";
-    file.close();
+    // Write a parameter file specifying to save parameters
+    tst::write("parameters.txt", "savepars 1");
 
     // Run a simulation
-    simulate({"program_name", "parameters.txt"});
+    doMain({"program", "parameters.txt"});
 
-    // Read back one saved output data file
-    std::vector<double> timepoints = tst::read("time.dat");
-
-    // Check the right number of entries have been saved
-    BOOST_CHECK_EQUAL(timepoints.size(), 11u);
-
-}
-
-// Test that saving data works
-BOOST_AUTO_TEST_CASE(savingWorks) {
-
-    // Same as the previous test at the beginning
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "tend 10\n";
-    file << "tsave 1\n";
-    file.close();
-    simulate({"program_name", "parameters.txt"});
-    std::vector<double> timepoints = tst::read("time.dat");
-
-    // Now change the number of entries to save
-    file.open("parameters.txt");
-    file << "tend 10\n";
-    file << "tsave 5\n";
-    file.close();
-
-    // Re-simulate
-    simulate({"program_name", "parameters.txt"});
-
-    // Read the new data back
-    std::vector<double> newtimepoints = tst::read("time.dat");
-
-    // Check the new data does not have the same number of entries
-    BOOST_CHECK(newtimepoints.size() < timepoints.size());
-    BOOST_CHECK_EQUAL(newtimepoints.size(), 3u);
-
-}
-
-// Test that providing a file with what to save works
-BOOST_AUTO_TEST_CASE(whatToSaveWorks) {
-
-    // Create parameters
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "tend 10\n";
-    file << "tsave 2\n";
-    file << "choose 1\n";
-    file.close();
-
-    // Create a what-to-save file
-    std::ofstream wtsfile;
-    wtsfile.open("whattosave.txt");
-    wtsfile << "time\n";
-    wtsfile << "popsize\n";
-    wtsfile.close();
-
-    // Simulate
-    simulate({"program_name", "parameters.txt"});
-
-    // Read back
-    std::vector<double> timepoints = tst::read("time.dat");
-    std::vector<double> popsizes = tst::read("popsize.dat");
+    // Read the parameter log file
+    const std::string pars = tst::readtext("paramlog.txt");
 
     // Check
-    BOOST_CHECK_EQUAL(timepoints.size(), 6u);
-    BOOST_CHECK_EQUAL(popsizes.size(), 6u);
+    BOOST_CHECK_EQUAL(pars, "Hello!");
+
+    // TODO: Check properly those things
 
 }
 
-// Test that the program works with only one deme
-BOOST_AUTO_TEST_CASE(worksWithOneDeme) {
+// Test that it works when the user can choose which data to save
+BOOST_AUTO_TEST_CASE(useCaseUserDefinedOutput) {
 
-    // Same as the previous test at the beginning
-    std::ofstream file;
-    file.open("parameters.txt");
-    file << "pgood 1 0.8\n";
-    file.close();
+    // Write an output request file
+    tst::write("whattosave.txt", "time");
 
-    // Now make sure that the simulation runs
-    BOOST_CHECK_EQUAL(simulate({"program_name", "parameters.txt"}), 0);
+    // Write a parameter file
+    tst::write("parameters.txt", "savedat 1\nchoose 1");
+
+    // Run the simulation
+    doMain({"program", "parameters.txt"});
+
+    // Read the data if they exist
+    const std::vector<double> values = tst::read("time.dat");
+
+    // Check their values
+    for (auto &i : values)
+        BOOST_CHECK_EQUAL(values[i], i);
+    
+    // Check that no other output file was read
+    tst::checkError([&] { 
+        tst::read("traitmeans.dat"); 
+    }, "Unable to open file traitmeans.dat");
+    
+}
+
+// Test that error when wrong output request file
+BOOST_AUTO_TEST_CASE(abuseWrongOutputRequestFile) {
+
+    // Write a parameter file
+    tst::write("parameters.txt", "savedat 1\nchoose 1");
+
+    // Check error if output request file not present
+    tst::checkError([&] {
+        doMain({"program", "parameters.txt"});
+    }, "Unable to open file whattosave.txt");
+
+}
+
+// Test that all outputs are saved if no choice is made
+BOOST_AUTO_TEST_CASE(useCaseAllOutputsIfNoChoice) {
+
+    // Write a parameter file with data saving but no choice
+    tst::write("parameters.txt", "savedat 1\nchoose 0");
+
+    // Run the simulation
+    doMain({"program", "parameters.txt"});
+
+    // Check that all output files can be read
+    BOOST_CHECK_NO_THROW(tst::read("time.dat"));
+    BOOST_CHECK_NO_THROW(tst::read("popsize.dat"));
+    BOOST_CHECK_NO_THROW(tst::read("patchsizes.dat"));
+    BOOST_CHECK_NO_THROW(tst::read("traitmeans.dat"));
+    BOOST_CHECK_NO_THROW(tst::read("individuals.dat"));
+
+    // TODO: Do we want to bother with checking actual values here?
+
+}
+
+// Test that nothing is saved if no data saving
+BOOST_AUTO_TEST_CASE(useCaseNothingIsSaved) {
+
+    // Write a parameter file specifying no data saving
+    tst::write("parameters.txt", "savedat 0");
+
+    // Run the simulation
+    doMain({"program", "parameters.txt"});
+
+    // Check that none of the possible output files are present
+    tst::checkError([&] {tst::read("time.dat");}, "Unable to open file time.dat");
+    tst::checkError([&] {tst::read("popsize.dat");}, "Unable to open file popsize.dat");
+    tst::checkError([&] {tst::read("patchsizes.dat");}, "Unable to open file patchsizes.dat");
+    tst::checkError([&] {tst::read("traitmeans.dat");}, "Unable to open file traitmeans.dat");
+    tst::checkError([&] {tst::read("individuals.dat");}, "Unable to open file individuals.dat");
+
+}
+
+// Test that it works when sowing individuals at random at the start
+BOOST_AUTO_TEST_CASE(useCaseSowingIndividualsAtRandom) {
+
+    // Write a parameter file
+    tst::write("parameters.txt", "sow 1");
+
+    // Check that no error
+    BOOST_CHECK_NO_THROW(doMain({"program", "parameters.txt"}));
+
+    // TODO: If this was part of a class I could test its behavior properly
+    // TODO: I could test that without sowing all individuals are in the same deme?
+
+}
+
+// Test that it works when verbose is on
+BOOST_AUTO_TEST_CASE(useCaseWithVerbose) {
+
+    // Write a parameter file with verbose and log file
+    tst::write("parameters.txt", "verbose 1\nsavelog 1");
+
+    // Run the program
+    doMain({"program", "parameters.txt"});
+
+    // Read the log file
+    const std::string log = tst::readtext("log.txt");
+
+    // Check
+    BOOST_CHECK_EQUAL(log, "Hello!");
+
+}
+
+// Test that a type 2 simulation (non-linear trade-off) works
+BOOST_AUTO_TEST_CASE(useCaseNonLinearTradeOff) {
+
+    // Write a parameter file with non-linear trade-off
+    tst::write("parameters.txt", "type 2");
+
+    // TODO: Change that to nonlinear or something
+
+    // Check that no error
+    BOOST_CHECK_NO_THROW(doMain({"program", "parameters.txt"}));
+
+    // TODO: Same, perhaps unnecessary if I had a class
+
+}
+
+// Test that extinction is handled well
+BOOST_AUTO_TEST_CASE(useCaseWithExtinction) {
+
+    // Write a parameter file doomed to go extinct in one generation
+    tst::write("parameters.txt", "poopsize 1\nmaxgrowth 0\nsavelog 1");
+
+    // Run the simulation
+    doMain({"program", "parameters.txt"});
+
+    // Read the log file
+    const std::string log = tst::readtext("log.txt");
+
+    // Check
+    BOOST_CHECK_EQUAL(log, "Hello!");
+
+    // TODO: Same here, could do with a class
 
 }

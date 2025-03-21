@@ -95,46 +95,54 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenZeroDemes) {
 // Test that the proportion of good patches should be between zero and one
 BOOST_AUTO_TEST_CASE(checkFailsWhenPropGoodPatchesNotBetweenZeroAndOne) {
     Parameters pars;
-    tst::write("parameters.txt", "pgood 2 -0.1 1");
+    tst::write("parameters.txt", "pgood 2 -0.1 1\npgoodEnd 0.1 0.1");
     tst::checkError([&]{ pars.read("parameters.txt"); }, "Proportion of good patches should be between zero and one");
-    tst::write("parameters.txt", "pgood 2 0.1 1.1");
+    tst::write("parameters.txt", "pgood 2 0.1 1.1\npgoodEnd 0.1 0.1");
     tst::checkError([&]{ pars.read("parameters.txt"); }, "Proportion of good patches should be between zero and one");
 }
 
 // Test that the proportion of good patches after warming should be between zero and one
 BOOST_AUTO_TEST_CASE(checkFailsWhenPropGoodPatchesAfterWarmingNotBetweenZeroAndOne) {
     Parameters pars;
-    tst::write("parameters.txt", "pgoodEnd 2 -0.1 1");
+    tst::write("parameters.txt", "pgood 2 0.1 0.1\npgoodEnd -0.1 1");
     tst::checkError([&]{ pars.read("parameters.txt"); }, "Proportion of good patches after warming should be between zero and one");
-    tst::write("parameters.txt", "pgoodEnd 2 0.1 1.1");
+    tst::write("parameters.txt", "pgood 2 0.1 0.1\npgoodEnd 0.1 1.1");
     tst::checkError([&]{ pars.read("parameters.txt"); }, "Proportion of good patches after warming should be between zero and one");
 }
 
-// Test that carrying capacity cannot be negative
-BOOST_AUTO_TEST_CASE(checkFailsWhenCarryingCapacityNegative) {
+// Test that carrying capacity must be positive
+BOOST_AUTO_TEST_CASE(checkFailsWhenCarryingCapacityNotPositive) {
+
     Parameters pars;
-    tst::write("parameters.txt", "capacities 2 -1.0 100.0");
-    tst::checkError([&]{ pars.read("parameters.txt"); }, "Carrying capacity cannot be negative");
+    tst::write("parameters.txt", "capacities -1.0 100.0");
+    tst::checkError([&]{ pars.read("parameters.txt"); }, "Carrying capacity must be positive");
+    tst::write("parameters.txt", "capacities 0.0 100.0");
+    tst::checkError([&]{ pars.read("parameters.txt"); }, "Carrying capacity must be positive");
+
 }
 
 // Test that carrying capacity after warming cannot be negative
-BOOST_AUTO_TEST_CASE(checkFailsWhenCarryingCapacityAfterWarmingNegative) {
+BOOST_AUTO_TEST_CASE(checkFailsWhenCarryingCapacityAfterWarmingNotPositive) {
+
     Parameters pars;
-    tst::write("parameters.txt", "capacitiesEnd 2 -1.0 100.0");
-    tst::checkError([&]{ pars.read("parameters.txt"); }, "Carrying capacity after warming cannot be negative");
+    tst::write("parameters.txt", "capacitiesEnd -1.0 100.0");
+    tst::checkError([&]{ pars.read("parameters.txt"); }, "Carrying capacity after warming must be positive");
+    tst::write("parameters.txt", "capacitiesEnd 0.0 100.0");
+    tst::checkError([&]{ pars.read("parameters.txt"); }, "Carrying capacity after warming must be positive");
+
 }
 
 // Test that stress level cannot be negative
 BOOST_AUTO_TEST_CASE(checkFailsWhenStressLevelNegative) {
     Parameters pars;
-    tst::write("parameters.txt", "stress 2 -1.0 0.0");
+    tst::write("parameters.txt", "stress -1.0 0.0");
     tst::checkError([&]{ pars.read("parameters.txt"); }, "Stress level cannot be negative");
 }
 
 // Test that stress level after warming cannot be negative
 BOOST_AUTO_TEST_CASE(checkFailsWhenStressLevelAfterWarmingNegative) {
     Parameters pars;
-    tst::write("parameters.txt", "stressEnd 2 -1.0 0.0");
+    tst::write("parameters.txt", "stressEnd -1.0 0.0");
     tst::checkError([&]{ pars.read("parameters.txt"); }, "Stress level after warming cannot be negative");
 }
 
@@ -272,5 +280,58 @@ BOOST_AUTO_TEST_CASE(parameterSavingWorks) {
 
     // Make sure the values have been properly replaced
     BOOST_CHECK_EQUAL(pars2.nloci, 42u);
+
+}
+
+// Test the updating of parameters under climate change
+BOOST_AUTO_TEST_CASE(parameterUpdateUnderClimateChange) {
+
+    // Create parameters
+    Parameters pars;
+
+    // Specify some parameter values
+    pars.pgood = {0.5, 0.5, 0.6};
+    pars.stress = {0, 1.0};
+    pars.capacities = {100.0, 100.0};
+    
+    // Some end parameter values
+    pars.pgoodEnd = {0.4, 0.4, 0.4};
+    pars.stressEnd = {1.0, 2.0};
+    pars.capacitiesEnd = {50.0, 50.0};
+
+    // Climate change should take two generations
+    pars.tend = 100;
+    pars.tchange = 98;
+    pars.twarming = 2;
+
+    // Some parameter that should remain constant
+    pars.steep = 0.2;
+
+    // Pretend we are halfway through climate change
+    pars.update(99);
+
+    // Climate-related parameters should have moved halfway to their final value
+    BOOST_CHECK_EQUAL(pars.pgood[0u], 0.45);
+    BOOST_CHECK_EQUAL(pars.pgood[1u], 0.45);
+    BOOST_CHECK_EQUAL(pars.pgood[2u], 0.5);
+    BOOST_CHECK_EQUAL(pars.stress[0u], 0.5);
+    BOOST_CHECK_EQUAL(pars.stress[1u], 1.5);
+    BOOST_CHECK_EQUAL(pars.capacities[0u], 75.0);
+    BOOST_CHECK_EQUAL(pars.capacities[1u], 75.0);
+
+    // One more time step
+    pars.update(100);
+
+    // Now those parameters should have reached their final values
+    BOOST_CHECK_EQUAL(pars.pgood[0u], pars.pgoodEnd[0u]);
+    BOOST_CHECK_EQUAL(pars.pgood[1u], pars.pgoodEnd[1u]);
+    BOOST_CHECK_EQUAL(pars.pgood[2u], pars.pgoodEnd[2u]);
+    BOOST_CHECK_EQUAL(pars.stress[0u], pars.stressEnd[0u]);
+    BOOST_CHECK_EQUAL(pars.stress[1u], pars.stressEnd[1u]);
+    BOOST_CHECK_EQUAL(pars.capacities[0u], pars.capacitiesEnd[0u]);
+    BOOST_CHECK_EQUAL(pars.capacities[1u], pars.capacitiesEnd[1u]);
+
+    // Constant parameters should have remained constant
+    BOOST_CHECK_EQUAL(pars.steep, 0.2);
 
 }

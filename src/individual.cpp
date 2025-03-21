@@ -4,49 +4,78 @@
 #include <cmath>
 
 // Constructor
-Individual::Individual(const double &p, const std::vector<double> &effects) :
+Individual::Individual(const double &freq, const std::shared_ptr<Architecture> &arch) :
+    tolerance(0.0),    
     deme(0u),
     patch(1u),
-    x(0.0),
     alive(true),
-    genome(std::bitset<1000>())
+    alleles(std::bitset<1000>()),
+    genetics(arch)
 {
 
-    // p: frequency of allele 1
-    // effects: effect sizes of the loci
+    // freq: frequency of allele 1
+    // arch: a genetic architecture
 
     // Check that the genome only has zeros
-    assert(genome.count() == 0u);
+    assert(alleles.count() == 0u);
 
     // Prepare a mutation sampler
-    auto isMutation = rnd::bernoulli(p);
+    auto isMutation = rnd::bernoulli(freq);
 
-    // Sample mutations across the genome
-    for (size_t i = 0u; i < effects.size(); ++i)
-        if (isMutation(rnd::rng)) genome.set(i);
+    // For each locus...
+    for (size_t i = 0u; i < genetics->nloci; ++i) {
 
-    // Compute phenotypes
-    develop(effects);
+        // If there is a mutation...
+        if (isMutation(rnd::rng)) {
+         
+            // Flip the allele
+            flip(i);
+            
+        }
+    }
+}
+
+// Function to kill an individual
+void Individual::kill() { alive = false; }
+
+// Resetters
+void Individual::setDeme(const size_t &d) { deme = d; }
+void Individual::setPatch(const size_t &p) { patch = p; }
+void Individual::setTolerance(const double &x) { tolerance = x; }
+
+// Function to update trait value when an allele has just flipped
+void Individual::flip(const size_t &i) {
+
+    // i: index of the allele to flip
+
+    // Flip the allele
+    alleles.flip(i);
+
+    // Update trait value
+    tolerance += genetics->effects[i] * (alleles.test(i) * 2.0 - 1.0);
+
+    // Note: this translates the new allele into plus or minus one.
 
 }
 
-// Simple setters
-void Individual::kill() { alive = false; }
-void Individual::setDeme(const size_t &d) { deme = d; }
-void Individual::setPatch(const size_t &p) { patch = p; }
-void Individual::setX(const double &val) { x = val; }
-
 // Function to mutate the genome
-void Individual::mutate(const double &mu, const size_t &n) {
+void Individual::mutate(const double &mu) {
 
     // mu: mutation rate
-    // n: number of loci
 
     // No mutation if the rate is zero
     if (mu == 0.0) return;
 
-    // All mutations if the rate is one
-    if (mu == 1.0) { for (size_t i = 0u; i < n; ++i) genome.flip(i); return; }
+    // If the rate is one...
+    if (mu == 1.0) { 
+        
+        // Flip each locus
+        for (size_t i = 0u; i < genetics->nloci; ++i) flip(i);
+
+        // Exit
+        return; 
+    
+    }
 
     // Prepare a next mutation sampler
     auto getNextMutant = rnd::iotagap(mu);
@@ -58,43 +87,22 @@ void Individual::mutate(const double &mu, const size_t &n) {
     for (;;) {
 
         // Sample the next mutation
-        const size_t mut = getNextMutant(rnd::rng);
+        const size_t i = getNextMutant(rnd::rng);
 
         // Stop if we are beyond the end of the genome
-        if (mut >= n) break;
+        if (i >= genetics->nloci) break;
 
-        // Mutate the sampled position
-        genome.flip(mut);
+        // Flip the sampled position
+        flip(i);
 
     }
 }
 
-// Function to (re-)compute the phenotype based on the genome
-void Individual::develop(const std::vector<double> &effects) {
-
-    // effects: effect sizes of the loci
-
-    // Initialize the phenotype
-    x = 0.0;
-    
-    // Sum the effects of the alleles
-    for (size_t l = 0u; l < effects.size(); ++l)
-        x += genome.test(l) * effects[l];
-
-}
-
 // Function to recombine genome with a pollen donor
-void Individual::recombine(
-    const double &rho, 
-    const Individual &pollen,
-    const std::vector<double> &chromends, 
-    const std::vector<double> &locations
-) {
+void Individual::recombine(const double &rho, const Individual &pollen) {
 
     // rho: recombination rate
     // pollen: pollen donor individual
-    // chromends: chromosome ends
-    // locations: locus locations
 
     // Exit if no recombination
     if (rho == 0.0) return;
@@ -102,10 +110,6 @@ void Individual::recombine(
     // Initialization
     size_t locus = 0u;
     size_t chrom = 0u;
-
-    // Count the number of loci and chromosomes
-    const size_t nloci = locations.size();
-    const size_t nchrom = chromends.size();
 
     // Haplotypes have equal chances to be transmitted
     auto getHaplotype = rnd::bernoulli(0.5);
@@ -120,14 +124,14 @@ void Individual::recombine(
     crossover = getNextCrossover(rnd::rng);
 
     // Initialize the current position and chromosome end
-    double position = locations[0u];
-    double chromend = chromends[0u];
+    double position = genetics->locations[0u];
+    double chromend = genetics->chromends[0u];
 
     // Sample the starting haplotype
     size_t hap = getHaplotype(rnd::rng);
 
     // While we progress through loci...
-    while (locus < nloci) {
+    while (locus < genetics->nloci) {
 
         // What is the next thing coming up?
         size_t next = static_cast<size_t>(crossover);
@@ -161,10 +165,10 @@ void Individual::recombine(
             ++chrom;
 
             // Update chromosome end
-            if (chrom < nchrom) chromend = chromends[chrom];
+            if (chrom < genetics->nchrom) chromend = genetics->chromends[chrom];
 
             // Make sure we are not beyond the last chromosome
-            assert(chrom < nchrom);
+            assert(chrom < genetics->nchrom);
 
             break;
 
@@ -174,32 +178,35 @@ void Individual::recombine(
             // If we are to read the pollen haplotype...
             if (hap) {
 
-                // Copy the pollen allele
-                if (pollen.getAllele(locus)) genome.set(locus);
-                else genome.reset(locus);
+                // If the pollen has a different allele...
+                if (alleles.test(locus) != pollen.getAllele(locus)) {
 
+                    // Flip the allele
+                    flip(locus);
+                    
+                }
             }
 
             // Move on to the next locus
             ++locus;
 
             // Update current position
-            if (locus < nloci) position = locations[locus];
+            if (locus < genetics->nloci) position = genetics->locations[locus];
 
             break;
         }
     }
 
     // Safety checks
-    assert(locus == nloci);
-    assert(chrom == nchrom - 1u);
+    assert(locus == genetics->nloci);
+    assert(chrom == genetics->nchrom - 1u);
 
 }
 
-// Simple getters
+// Getters
 size_t Individual::getDeme() const { return deme; }
 size_t Individual::getPatch() const { return patch; }
-double Individual::getX() const { return x; }
+double Individual::getTolerance() const { return tolerance; }
 bool Individual::isAlive() const { return alive; }
-size_t Individual::getAllele(const size_t &l) const { return genome.test(l); }
-size_t Individual::getAlleleSum() const { return genome.count(); }
+size_t Individual::getAllele(const size_t &l) const { return alleles.test(l); }
+size_t Individual::countAlleles() const { return alleles.count(); }

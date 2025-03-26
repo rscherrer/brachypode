@@ -1,9 +1,6 @@
 // This script contains member functions for the Buffer class.
 
 #include "buffer.hpp"
-#include <cassert>
-#include <fstream>
-#include <algorithm>
 
 // Constructor
 Buffer::Buffer(const size_t &n, const std::string &filename) :

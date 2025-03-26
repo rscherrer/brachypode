@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE(savingIntoBuffers) {
     print.save("foo", 3.14);
 
     // An unsigned integer
-    print.save("foo", 42u);
+    print.save("foo", static_cast<size_t>(42u));
 
     // An integer
     print.save("foo", -1);

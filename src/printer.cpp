@@ -1,7 +1,6 @@
 // Functions pertaining to the stf namespace.
 
 #include "printer.hpp"
-#include <cassert>
 
 // Constructor
 Printer::Printer(const std::vector<std::string> &names) :

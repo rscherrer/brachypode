@@ -50,6 +50,14 @@ Parameters::Parameters(const std::string &filename) :
 
     // filename: optional parameter input file
 
+    // Read from file if needed
+    if (filename != "") read(filename);
+
+}
+
+// Function to check parameter values are valid
+void Parameters::check() const {
+
     // Check that the parameter values are valid
     assert(popsize != 0u);
     assert(pgood.size() != 0u);
@@ -84,9 +92,6 @@ Parameters::Parameters(const std::string &filename) :
     assert(tend != 0u);
     assert(tsave != 0u);
     assert(linear || !linear && tradeoff <= 1.0);
-
-    // Read from file if needed
-    if (filename != "") read(filename);
 
 }
 
@@ -293,21 +298,6 @@ void Parameters::read(const std::string &filename)
     if (tend == 0u) throw std::runtime_error("Simulation time cannot be zero");
     if (tsave == 0u) throw std::runtime_error("Cannot save data every zero time point");
     if (!linear && tradeoff > 1.0) throw std::runtime_error("Non-linear trade-off should be between 0 and 1");
-
-}
-
-// Function to re-adjust some parameter values based on a genetic architecture
-void Parameters::adjust(const Architecture &arch) {
-
-    // arch: the genetic architecture 
-
-    // Update hyperparameters
-    nchrom = arch.nchrom;
-    nloci = arch.nloci;
-
-    // Check
-    assert(nchrom == arch.nchrom);
-    assert(nloci == arch.nloci);
 
 }
 

@@ -5,7 +5,6 @@
 
 #include "testutils.hpp"
 #include "../src/population.hpp"
-#include "../src/printer.hpp"
 #include <boost/test/unit_test.hpp>
 
 // Test that a population initializes properly
@@ -18,9 +17,7 @@ BOOST_AUTO_TEST_CASE(populationInitializesProperly) {
     pars.sow = false;
 
     // Architecture
-    Architecture arch({3u, 3u, 0.1});
-
-    // TODO: Make Architecture take parameters?
+    Architecture arch(pars);
 
     // Create a population
     Population pop(pars, arch);
@@ -53,7 +50,7 @@ BOOST_AUTO_TEST_CASE(populationSowsAtRandom) {
     pars.popsize = 1000u;
 
     // Architecture
-    Architecture arch({3u, 3u, 0.1});
+    Architecture arch(pars);
 
     // Create a population
     Population pop(pars, arch);
@@ -76,7 +73,7 @@ BOOST_AUTO_TEST_CASE(populationScreenOutput) {
     Parameters pars;
 
     // Architecture
-    Architecture arch({3u, 3u, 0.1});
+    Architecture arch(pars);
 
     // Population
     Population pop(pars, arch);
@@ -93,7 +90,7 @@ BOOST_AUTO_TEST_CASE(populationMovesOn) {
     Parameters pars;
 
     // Architecture
-    Architecture arch({3u, 3u, 0.1});
+    Architecture arch(pars);
 
     // Population
     Population pop(pars, arch);
@@ -126,7 +123,7 @@ BOOST_AUTO_TEST_CASE(populationUpdateClimateChange) {
     pars.pgoodEnd = { 0.1, 0.4 }; 
 
     // Architecture
-    Architecture arch({3u, 3u, 0.1});
+    Architecture arch(pars);
 
     // Population
     Population pop(pars, arch);
@@ -179,7 +176,7 @@ BOOST_AUTO_TEST_CASE(populationGoesExtinct) {
     pars.maxgrowth = 0.0;
 
     // Architecture
-    Architecture arch({1u, 1u, 0.1});
+    Architecture arch(pars);
 
     // Population
     Population pop(pars, arch);
@@ -209,7 +206,7 @@ BOOST_AUTO_TEST_CASE(populationChangesSize) {
     pars.maxgrowth = 2.0;
 
     // Architecture
-    Architecture arch({1u, 1u, 0.1});
+    Architecture arch(pars);
 
     // Population
     Population pop(pars, arch);
@@ -238,9 +235,11 @@ BOOST_AUTO_TEST_CASE(populationCanPrint) {
     pars.popsize = 3u;
     pars.pgood = {0.0, 0.0};
     pars.allfreq = 1.0;
+    pars.nloci = 5u;
+    pars.effect = 0.1;
 
     // Architecture
-    Architecture arch({3u, 5u, 0.1});
+    Architecture arch(pars);
 
     // Population
     Population pop(pars, arch);
@@ -317,7 +316,7 @@ BOOST_AUTO_TEST_CASE(populationWithNonLinearTradeOff) {
     pars.linear = false;
 
     // Architecture
-    Architecture arch({3u, 3u, 0.1});
+    Architecture arch(pars);
 
     // Create a population
     Population pop(pars, arch);

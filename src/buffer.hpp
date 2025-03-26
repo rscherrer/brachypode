@@ -13,6 +13,8 @@
 #include <fstream>
 #include <memory>
 #include <string>
+#include <cassert>
+#include <algorithm>
 
 class Buffer {
 

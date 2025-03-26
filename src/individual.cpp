@@ -1,7 +1,6 @@
 // This script contains all the functions of the Individual class.
 
 #include "individual.hpp"
-#include <cmath>
 
 // Constructor
 Individual::Individual(const double &freq, const std::shared_ptr<Architecture> &arch) :
@@ -9,9 +8,8 @@ Individual::Individual(const double &freq, const std::shared_ptr<Architecture> &
     deme(0u),
     patch(1u),
     nseeds(0u),
-    alive(true),
     alleles(std::bitset<1000>()),
-    genetics(arch)
+    architecture(arch)
 {
 
     // freq: frequency of allele 1
@@ -24,7 +22,7 @@ Individual::Individual(const double &freq, const std::shared_ptr<Architecture> &
     auto isMutation = rnd::bernoulli(freq);
 
     // For each locus...
-    for (size_t i = 0u; i < genetics->nloci; ++i) {
+    for (size_t i = 0u; i < architecture->nloci; ++i) {
 
         // If there is a mutation...
         if (isMutation(rnd::rng)) {
@@ -35,9 +33,6 @@ Individual::Individual(const double &freq, const std::shared_ptr<Architecture> &
         }
     }
 }
-
-// Function to kill an individual
-void Individual::kill() { alive = false; }
 
 // Resetters
 void Individual::setDeme(const size_t &d) { deme = d; }
@@ -54,7 +49,7 @@ void Individual::flip(const size_t &i) {
     alleles.flip(i);
 
     // Update trait value
-    tolerance += genetics->effects[i] * (alleles.test(i) * 2.0 - 1.0);
+    tolerance += architecture->effects[i] * (alleles.test(i) * 2.0 - 1.0);
 
     // Note: this translates the new allele into plus or minus one.
 
@@ -72,7 +67,7 @@ void Individual::mutate(const double &mu) {
     if (mu == 1.0) { 
         
         // Flip each locus
-        for (size_t i = 0u; i < genetics->nloci; ++i) flip(i);
+        for (size_t i = 0u; i < architecture->nloci; ++i) flip(i);
 
         // Exit
         return; 
@@ -92,7 +87,7 @@ void Individual::mutate(const double &mu) {
         const size_t i = getNextMutant(rnd::rng);
 
         // Stop if we are beyond the end of the genome
-        if (i >= genetics->nloci) break;
+        if (i >= architecture->nloci) break;
 
         // Flip the sampled position
         flip(i);
@@ -126,14 +121,14 @@ void Individual::recombine(const double &rho, const Individual &pollen) {
     crossover = getNextCrossover(rnd::rng);
 
     // Initialize the current position and chromosome end
-    double position = genetics->locations[0u];
-    double chromend = genetics->chromends[0u];
+    double position = architecture->locations[0u];
+    double chromend = architecture->chromends[0u];
 
     // Sample the starting haplotype
     size_t hap = getHaplotype(rnd::rng);
 
     // While we progress through loci...
-    while (locus < genetics->nloci) {
+    while (locus < architecture->nloci) {
 
         // What is the next thing coming up?
         size_t next = static_cast<size_t>(crossover);
@@ -167,10 +162,10 @@ void Individual::recombine(const double &rho, const Individual &pollen) {
             ++chrom;
 
             // Update chromosome end
-            if (chrom < genetics->nchrom) chromend = genetics->chromends[chrom];
+            if (chrom < architecture->nchrom) chromend = architecture->chromends[chrom];
 
             // Make sure we are not beyond the last chromosome
-            assert(chrom < genetics->nchrom);
+            assert(chrom < architecture->nchrom);
 
             break;
 
@@ -193,15 +188,15 @@ void Individual::recombine(const double &rho, const Individual &pollen) {
             ++locus;
 
             // Update current position
-            if (locus < genetics->nloci) position = genetics->locations[locus];
+            if (locus < architecture->nloci) position = architecture->locations[locus];
 
             break;
         }
     }
 
     // Safety checks
-    assert(locus == genetics->nloci);
-    assert(chrom == genetics->nchrom - 1u);
+    assert(locus == architecture->nloci);
+    assert(chrom == architecture->nchrom - 1u);
 
 }
 
@@ -210,6 +205,5 @@ size_t Individual::getDeme() const { return deme; }
 size_t Individual::getPatch() const { return patch; }
 size_t Individual::getNSeeds() const { return nseeds; }
 double Individual::getTolerance() const { return tolerance; }
-bool Individual::isAlive() const { return alive; }
 size_t Individual::getAllele(const size_t &l) const { return alleles.test(l); }
 size_t Individual::countAlleles() const { return alleles.count(); }

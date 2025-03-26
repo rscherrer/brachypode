@@ -5,9 +5,6 @@
 // by means of buffers.
 
 #include "buffer.hpp"
-#include <fstream>
-#include <vector>
-#include <memory>
 #include <unordered_map>
 #include <optional>
 
@@ -41,7 +38,7 @@ private:
     // Data buffers
     std::unordered_map<std::string, std::optional<Buffer> > buffers;
 
-}
+};
 
 #endif
 

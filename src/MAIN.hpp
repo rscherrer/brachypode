@@ -7,6 +7,8 @@
 #include "individual.hpp"
 #include "architecture.hpp"
 #include "printer.hpp"
+#include "buffer.hpp"
+#include "population.hpp"
 
 // Main simulation function
 void doMain(const std::vector<std::string>&);

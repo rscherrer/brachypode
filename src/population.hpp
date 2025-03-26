@@ -5,6 +5,9 @@
 // a vector of Individuals and makes them go through each generation
 // of the simulation.
 
+#include "printer.hpp"
+#include "parameters.hpp"
+#include "architecture.hpp"
 #include "individual.hpp"
 
 class Population {
@@ -79,6 +82,6 @@ private:
     double rlinear(const double&) const;
     double rnonlinear(const double&) const;
 
-}
+};
 
 #endif

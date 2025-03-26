@@ -1,9 +1,6 @@
 // Functions pertaining to the tst namespace.
 
 #include "testutils.hpp"
-#include <fstream>
-#include <functional>
-#include <boost/test/unit_test.hpp>
 
 // Function to read a binary data file
 std::vector<double> tst::read(const std::string &filename)

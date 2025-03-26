@@ -9,42 +9,31 @@
 // from an architecture file.
 
 #include "parameters.hpp"
-#include <vector>
-
-struct ArchPars {
-
-    size_t nchrom;  // number of chromsomes
-    size_t nloci;   // number of loci
-    double effect;  // locus effect size
-
-};
+#include "random.hpp"
  
-class Architecture {
-
-public:
+struct Architecture {
 
     // Constructor
-    Architecture(const ArchPars&, const std::string& = "");
+    Architecture(const Parameters&, const std::string& = "");
 
     // Functions
+    void check() const;
+    void make();
+    void read(const std::string&);
     void save(const std::string&) const;
 
-private:
+    // Note: parameters are public for easy access but should be made
+    // constant after initialization for safety.
 
     // Hyperparameters
     size_t nchrom;
     size_t nloci;
+    double tolmax;
     
     // Parameters
     std::vector<double> chromends; // ends of chromosomes
     std::vector<double> locations; // gene locations
     std::vector<double> effects;   // effect sizes
-
-    // Maximum trait value
-    double tolmax;
-
-    // Private setters
-    void read(const std::string&);
 
 };
 

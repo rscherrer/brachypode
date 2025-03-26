@@ -3,8 +3,6 @@
 // can be tested in different use cases in our tests.
 
 #include "MAIN.hpp"
-#include "buffer.hpp"
-#include "population.hpp"
 
 // Function to return a list of valid outputs
 std::vector<std::string> valid() {
@@ -42,10 +40,14 @@ void doMain(const std::vector<std::string> &args) {
     const std::string archfile = pars.loadarch ? "architecture.txt" : "";
 
     // Genetic architecture (from file if needed)
-    const Architecture arch({pars.nchrom, pars.nloci, pars.effect}, archfile);
+    const Architecture arch(pars, archfile);
     
     // Note: genetic parameters from the architecture now override
     // those that may have been given in the general parameters.
+
+    // Check
+    pars.check();
+    arch.check();
 
     // Verbose
     if (pars.loadarch) std::cout << "Genetic architecture read in succesfully\n";

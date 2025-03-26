@@ -8,9 +8,8 @@
 #include "random.hpp"
 #include "parameters.hpp"
 #include "architecture.hpp"
-#include <vector>
-#include <cassert>
 #include <bitset>
+#include <cmath>
 
 class Individual {
 
@@ -48,8 +47,8 @@ private:
     // Alleles as a bitset
     std::bitset<1000> alleles;
 
-    // Pointer to a genetic architecture
-    std::shared_ptr<Architecture> genetics;
+    // Pointer to shared genetic parameters
+    std::shared_ptr<Architecture> architecture;
 
     // Private setter
     void flip(const size_t&);

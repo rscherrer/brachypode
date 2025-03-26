@@ -2,8 +2,6 @@
 
 #include "population.hpp"
 
-#include "printer.hpp"
-
 // Constructor
 Population::Population(const Parameters &pars, const Architecture &arch) :
     individuals(std::make_unique<std::vector<Individual> >()),
@@ -220,8 +218,6 @@ void Population::cycle(Printer &print) {
 
     // Reset statistics
     reset();
-
-    // TODO: Should the valid state of the Printer be checked here? 
 
     // Flag to know if it is time to save some data
     const bool tts = print.ison() && time % tsave == 0u;

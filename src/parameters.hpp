@@ -10,18 +10,17 @@
 #include <chrono>
 #include <cassert>
 #include <cstdint>
+#include <string>
+#include <vector>
 
-#include "architecture.hpp" 
-
-class Parameters {
-
-public:
+struct Parameters {
 
     // Constructor
     Parameters(const std::string& = "");
 
     // Functions
-    void adjust(const Architecture&);
+    void check() const;
+    void read(const std::string&);
     void save(const std::string&) const;
 
     // Note: parameters are public for easy access but should be made
@@ -60,11 +59,6 @@ public:
     bool savedat;                      // save output into data files
     bool choose;                       // choose which output(s) to save
     bool verbose;                      // print progress to screen
-
-private:
-
-    // Private setters
-    void read(const std::string&);
 
 };
 

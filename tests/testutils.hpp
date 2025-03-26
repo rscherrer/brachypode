@@ -6,6 +6,9 @@
 #include <vector>
 #include <string>
 #include <functional>
+#include <fstream>
+#include <sstream>
+#include <boost/test/unit_test.hpp>
 
 namespace tst
 {

@@ -1,22 +1,58 @@
 // This script contains all the functions of the Architecture structure.
 
 #include "architecture.hpp"
-#include "random.hpp"
 
 // TODO: Say in the documentation that architecture loading will overwrite parameters
 
 // Constructor
-Architecture::Architecture(const ArchPars &pars, const std::string &filename) :
+Architecture::Architecture(const Parameters &pars, const std::string &filename) :
     nchrom(pars.nchrom),
     nloci(pars.nloci),
+    tolmax(pars.effect * pars.nloci),
     chromends(std::vector<double>(nchrom, 0.0)),
     locations(std::vector<double>(nloci, 0.0)),
-    effects(std::vector<double>(nloci, pars.effect)),
-    tolmax(0.0)
+    effects(std::vector<double>(nloci, pars.effect))
 {
 
     // pars: architecture parameters
     // filename: optional architecture file to load
+
+    // Generate a new architecture
+    make();
+
+    // Read in architecture if needed
+    if (filename != "") read(filename);
+    
+}
+
+// Function to check architecture parameters
+void Architecture::check() const {
+
+    // Scalar checks
+    assert(nchrom > 0u);
+    assert(nloci >= 0u);
+    assert(chromends.size() == nchrom);
+    assert(locations.size() == nloci);
+    assert(effects.size() == locations.size());
+    assert(chromends[0u] > 0.0);
+    assert(chromends.back() == 1.0);
+    assert(locations[0u] >= 0.0);
+    assert(locations.back() <= 1.0);
+
+    // Chromosome ends in increasing order
+    for (size_t i = 0u; i < chromends.size() - 1u; ++i)
+        assert(chromends[i + 1u] > chromends[i]);
+
+    // Locations in increasing order
+    for (size_t i = 0u; i < locations.size() - 1u; ++i)
+        assert(locations[i + 1u] > locations[i]);
+
+}
+
+// Function to generate a new architecture
+void Architecture::make() {
+
+    // effect: locus effect size
 
     // For each chromosome...
     for (size_t k = 0u; k < nchrom; ++k) {
@@ -59,9 +95,6 @@ Architecture::Architecture(const ArchPars &pars, const std::string &filename) :
     // Compute maximum trait value
     for (double &effect : effects) tolmax += effect;
 
-    // Read in architecture if needed
-    if (filename != "") read(filename);
-    
 }
 
 // Function to load the genetic architecture from a file

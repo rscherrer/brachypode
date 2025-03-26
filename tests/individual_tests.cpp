@@ -10,7 +10,7 @@
 BOOST_AUTO_TEST_CASE(individualInitialization) {
 
     // Create architecture
-    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(1u, 3u, 0.1);
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(Parameters()));
 
     // Create individual
     Individual ind(0.0, arch);
@@ -20,25 +20,7 @@ BOOST_AUTO_TEST_CASE(individualInitialization) {
     BOOST_CHECK_EQUAL(ind.getPatch(), 1u);
     BOOST_CHECK_EQUAL(ind.getNSeeds(), 0u);
     BOOST_CHECK_EQUAL(ind.getTolerance(), 0.0);
-    BOOST_CHECK(ind.isAlive());
     BOOST_CHECK_EQUAL(ind.countAlleles(), 0u);
-
-}
-
-// Test that an individual is dead after we kill it
-BOOST_AUTO_TEST_CASE(individualIsDeadAfterBeingKilled) {
-
-    // Create architecture
-    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(1u, 3u, 0.1);
-
-    // Create individual
-    Individual ind(0.0, arch);
-
-    // Kill it
-    ind.kill();
-
-    // Should be dead
-    BOOST_CHECK(!ind.isAlive());
 
 }
 
@@ -46,7 +28,7 @@ BOOST_AUTO_TEST_CASE(individualIsDeadAfterBeingKilled) {
 BOOST_AUTO_TEST_CASE(changeInDeme) {
 
     // Create architecture
-    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(1u, 3u, 0.1);
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(Parameters()));
 
     // Create individual
     Individual ind(0.0, arch);
@@ -63,7 +45,7 @@ BOOST_AUTO_TEST_CASE(changeInDeme) {
 BOOST_AUTO_TEST_CASE(changeInPatch) {
 
     // Create architecture
-    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(1u, 3u, 0.1);
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(Parameters()));
 
     // Create individual
     Individual ind(0.0, arch);
@@ -80,7 +62,7 @@ BOOST_AUTO_TEST_CASE(changeInPatch) {
 BOOST_AUTO_TEST_CASE(changeInNSeeds) {
 
     // Create architecture
-    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(1u, 3u, 0.1);
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(Parameters()));
 
     // Create individual
     Individual ind(0.0, arch);
@@ -97,7 +79,7 @@ BOOST_AUTO_TEST_CASE(changeInNSeeds) {
 BOOST_AUTO_TEST_CASE(changeInTrait) {
 
     // Create architecture
-    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(1u, 3u, 0.1);
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(Parameters()));
 
     // Create individual
     Individual ind(0.0, arch);
@@ -114,7 +96,7 @@ BOOST_AUTO_TEST_CASE(changeInTrait) {
 BOOST_AUTO_TEST_CASE(noMutationDoesNotChangeTheGenome) {
 
     // Create architecture
-    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(1u, 20u, 0.1);
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(Parameters()));
 
     // Create individual
     Individual ind(0.0, arch);
@@ -136,8 +118,15 @@ BOOST_AUTO_TEST_CASE(noMutationDoesNotChangeTheGenome) {
 // Test that full mutation changes the whole genome
 BOOST_AUTO_TEST_CASE(fullMutationChangesTheWholeGenome) {
 
+    // Parameters
+    Parameters pars;
+
+    // Tweak
+    pars.nloci = 20u;
+    pars.effect = 0.1;
+
     // Create architecture
-    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(1u, 20u, 0.1);
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(pars));
 
     // Create individual
     Individual ind(0.0, arch);
@@ -158,7 +147,7 @@ BOOST_AUTO_TEST_CASE(fullMutationChangesTheWholeGenome) {
 BOOST_AUTO_TEST_CASE(noChangeIfRecombinationIsZero) {
 
     // Create architecture
-    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(1u, 5u, 0.1);
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(Parameters()));
 
     // Note: there cannot be free recombination since only one chromosome
 
@@ -183,7 +172,7 @@ BOOST_AUTO_TEST_CASE(noChangeIfRecombinationIsZero) {
 BOOST_AUTO_TEST_CASE(nonZeroRecombination) {
 
     // Create architecture
-    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(1u, 5u, 0.1);
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(Parameters()));
 
     // Create individual
     Individual ind(0.0, arch);

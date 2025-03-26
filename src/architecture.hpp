@@ -1,7 +1,7 @@
 #ifndef BRACHYPODE_ARCHITECTURE_HPP
 #define BRACHYPODE_ARCHITECTURE_HPP
 
-// This is the header for the Architecture structure. An Architecture object
+// This is the header for the Architecture class. An Architecture object
 // contains all the details of the genotype-phenotype map that take too much
 // space to be placed within a Parameters object (e.g. if there are many loci).
 // The parameters of the genetic architecture (e.g. locus locations)
@@ -11,14 +11,25 @@
 #include "parameters.hpp"
 #include <vector>
 
-struct Architecture {
+struct ArchPars {
+
+    size_t nchrom;  // number of chromsomes
+    size_t nloci;   // number of loci
+    double effect;  // locus effect size
+
+};
+ 
+class Architecture {
+
+public:
 
     // Constructor
-    Architecture(const size_t&, const size_t&, const double&);
+    Architecture(const ArchPars&, const std::string& = "");
 
     // Functions
-    void load(const std::string&);
     void save(const std::string&) const;
+
+private:
 
     // Hyperparameters
     size_t nchrom;
@@ -31,6 +42,9 @@ struct Architecture {
 
     // Maximum trait value
     double tolmax;
+
+    // Private setters
+    void read(const std::string&);
 
 };
 

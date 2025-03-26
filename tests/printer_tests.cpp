@@ -7,107 +7,127 @@
 #include "../src/printer.hpp"
 #include <boost/test/unit_test.hpp>
 
-// Test that updating the requested outputs works
-BOOST_AUTO_TEST_CASE(updatingRequestedOutputs) {
+// Test that printer opens buffers properly
+BOOST_AUTO_TEST_CASE(printerOpensBuffers) {
 
-    // Set the list of valid outputs
+    // Valid outputs
     std::vector<std::string> valid = {"foo", "bar", "baz"};
 
-    // Write some requested outputs to a file
+    // Create a printer
+    Printer print(valid);
+    
+    // Open buffers
+    print.open();
+
+    // Check that the printer is on
+    BOOST_CHECK(print.ison());
+
+    // Check that the buffers are open
+    BOOST_CHECK(print.check("foo"));
+    BOOST_CHECK(print.check("bar"));
+    BOOST_CHECK(print.check("baz"));
+
+    // Close
+    print.close();
+
+    // Check that the buffers are closed
+    BOOST_CHECK(!print.check("foo"));
+    BOOST_CHECK(!print.check("bar"));
+    BOOST_CHECK(!print.check("baz"));
+
+} 
+
+// Test that the printer can read requested output
+BOOST_AUTO_TEST_CASE(printerReadsRequestedOutput) {
+
+    // Valid outputs
+    std::vector<std::string> valid = {"foo", "bar", "baz"};
+
+    // Create a printer
+    Printer print(valid);
+
+    // Write requested outputs
     tst::write("whattosave.txt", "foo\nbar");
 
-    // Set a list of requested outputs so far
-    std::vector<std::string> outputs = {"time", "popsize", "patchsizes"};
+    // Read requested outputs
+    print.read("whattosave.txt");
 
-    // Update the requested outputs using the reading function
-    stf::read(outputs, "whattosave.txt", valid);
+    // Open the buffers
+    print.open();
 
-    // Check that the new outputs have changed as expected
-    BOOST_CHECK_EQUAL(outputs.size(), 2u);
-    BOOST_CHECK_EQUAL(outputs[0u], "foo");
-    BOOST_CHECK_EQUAL(outputs[1u], "bar");
+    // Check that the right buffers are open
+    BOOST_CHECK(print.check("foo"));
+    BOOST_CHECK(print.check("bar"));
+    BOOST_CHECK(!print.check("baz"));
 
 }
 
 // Test that updating fails if file not found
-BOOST_AUTO_TEST_CASE(updatingFailsWhenFileNotFound) {
+BOOST_AUTO_TEST_CASE(printerFailsWhenFileNotFound) {
 
     // Set the list of valid outputs
     std::vector<std::string> valid = {"foo", "bar", "baz"};
 
-    // Set a list of requested outputs so far
-    std::vector<std::string> outputs = {"time", "popsize", "patchsizes"};
+    // Create a printer
+    Printer print(valid);
 
     // Check that updating errors when the file is not found
     tst::checkError([&]() {
-        stf::read(outputs, "nonexistent.txt", valid);
+        print.read("nonexistent.txt");
     }, "Unable to open file nonexistent.txt");
 
 }
 
 // Test that updating fails when invalid output requested
-BOOST_AUTO_TEST_CASE(updatingFailsWhenInvalidOutputRequested) {
+BOOST_AUTO_TEST_CASE(printerFailsWhenInvalidOutputRequested) {
 
     // Set the list of valid outputs
     std::vector<std::string> valid = {"foo", "bar", "baz"};
 
+    // Create a printer
+    Printer print(valid);
+
     // Write some requested outputs to file
     tst::write("whattosave.txt", "foo\nbar\nqux");
-
-    // Set a list of requested outputs so far
-    std::vector<std::string> outputs = {"time", "popsize", "patchsizes"};
     
     // Check that updating errors when an invalid output is requested
     tst::checkError([&]() {
-        stf::read(outputs, "whattosave.txt", valid);
+        print.read("whattosave.txt");
     }, "Invalid output requested in whattosave.txt: qux");
 
 }
 
-// Test that opening buffers works
-BOOST_AUTO_TEST_CASE(openingBuffers) {
+// Test that saving into buffers works
+BOOST_AUTO_TEST_CASE(savingIntoBuffers) {
 
     // Set the list of buffer names
-    std::vector<std::string> names = {"foo", "bar", "baz"};
+    std::vector<std::string> valid = {"foo", "bar", "baz"};
 
-    // Set up a map of buffers
-    std::unordered_map<std::string, std::optional<Buffer> > buffers;
+    // Create a printer
+    Printer print(valid);
 
-    // Open the buffers
-    stf::open(buffers, names);
+    // Open
+    print.open();
 
-    // Check that the buffers have been created
-    BOOST_CHECK_EQUAL(buffers.size(), 3u);
-    BOOST_CHECK(buffers.find("foo") != buffers.end());
-    BOOST_CHECK(buffers.find("bar") != buffers.end());
-    BOOST_CHECK(buffers.find("baz") != buffers.end());
+    // Save a double
+    print.save("foo", 3.14);
 
-    // Check that the buffers are open
-    BOOST_CHECK(buffers["foo"]->isopen());
-    BOOST_CHECK(buffers["bar"]->isopen());
-    BOOST_CHECK(buffers["baz"]->isopen());
+    // An unsigned integer
+    print.save("foo", 42u);
 
-}
+    // An integer
+    print.save("foo", -1);
 
-// Test that closing buffers works
-BOOST_AUTO_TEST_CASE(closingBuffers) {
+    // Close
+    print.close();
 
-    // Set the list of buffer names
-    std::vector<std::string> names = {"foo", "bar", "baz"};
+    // Read the data back in
+    std::vector<double> values = tst::read("foo.dat");
 
-    // Set up a map of buffers
-    std::unordered_map<std::string, std::optional<Buffer> > buffers;
+    // Check the saved value
+    BOOST_CHECK_EQUAL(values.size(), 3u);
+    BOOST_CHECK_EQUAL(values[0u], 3.14);
+    BOOST_CHECK_EQUAL(values[1u], 42.0);
+    BOOST_CHECK_EQUAL(values[2u], -1.0);
 
-    // Open the buffers
-    stf::open(buffers, names);
-
-    // Close the buffers
-    stf::close(buffers);
-
-    // Check that the buffers have been closed
-    BOOST_CHECK_EQUAL(buffers.size(), 3u);
-    BOOST_CHECK(!buffers["foo"]->isopen());
-    BOOST_CHECK(!buffers["bar"]->isopen());
-    BOOST_CHECK(!buffers["baz"]->isopen());
-    
 }

@@ -20,22 +20,22 @@ public:
     Individual(const double&, const std::shared_ptr<Architecture>&);
 
     // Setters
-    void kill();
     void mutate(const double&);
     void recombine(const double&, const Individual&);
 
     // Resetters
     void setDeme(const size_t&);
     void setPatch(const size_t&);
+    void setNSeeds(const size_t&);
     void setTolerance(const double&);
 
     // Getters
     size_t getDeme() const;
     size_t getPatch() const;
+    size_t getNSeeds() const;
     size_t getAllele(const size_t&) const;
     size_t countAlleles() const;
     double getTolerance() const;
-    bool isAlive() const;
 
 private:
 
@@ -43,9 +43,7 @@ private:
     double tolerance;
     size_t deme;
     size_t patch;
-
-    // Is the individual alive?
-    bool alive;
+    size_t nseeds;
 
     // Alleles as a bitset
     std::bitset<1000> alleles;

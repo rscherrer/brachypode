@@ -15,6 +15,7 @@ namespace tst
     std::string readtext(const std::string&);
     void write(const std::string&, const std::string&);
     void checkError(const std::function<void()>&, const std::string&);
+    void checkOutput(const std::function<void()>&, const std::string&);
 
 }
 

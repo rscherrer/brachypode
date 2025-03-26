@@ -6,18 +6,17 @@
 // TODO: Say in the documentation that architecture loading will overwrite parameters
 
 // Constructor
-Architecture::Architecture(const size_t &nc, const size_t& nl, const double &effect) :
-    nchrom(nc),
-    nloci(nl),
+Architecture::Architecture(const ArchPars &pars, const std::string &filename) :
+    nchrom(pars.nchrom),
+    nloci(pars.nloci),
     chromends(std::vector<double>(nchrom, 0.0)),
     locations(std::vector<double>(nloci, 0.0)),
-    effects(std::vector<double>(nloci, effect)),
+    effects(std::vector<double>(nloci, pars.effect)),
     tolmax(0.0)
 {
 
-    // nc: number of chromosomes
-    // nl: number of loci
-    // effect: effect size per locus
+    // pars: architecture parameters
+    // filename: optional architecture file to load
 
     // For each chromosome...
     for (size_t k = 0u; k < nchrom; ++k) {
@@ -59,11 +58,14 @@ Architecture::Architecture(const size_t &nc, const size_t& nl, const double &eff
 
     // Compute maximum trait value
     for (double &effect : effects) tolmax += effect;
+
+    // Read in architecture if needed
+    if (filename != "") read(filename);
     
 }
 
 // Function to load the genetic architecture from a file
-void Architecture::load(const std::string &filename) {
+void Architecture::read(const std::string &filename) {
 
     // filename: name of the file to read from
 

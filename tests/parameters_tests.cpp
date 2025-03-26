@@ -245,20 +245,11 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenSaveTimeIntervalZero) {
     tst::checkError([&]{ pars.read("parameters.txt"); }, "Cannot save data every zero time point");
 }
 
-// Test that type should be 1 or 2
-BOOST_AUTO_TEST_CASE(checkFailsWhenTypeOutOfBounds) {
+// Test that trade-off should be between 0 and 1 if non-linear
+BOOST_AUTO_TEST_CASE(checkFailsWhenNonLinearTradeOffOutOfBounds) {
     Parameters pars;
-    tst::write("parameters.txt", "type 0");
-    tst::checkError([&]{ pars.read("parameters.txt"); }, "Type should be 1 or 2");
-    tst::write("parameters.txt", "type 3");
-    tst::checkError([&]{ pars.read("parameters.txt"); }, "Type should be 1 or 2");
-}
-
-// Test that trade-off should be between 0 and 1 if type is 2
-BOOST_AUTO_TEST_CASE(checkFailsWhenTradeOffOutOfBoundsForType2) {
-    Parameters pars;
-    tst::write("parameters.txt", "type 2\ntradeoff 1.2");
-    tst::checkError([&]{ pars.read("parameters.txt"); }, "Trade-off should be between 0 and 1 if type is 2");
+    tst::write("parameters.txt", "linear 0\ntradeoff 1.2");
+    tst::checkError([&]{ pars.read("parameters.txt"); }, "Non-linear trade-off should be between 0 and 1");
 }
 
 // Test that the parameter saving function works
@@ -283,55 +274,24 @@ BOOST_AUTO_TEST_CASE(parameterSavingWorks) {
 
 }
 
-// Test the updating of parameters under climate change
-BOOST_AUTO_TEST_CASE(parameterUpdateUnderClimateChange) {
+// Test that parameters values can be re-adjusted properly
+BOOST_AUTO_TEST_CASE(parametersReAdjust) {
 
-    // Create parameters
+    // Create a parameter set
     Parameters pars;
 
-    // Specify some parameter values
-    pars.pgood = {0.5, 0.5, 0.6};
-    pars.stress = {0, 1.0};
-    pars.capacities = {100.0, 100.0};
-    
-    // Some end parameter values
-    pars.pgoodEnd = {0.4, 0.4, 0.4};
-    pars.stressEnd = {1.0, 2.0};
-    pars.capacitiesEnd = {50.0, 50.0};
+    // Change genetic hyperparameters
+    pars.nloci = 4u;
+    pars.nchrom = 33u;
 
-    // Climate change should take two generations
-    pars.tend = 100;
-    pars.tchange = 98;
-    pars.twarming = 2;
+    // Create a genetic architecture
+    Architecture arch(5u, 6u, 0.1);
 
-    // Some parameter that should remain constant
-    pars.steep = 0.2;
+    // Adjust parameter values
+    pars.adjust(arch);
 
-    // Pretend we are halfway through climate change
-    pars.update(99);
-
-    // Climate-related parameters should have moved halfway to their final value
-    BOOST_CHECK_EQUAL(pars.pgood[0u], 0.45);
-    BOOST_CHECK_EQUAL(pars.pgood[1u], 0.45);
-    BOOST_CHECK_EQUAL(pars.pgood[2u], 0.5);
-    BOOST_CHECK_EQUAL(pars.stress[0u], 0.5);
-    BOOST_CHECK_EQUAL(pars.stress[1u], 1.5);
-    BOOST_CHECK_EQUAL(pars.capacities[0u], 75.0);
-    BOOST_CHECK_EQUAL(pars.capacities[1u], 75.0);
-
-    // One more time step
-    pars.update(100);
-
-    // Now those parameters should have reached their final values
-    BOOST_CHECK_EQUAL(pars.pgood[0u], pars.pgoodEnd[0u]);
-    BOOST_CHECK_EQUAL(pars.pgood[1u], pars.pgoodEnd[1u]);
-    BOOST_CHECK_EQUAL(pars.pgood[2u], pars.pgoodEnd[2u]);
-    BOOST_CHECK_EQUAL(pars.stress[0u], pars.stressEnd[0u]);
-    BOOST_CHECK_EQUAL(pars.stress[1u], pars.stressEnd[1u]);
-    BOOST_CHECK_EQUAL(pars.capacities[0u], pars.capacitiesEnd[0u]);
-    BOOST_CHECK_EQUAL(pars.capacities[1u], pars.capacitiesEnd[1u]);
-
-    // Constant parameters should have remained constant
-    BOOST_CHECK_EQUAL(pars.steep, 0.2);
+    // Check that the values were adjusted
+    BOOST_CHECK_EQUAL(pars.nchrom, 5u);
+    BOOST_CHECK_EQUAL(pars.nloci, 6u);
 
 }

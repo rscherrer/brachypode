@@ -1,7 +1,8 @@
 #ifndef BRACHYPODE_PRINTER_HPP
 #define BRACHYPODE_PRINTER_HPP
 
-// This header is for the stf (save to file) namespace, which contains functions to save data to file.
+// This header is for the Printer class, which saves data to output files
+// by means of buffers.
 
 #include "buffer.hpp"
 #include <fstream>
@@ -10,12 +11,35 @@
 #include <unordered_map>
 #include <optional>
 
-namespace stf {
+class Printer {
 
-    // Functions to help save to file
-    void read(std::vector<std::string>&, const std::string&, const std::vector<std::string>&);
-    void open(std::unordered_map<std::string, std::optional<Buffer> >&, const std::vector<std::string>&);
-    void close(std::unordered_map<std::string, std::optional<Buffer> >&);
+public:
+
+    // Constructor
+    Printer(const std::vector<std::string>&);
+
+    // Setters
+    void read(const std::string&);
+    void open();
+    void save(const std::string&, const double&);
+    void save(const std::string&, const size_t&);
+    void save(const std::string&, const int&);
+    void close();
+
+    // Getters
+    bool ison();
+    bool check(const std::string&);
+
+private:
+
+    // Output variable names
+    std::vector<std::string> outputs;
+
+    // Valid names
+    std::vector<std::string> valids;
+
+    // Data buffers
+    std::unordered_map<std::string, std::optional<Buffer> > buffers;
 
 }
 

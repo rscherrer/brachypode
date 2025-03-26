@@ -8,6 +8,7 @@ Individual::Individual(const double &freq, const std::shared_ptr<Architecture> &
     tolerance(0.0),    
     deme(0u),
     patch(1u),
+    nseeds(0u),
     alive(true),
     alleles(std::bitset<1000>()),
     genetics(arch)
@@ -41,6 +42,7 @@ void Individual::kill() { alive = false; }
 // Resetters
 void Individual::setDeme(const size_t &d) { deme = d; }
 void Individual::setPatch(const size_t &p) { patch = p; }
+void Individual::setNSeeds(const size_t &n) { nseeds = n; }
 void Individual::setTolerance(const double &x) { tolerance = x; }
 
 // Function to update trait value when an allele has just flipped
@@ -206,6 +208,7 @@ void Individual::recombine(const double &rho, const Individual &pollen) {
 // Getters
 size_t Individual::getDeme() const { return deme; }
 size_t Individual::getPatch() const { return patch; }
+size_t Individual::getNSeeds() const { return nseeds; }
 double Individual::getTolerance() const { return tolerance; }
 bool Individual::isAlive() const { return alive; }
 size_t Individual::getAllele(const size_t &l) const { return alleles.test(l); }

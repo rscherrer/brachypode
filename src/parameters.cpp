@@ -13,7 +13,7 @@ size_t clockseed() {
 }
 
 // Constructor
-Parameters::Parameters() :
+Parameters::Parameters(const std::string &filename) :
     popsize(10u),
     pgood({0.8, 0.6, 0.5, 0.3, 0.1}),
     pgoodEnd({0.8, 0.6, 0.5, 0.3, 0.1}),
@@ -36,8 +36,8 @@ Parameters::Parameters() :
     tsave(20u),
     tchange(100000),
     twarming(1),
-    type(1u),
     seed(clockseed()),
+    linear(true),
     sow(true),
     loadarch(false),
     savepars(false),
@@ -47,6 +47,8 @@ Parameters::Parameters() :
     choose(false),
     verbose(false)
 {
+
+    // filename: optional parameter input file
 
     // Check that the parameter values are valid
     assert(popsize != 0u);
@@ -81,7 +83,10 @@ Parameters::Parameters() :
     assert(recombination >= 0.0);
     assert(tend != 0u);
     assert(tsave != 0u);
-    assert(type == 1u || type == 2u && tradeoff <= 1.0);
+    assert(linear || !linear && tradeoff <= 1.0);
+
+    // Read from file if needed
+    if (filename != "") read(filename);
 
 }
 
@@ -233,8 +238,8 @@ void Parameters::read(const std::string &filename)
         else if (input == "tsave") readin(file, tsave, "tsave");
         else if (input == "tchange") readin(file, tchange, "tchange");
         else if (input == "twarming") readin(file, twarming, "twarming");
-        else if (input == "type") readin(file, type, "type");
         else if (input == "seed") readin(file, seed, "seed");
+        else if (input == "linear") readin(file, linear, "linear");
         else if (input == "sow") readin(file, sow, "sow");
         else if (input == "loadarch") readin(file, loadarch, "loadarch");
         else if (input == "savepars") readin(file, savepars, "savepars");
@@ -287,68 +292,23 @@ void Parameters::read(const std::string &filename)
     if (recombination < 0.0) throw std::runtime_error("Recombination rate cannot be negative");
     if (tend == 0u) throw std::runtime_error("Simulation time cannot be zero");
     if (tsave == 0u) throw std::runtime_error("Cannot save data every zero time point");
-    if (type == 0u) throw std::runtime_error("Type should be 1 or 2");
-    if (type > 2u) throw std::runtime_error("Type should be 1 or 2");
-    if (type == 2u && tradeoff > 1.0) throw std::runtime_error("Trade-off should be between 0 and 1 if type is 2");
-
-    // Verbose
-    std::cout << "Parameters were read in succesfully.\n";
+    if (!linear && tradeoff > 1.0) throw std::runtime_error("Non-linear trade-off should be between 0 and 1");
 
 }
 
-// Function to linearly update a parameter value upon time step increment
-double lincrement(const double &x, const double &xfinal, const int &t, const int &tfinal) {
+// Function to re-adjust some parameter values based on a genetic architecture
+void Parameters::adjust(const Architecture &arch) {
 
-    // x: current value of the parameter
-    // xfinal: final value the parameter is supposed to reach
-    // t: current time step
-    // tfinal: time step when the parameter should reach its final value
+    // arch: the genetic architecture 
 
-    // Compute new value
-    return x + (xfinal - x) / (tfinal - t + 1.0);
+    // Update hyperparameters
+    nchrom = arch.nchrom;
+    nloci = arch.nloci;
 
-    // Note: this follows from the equation of a line.
+    // Check
+    assert(nchrom == arch.nchrom);
+    assert(nloci == arch.nloci);
 
-}
-
-// Update climate-related parameters
-void Parameters::update(const int &t) {
-
-    // t: time step
-
-    // Early exit if warming has not started
-    if (t <= tchange) return;
-
-    // Time at which climate change ends
-    const int tfinal = tchange + twarming;
-
-    // Early exit if warming is over
-    if (t > tfinal) return;
-
-    // For each patch...
-    for (size_t i = 0u; i < 2u; ++i) {
-
-        // Update the stress level and carrying capacity
-        stress[i] = lincrement(stress[i], stressEnd[i], t, tfinal);
-        capacities[i] = lincrement(capacities[i], capacitiesEnd[i], t, tfinal);
-
-        // Check that they are still positive
-        assert(stress[i] >= 0.0);
-        assert(capacities[i] > 0.0);
-
-    }
-
-    // For each deme...
-    for (size_t i = 0u; i < pgood.size(); ++i) {
-
-        // Update the cover of good patches
-        pgood[i] = lincrement(pgood[i], pgoodEnd[i], t, tfinal);
-
-        // Make sure it is still between zero and one
-        assert(pgood[i] >= 0.0);
-        assert(pgood[i] <= 1.0);
-
-    }
 }
 
 // Save parameters to a file
@@ -391,8 +351,8 @@ void Parameters::save(const std::string &filename) const
     file << "tsave " << tsave << '\n';
     file << "tchange " << tchange << '\n';
     file << "twarming " << twarming << '\n';
-    file << "type " << type << '\n';
     file << "seed " << seed << '\n';
+    file << "linear " << linear << '\n';
     file << "sow " << sow << '\n';
     file << "loadarch " << loadarch << '\n';
     file << "savepars " << savepars << '\n';

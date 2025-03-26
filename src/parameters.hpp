@@ -11,15 +11,21 @@
 #include <cassert>
 #include <cstdint>
 
-struct Parameters {
+#include "architecture.hpp" 
+
+class Parameters {
+
+public:
 
     // Constructor
-    Parameters();
+    Parameters(const std::string& = "");
 
     // Functions
-    void read(const std::string&);
-    void update(const int&);
+    void adjust(const Architecture&);
     void save(const std::string&) const;
+
+    // Note: parameters are public for easy access but should be made
+    // constant after initialization for safety. 
 
     // Parameters
     size_t popsize;                    // initial population size
@@ -44,8 +50,8 @@ struct Parameters {
     size_t tsave;                      // recording time
     size_t tchange;                    // time to initiate warming
     size_t twarming;                   // duration of the warming period
-    size_t type;                       // type of trade off implementation
     size_t seed;                       // seed for random number generator
+    bool linear;                       // linear implementation of trade-off?
     bool sow;                          // sow individuals at random
     bool loadarch;                     // load genetic architecture from file
     bool savepars;                     // save parameters to file
@@ -54,6 +60,11 @@ struct Parameters {
     bool savedat;                      // save output into data files
     bool choose;                       // choose which output(s) to save
     bool verbose;                      // print progress to screen
+
+private:
+
+    // Private setters
+    void read(const std::string&);
 
 };
 

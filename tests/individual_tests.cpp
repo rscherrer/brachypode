@@ -18,6 +18,7 @@ BOOST_AUTO_TEST_CASE(individualInitialization) {
     // Check attributes
     BOOST_CHECK_EQUAL(ind.getDeme(), 0u);
     BOOST_CHECK_EQUAL(ind.getPatch(), 1u);
+    BOOST_CHECK_EQUAL(ind.getNSeeds(), 0u);
     BOOST_CHECK_EQUAL(ind.getTolerance(), 0.0);
     BOOST_CHECK(ind.isAlive());
     BOOST_CHECK_EQUAL(ind.countAlleles(), 0u);
@@ -72,6 +73,23 @@ BOOST_AUTO_TEST_CASE(changeInPatch) {
 
     // Check
     BOOST_CHECK_EQUAL(ind.getPatch(), 1u);
+
+}
+
+// Test that assigning number of seeds works
+BOOST_AUTO_TEST_CASE(changeInNSeeds) {
+
+    // Create architecture
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(1u, 3u, 0.1);
+
+    // Create individual
+    Individual ind(0.0, arch);
+
+    // Update the patch
+    ind.setNSeeds(666u);
+
+    // Check
+    BOOST_CHECK_EQUAL(ind.getNSeeds(), 666u);
 
 }
 

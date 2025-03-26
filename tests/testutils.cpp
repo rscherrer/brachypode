@@ -127,3 +127,28 @@ void tst::checkError(const std::function<void()>& func, const std::string& expec
     BOOST_CHECK_EQUAL(message, expected);
 
 }
+
+// Helper function to test screen output
+void tst::checkOutput(const std::function<void()>& func, const std::string& expected) {
+
+    // func: function to run
+    // expected: expected error message
+
+    // Redirect output
+    std::ostringstream oss;
+    std::streambuf* old = std::cout.rdbuf();
+    std::cout.rdbuf(oss.rdbuf());
+
+    // Execute function
+    func();
+
+    // Restore
+    std::cout.rdbuf(old);
+
+    // Captured output
+    std::string output = oss.str();
+
+    // Is it as expected?
+    BOOST_CHECK_EQUAL(output, expected);
+
+}

@@ -189,26 +189,6 @@ void Population::show() const {
 
 }
 
-// Function to compute the growth rate with a linear trade-off
-double Population::rlinear(const double &tol) const {
-
-    // x: tolerance trait value
-
-    // Compute value
-    return maxgrowth - tradeoff * tol;
- 
-}
-
-// Function to compute the growth rate with a non-linear trade-off
-double Population::rnonlinear(const double &tol) const {
-
-    // x: tolerance trait value
-
-    // Compute value
-    return maxgrowth * pow(1.0 - pow(tol / tolmax, 1.0 / dvalue), dvalue);
-
-}
-
 // Function to perform one step of the life cycle
 void Population::cycle(Printer &print) {
 
@@ -282,14 +262,18 @@ void Population::cycle(Printer &print) {
         // Current local population size
         const size_t n = patchsizes[2u * deme + patch];
 
+        pow(tol / tolmax, nonlinear)
+
+        powint(tol / tolmax, nonlinear)
+
+        sqrt(tol / tolmax)
+
+        
+
         // Compute population growth rate
-        const double r = linear ? rlinear(tol) : rnonlinear(tol);
+        const double r = maxgrowth - tradeoff * tolmax * power(tol / tolmax, nonlinear, nlint);
 
         // TODO: Sort out this mess
-
-        // Note: the growth rate is just an exponent here, as it will
-        // be fed into an exponential (see below). It does not represent
-        // an actual increase in number of individuals directly.
 
         // Cover of the focal patch in the deme
         const double cover = patch ? pgood[deme] : 1.0 - pgood[deme];

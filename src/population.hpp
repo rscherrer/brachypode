@@ -78,10 +78,6 @@ private:
     void gather(const size_t&, const size_t&, const double&);
     void shuffle();
 
-    // Private getters
-    double rlinear(const double&) const;
-    double rnonlinear(const double&) const;
-
 };
 
 #endif

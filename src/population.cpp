@@ -50,8 +50,12 @@ Population::Population(const Parameters &pars, const Architecture &arch) :
     auto pointarch = std::make_shared<Architecture>(arch);
 
     // Fill the population with individuals
-    for (size_t i = 0u; i < individuals->size(); ++i) 
+    for (size_t i = 0u; i < popsize; ++i) 
         individuals->emplace_back(Individual(allfreq, pointarch));
+
+    // Check
+    assert(individuals->size() == popsize);
+    assert(newborns->size() == 0u);
 
     // Sow individuals at random if needed
     if (sow) shuffle();
@@ -186,25 +190,22 @@ void Population::show() const {
 }
 
 // Function to compute the growth rate with a linear trade-off
-double Population::rlinear(const double &x) const {
+double Population::rlinear(const double &tol) const {
 
     // x: tolerance trait value
 
     // Compute value
-    const double r = maxgrowth - tradeoff * x;
-
-    // Clamp at zero
-    return r > 0.0 ? r : 0.0;
+    return maxgrowth - tradeoff * tol;
  
 }
 
 // Function to compute the growth rate with a non-linear trade-off
-double Population::rnonlinear(const double &x) const {
+double Population::rnonlinear(const double &tol) const {
 
     // x: tolerance trait value
 
     // Compute value
-    return maxgrowth * pow(1.0 - pow(x / tolmax, 1.0 / dvalue), dvalue);
+    return maxgrowth * pow(1.0 - pow(tol / tolmax, 1.0 / dvalue), dvalue);
 
 }
 
@@ -253,9 +254,9 @@ void Population::cycle(Printer &print) {
 
     // Save population size if needed
     if (tts) print.save("popsize", popsize);
-    
+
     // For each patch in each deme...
-    for (size_t j = 0u; patchsizes.size(); ++j) {
+    for (size_t j = 0u; j < patchsizes.size(); ++j) {
 
         // Finalize the computation of the mean
         if (patchsizes[j]) meantol[j] /= patchsizes[j];
@@ -284,8 +285,11 @@ void Population::cycle(Printer &print) {
         // Compute population growth rate
         const double r = linear ? rlinear(tol) : rnonlinear(tol);
 
-        // Check
-        assert(r >= 0.0);
+        // TODO: Sort out this mess
+
+        // Note: the growth rate is just an exponent here, as it will
+        // be fed into an exponential (see below). It does not represent
+        // an actual increase in number of individuals directly.
 
         // Cover of the focal patch in the deme
         const double cover = patch ? pgood[deme] : 1.0 - pgood[deme];

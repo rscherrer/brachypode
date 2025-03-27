@@ -79,7 +79,9 @@ BOOST_AUTO_TEST_CASE(populationScreenOutput) {
     Population pop(pars, arch);
 
     // Check that output is as expected
-    tst::checkOutput([&] { pop.show(); }, "n = { 0 0 0 } at t = 0");
+    tst::checkOutput([&] { pop.show(); }, "n = { 0 0 0 0 0 } at t = 0\n");
+
+    // TODO: Check linebreaks in output messages
 
 }
 

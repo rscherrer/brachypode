@@ -43,6 +43,7 @@ struct Parameters {
     double effect;                     // locus effect size
     double allfreq;                    // initial frequency of allele 1
     double tradeoff;                   // tradeoff between tolerance and fertility
+    double nonlinear;                  // non-linearity of the tradeoff curve
     double selfing;                    // rate of selfing
     double recombination;              // recombination rate
     size_t tend;                       // simulation time
@@ -50,7 +51,6 @@ struct Parameters {
     size_t tchange;                    // time to initiate warming
     size_t twarming;                   // duration of the warming period
     size_t seed;                       // seed for random number generator
-    bool linear;                       // linear implementation of trade-off?
     bool sow;                          // sow individuals at random
     bool loadarch;                     // load genetic architecture from file
     bool savepars;                     // save parameters to file
@@ -59,6 +59,8 @@ struct Parameters {
     bool savedat;                      // save output into data files
     bool choose;                       // choose which output(s) to save
     bool verbose;                      // print progress to screen
+
+    // TODO: Make sure times are treated as unsigned everywhere
 
 };
 

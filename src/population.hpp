@@ -9,6 +9,14 @@
 #include "parameters.hpp"
 #include "architecture.hpp"
 #include "individual.hpp"
+#include "utilities.hpp"
+
+namespace pop {
+
+    // Utility functions for the class
+    double growth(const double&, const double&, const double&, const double&, const double&);
+
+}
 
 class Population {
 
@@ -18,10 +26,13 @@ public:
     Population(const Parameters&, const Architecture&);
 
     // Setters
-    void show() const;
     void update();
     void cycle(Printer&);
     void moveon();
+
+    // Checkers
+    void show() const;
+    void check() const;
 
     // Main getters
     size_t size() const;
@@ -30,7 +41,7 @@ public:
     size_t deme(const size_t&) const;
 
     // Other getters
-    int getTime() const;
+    size_t getTime() const;
     double getPGood(const size_t&) const;
     double getStress(const size_t&) const;
     double getCapacity(const size_t&) const;
@@ -53,9 +64,8 @@ private:
     double steep;                      // steepness of tolerance function
     double dispersal;                  // dispersal rate
     double mutation;                   // mutation rate
-    double allfreq;                    // initial frequency of allele 1
     double tradeoff;                   // tradeoff between tolerance and fertility
-    double dvalue;                     // useful exponent for nonlinear tradeoff
+    double nonlinear;                  // non-linearity parameter for the trade-off
     double selfing;                    // rate of selfing
     double recombination;              // recombination rate
     double tolmax;                     // maximum stress tolerance possible 
@@ -63,11 +73,9 @@ private:
     size_t tsave;                      // recording time
     size_t tchange;                    // time to initiate warming
     size_t twarming;                   // duration of the warming period
-    bool linear;                       // linear or nonlinear tradeoff implementation?
-    bool sow;                          // sow individuals at random
 
     // Variables
-    int time;
+    size_t time;
     size_t popsize;
     std::vector<size_t> demesizes;
     std::vector<size_t> patchsizes;

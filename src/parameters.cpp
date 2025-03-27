@@ -30,6 +30,7 @@ Parameters::Parameters(const std::string &filename) :
     effect(0.1),
     allfreq(0.5),
     tradeoff(0.1),
+    nonlinear(1.0),
     selfing(0.95),
     recombination(1.0),
     tend(10u),
@@ -37,7 +38,6 @@ Parameters::Parameters(const std::string &filename) :
     tchange(100000),
     twarming(1),
     seed(clockseed()),
-    linear(true),
     sow(true),
     loadarch(false),
     savepars(false),
@@ -49,6 +49,9 @@ Parameters::Parameters(const std::string &filename) :
 {
 
     // filename: optional parameter input file
+
+    // Check
+    check();
 
     // Read from file if needed
     if (filename != "") read(filename);
@@ -86,12 +89,12 @@ void Parameters::check() const {
     assert(allfreq >= 0.0);
     assert(allfreq <= 1.0);
     assert(tradeoff >= 0.0);
+    assert(nonlinear > 0.0);
     assert(selfing >= 0.0);
     assert(selfing <= 1.0);
     assert(recombination >= 0.0);
     assert(tend != 0u);
     assert(tsave != 0u);
-    assert(linear || !linear && tradeoff <= 1.0);
 
 }
 
@@ -237,6 +240,7 @@ void Parameters::read(const std::string &filename)
         else if (input == "effect") readin(file, effect, "effect");
         else if (input == "allfreq") readin(file, allfreq, "allfreq");
         else if (input == "tradeoff") readin(file, tradeoff, "tradeoff");
+        else if (input == "nonlinear") readin(file, nonlinear, "nonlinear");
         else if (input == "selfing") readin(file, selfing, "selfing");
         else if (input == "recombination") readin(file, recombination, "recombination");
         else if (input == "tend") readin(file, tend, "tend");
@@ -244,7 +248,6 @@ void Parameters::read(const std::string &filename)
         else if (input == "tchange") readin(file, tchange, "tchange");
         else if (input == "twarming") readin(file, twarming, "twarming");
         else if (input == "seed") readin(file, seed, "seed");
-        else if (input == "linear") readin(file, linear, "linear");
         else if (input == "sow") readin(file, sow, "sow");
         else if (input == "loadarch") readin(file, loadarch, "loadarch");
         else if (input == "savepars") readin(file, savepars, "savepars");
@@ -265,40 +268,40 @@ void Parameters::read(const std::string &filename)
     file.close();
 
     // Check that the parameter values are valid
-    if (popsize == 0u) throw std::runtime_error("Initial population size cannot be zero");
-    if (pgood.size() == 0u) throw std::runtime_error("There cannot be zero demes");
+    if (popsize == 0u) throw std::runtime_error("Initial population size must be strictly positive");
+    if (pgood.size() == 0u) throw std::runtime_error("Number of demes must be strictly positive");
     assert(pgood.size() == pgoodEnd.size()); // should have been caught already
     for (size_t i = 0u; i < pgood.size(); ++i) {
-        if (pgood[i] < 0.0) throw std::runtime_error("Proportion of good patches should be between zero and one");
-        if (pgood[i] > 1.0) throw std::runtime_error("Proportion of good patches should be between zero and one");
-        if (pgoodEnd[i] < 0.0) throw std::runtime_error("Proportion of good patches after warming should be between zero and one");
-        if (pgoodEnd[i] > 1.0) throw std::runtime_error("Proportion of good patches after warming should be between zero and one");
+        if (pgood[i] < 0.0) throw std::runtime_error("Proportion of good patches must be between zero and one");
+        if (pgood[i] > 1.0) throw std::runtime_error("Proportion of good patches must be between zero and one");
+        if (pgoodEnd[i] < 0.0) throw std::runtime_error("Proportion of good patches after warming must be between zero and one");
+        if (pgoodEnd[i] > 1.0) throw std::runtime_error("Proportion of good patches after warming must be between zero and one");
     }
     for (size_t i = 0u; i < 2u; ++i) {
-        if (capacities[i] <= 0.0) throw std::runtime_error("Carrying capacity must be positive");
-        if (capacitiesEnd[i] <= 0.0) throw std::runtime_error("Carrying capacity after warming must be positive");
-        if (stress[i] < 0.0) throw std::runtime_error("Stress level cannot be negative");
-        if (stressEnd[i] < 0.0) throw std::runtime_error("Stress level after warming cannot be negative");
+        if (capacities[i] <= 0.0) throw std::runtime_error("Carrying capacity must be strictly positive");
+        if (capacitiesEnd[i] <= 0.0) throw std::runtime_error("Carrying capacity after warming must be strictly positive");
+        if (stress[i] < 0.0) throw std::runtime_error("Stress level must be positive");
+        if (stressEnd[i] < 0.0) throw std::runtime_error("Stress level after warming must be positive");
     }
-    if (maxgrowth < 0.0) throw std::runtime_error("Maximum growth rate cannot be negative");
-    if (steep < 0.0) throw std::runtime_error("Steepness of the tolerance function cannot be negative");
-    if (dispersal < 0.0) throw std::runtime_error("Dispersal rate should be between zero and one");
-    if (dispersal > 1.0) throw std::runtime_error("Dispersal rate should be between zero and one");
-    if (mutation < 0.0) throw std::runtime_error("Mutation rate should be between zero and one");
-    if (mutation > 1.0) throw std::runtime_error("Mutation rate should be between zero and one");
-    if (nloci > 1000) throw std::runtime_error("There cannot be more than 1000 loci");
-    if (nchrom == 0) throw std::runtime_error("There cannot be zero chromosomes");
-    if (nloci == 0u) throw std::runtime_error("There cannot be zero loci");
-    if (allfreq < 0.0) throw std::runtime_error("Initial allele frequency should be between zero and one");
-    if (allfreq > 1.0) throw std::runtime_error("Initial allele frequency should be between zero and one");
-    if (tradeoff < 0.0) throw std::runtime_error("Trade-off cannot be negative");
+    if (maxgrowth < 0.0) throw std::runtime_error("Maximum growth rate must be positive");
+    if (steep < 0.0) throw std::runtime_error("Steepness of the tolerance function must be positive");
+    if (dispersal < 0.0) throw std::runtime_error("Dispersal rate must be between zero and one");
+    if (dispersal > 1.0) throw std::runtime_error("Dispersal rate must be between zero and one");
+    if (mutation < 0.0) throw std::runtime_error("Mutation rate must be between zero and one");
+    if (mutation > 1.0) throw std::runtime_error("Mutation rate must be between zero and one");
+    if (nloci > 1000) throw std::runtime_error("Number of loci must be 1000 at most");
+    if (nchrom == 0) throw std::runtime_error("Number of chromosomes must be stricly positive");
+    if (nloci == 0u) throw std::runtime_error("Number of loci must be stricly positive");
+    if (allfreq < 0.0) throw std::runtime_error("Initial allele frequency must be between zero and one");
+    if (allfreq > 1.0) throw std::runtime_error("Initial allele frequency must be between zero and one");
+    if (tradeoff < 0.0) throw std::runtime_error("Trade-off strength must be positive");
+    if (nonlinear <= 0.0) throw std::runtime_error("Non-linearity parameter must be strictly positive");
     if (selfing < 0.0) throw std::runtime_error("Rate of selfing must be between zero and one");
     if (selfing > 1.0) throw std::runtime_error("Rate of selfing must be between zero and one");
-    if (recombination < 0.0) throw std::runtime_error("Recombination rate cannot be negative");
-    if (tend == 0u) throw std::runtime_error("Simulation time cannot be zero");
-    if (tsave == 0u) throw std::runtime_error("Cannot save data every zero time point");
-    if (!linear && tradeoff > 1.0) throw std::runtime_error("Non-linear trade-off should be between 0 and 1");
-
+    if (recombination < 0.0) throw std::runtime_error("Recombination rate must be positive");
+    if (tend == 0u) throw std::runtime_error("Simulation time must be strictly positive");
+    if (tsave == 0u) throw std::runtime_error("Data saving frequency must be strictly positive");
+    
 }
 
 // Save parameters to a file
@@ -335,6 +338,7 @@ void Parameters::save(const std::string &filename) const
     file << "effect " << effect << '\n';
     file << "allfreq " << allfreq << '\n';
     file << "tradeoff " << tradeoff << '\n';
+    file << "nonlinear " << nonlinear << '\n';
     file << "selfing " << selfing << '\n';
     file << "recombination " << recombination << '\n';
     file << "tend " << tend << '\n';
@@ -342,7 +346,6 @@ void Parameters::save(const std::string &filename) const
     file << "tchange " << tchange << '\n';
     file << "twarming " << twarming << '\n';
     file << "seed " << seed << '\n';
-    file << "linear " << linear << '\n';
     file << "sow " << sow << '\n';
     file << "loadarch " << loadarch << '\n';
     file << "savepars " << savepars << '\n';

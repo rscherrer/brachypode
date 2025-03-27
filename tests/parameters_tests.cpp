@@ -276,11 +276,14 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenSaveTimeIntervalZero) {
 
 }
 
-// Test that trade-off should be between 0 and 1 if non-linear
-BOOST_AUTO_TEST_CASE(checkFailsWhenNonLinearTradeOffOutOfBounds) {
+// Test that fails when zero or negative non-linearity parameter
+BOOST_AUTO_TEST_CASE(checkFailsWhenWrongNonLinearTradeOff) {
     
-    tst::write("parameters.txt", "linear 0\ntradeoff 1.2");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Non-linear trade-off should be between 0 and 1");
+    tst::write("parameters.txt", "tradeoff 0.5\nnonlinear 0");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Non-linearity parameter should be strictly positive");
+
+    tst::write("parameters.txt", "tradeoff 0.5\nnonlinear -0.5");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Non-linearity parameter should be strictly positive");
 
 }
 

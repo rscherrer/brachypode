@@ -4,12 +4,14 @@
 // This header contains the namespace Utility.
 
 #include <stdexcept>
+#include <cmath>
 
 namespace utl {
 
     // Useful functions
-    double powint(double, int);
-    double rootn(const double&, const int&);
+    bool isinteger(const double&);
+    double pown(double, int);
+    double rootn(const double&, int, const double& = 1e-9);
 
 }
 

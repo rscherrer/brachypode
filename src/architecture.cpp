@@ -122,7 +122,7 @@ void Architecture::read(const std::string &filename) {
 
     // Error if no chromosome
     if (nchrom == 0u) 
-        throw std::runtime_error("There should be at least one chromosome in architecture file");
+        throw std::runtime_error("There must be at least one chromosome in architecture file");
 
     // Resize container
     chromends.resize(nchrom);
@@ -139,17 +139,17 @@ void Architecture::read(const std::string &filename) {
 
         // Check order
         if (k > 0u && chromends[k] <= chromends[k - 1u])
-            throw std::runtime_error("Chromosome ends should be in increasing order in architecture file");
+            throw std::runtime_error("Chromosome ends must be in increasing order in architecture file");
 
     }
 
     // Check end of the first chromosome
     if (chromends[0u] < 0.0)
-        throw std::runtime_error("Chromosome ends should be positive in architecture file");
+        throw std::runtime_error("Chromosome ends must be positive in architecture file");
 
     // Check end of the last chromosome
     if (chromends.back() != 1.0) 
-        throw std::runtime_error("End of the last chromosome should be one in architecture file");
+        throw std::runtime_error("End of the last chromosome must be one in architecture file");
 
     // Check size
     assert(chromends.size() == nchrom);
@@ -163,7 +163,7 @@ void Architecture::read(const std::string &filename) {
 
     // Error if no loci
     if (nloci == 0)
-         throw std::runtime_error("There should be at least one locus in architecture file");
+         throw std::runtime_error("There must be at least one locus in architecture file");
 
     // Resize containers
     locations.resize(nloci);
@@ -181,13 +181,13 @@ void Architecture::read(const std::string &filename) {
 
         // Check order
         if (l > 0u && locations[l] <= locations[l - 1]) 
-            throw std::runtime_error("Locus locations should be in increasing order in architecture file");
+            throw std::runtime_error("Locus locations must be in increasing order in architecture file");
 
     }
 
     // Check bounds
-    if (locations[0u] < 0.0) throw std::runtime_error("Locus location should be positive in architecture file");
-    if (locations.back() > chromends.back()) throw std::runtime_error("Locus location should not be beyond the end of the last chromosome in architecture file");
+    if (locations[0u] < 0.0) throw std::runtime_error("Locus location must be positive in architecture file");
+    if (locations.back() > chromends.back()) throw std::runtime_error("Locus location cannot be beyond the end of the last chromosome in architecture file");
 
     // Read each effect size
     for (size_t l = 0u; l < nloci; ++l) file >> effects[l];

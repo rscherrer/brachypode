@@ -17,9 +17,8 @@ Population::Population(const Parameters &pars, const Architecture &arch) :
     steep(pars.steep),
     dispersal(pars.dispersal),
     mutation(pars.mutation),
-    allfreq(pars.allfreq),
     tradeoff(pars.tradeoff),
-    dvalue(-log2(1.0 - tradeoff)),
+    nonlinear(pars.nonlinear),
     selfing(pars.selfing),
     recombination(pars.recombination),
     tolmax(arch.tolmax),
@@ -27,7 +26,6 @@ Population::Population(const Parameters &pars, const Architecture &arch) :
     tsave(pars.tsave),
     tchange(pars.tchange),
     twarming(pars.twarming),
-    sow(pars.sow),
     time(0u),
     popsize(pars.popsize),
     demesizes(std::vector<size_t>(ndemes, 0u)),
@@ -37,6 +35,9 @@ Population::Population(const Parameters &pars, const Architecture &arch) :
 
     // pars: parameter set
     // arch: genetic architecture
+
+    // Check
+    check();
 
     // Reserve space for the population
     individuals->reserve(popsize);
@@ -51,14 +52,14 @@ Population::Population(const Parameters &pars, const Architecture &arch) :
 
     // Fill the population with individuals
     for (size_t i = 0u; i < popsize; ++i) 
-        individuals->emplace_back(Individual(allfreq, pointarch));
+        individuals->emplace_back(Individual(pars.allfreq, pointarch));
 
     // Check
     assert(individuals->size() == popsize);
     assert(newborns->size() == 0u);
 
     // Sow individuals at random if needed
-    if (sow) shuffle();
+    if (pars.sow) shuffle();
 
 }
 
@@ -109,7 +110,7 @@ void Population::update() {
     if (time <= tchange) return;
 
     // Time at which climate change ends
-    const int tfinal = tchange + twarming;
+    const size_t tfinal = tchange + twarming;
 
     // Early exit if warming is over
     if (time > tfinal) return;
@@ -189,10 +190,95 @@ void Population::show() const {
 
 }
 
+// Function to check parameter values
+void Population::check() const {
+
+    // Check that the parameter values are valid
+    assert(popsize != 0u);
+    assert(pgood.size() != 0u);
+    assert(pgood.size() == pgoodEnd.size());
+    assert(pgood.size() == ndemes);
+    for (size_t i = 0u; i < pgood.size(); ++i) {
+        assert(pgood[i] >= 0.0);
+        assert(pgood[i] <= 1.0);
+        assert(pgoodEnd[i] >= 0.0);
+        assert(pgoodEnd[i] <= 1.0);
+    }
+    for (size_t i = 0u; i < 2u; ++i) {
+        assert(capacities[i] > 0.0);
+        assert(capacitiesEnd[i] > 0.0);
+        assert(stress[i] >= 0.0);
+        assert(stressEnd[i] >= 0.0);
+    }
+    assert(maxgrowth >= 0.0);
+    assert(steep >= 0.0);
+    assert(dispersal >= 0.0);
+    assert(dispersal <= 1.0);
+    assert(mutation >= 0.0);
+    assert(mutation <= 1.0);
+    assert(tradeoff >= 0.0);
+    assert(nonlinear > 0.0);
+    assert(selfing >= 0.0);
+    assert(selfing <= 1.0);
+    assert(recombination >= 0.0);
+    assert(tend != 0u);
+    assert(tsave != 0u);
+    assert(demesizes.size() == ndemes);
+    assert(patchsizes.size() == 2u * ndemes);
+    assert(meantol.size() == 2u * ndemes);
+    assert(time >= 0);
+
+}
+
+// Compute a growth rate efficiently
+double pop::growth(const double &r0, const double &epsilon, const double &x, const double &xmax, const double &n) {
+
+    // r0: maximum growth rate
+    // epsilon: trade-off parameter
+    // x: trait value
+    // xmax: maximum possible trait value
+    // n: non-linearity parameter (degree of the polynomial)
+
+    // Check
+    assert(xmax > 0.0);
+    assert(x >= 0.0);
+    assert(n > 0.0);
+
+    // TODO: Non-linearity parameter must be between zero and infinity
+
+    // Linear trade-off
+    if (n == 1.0) return r0 - epsilon * x;
+
+    // Second degree is faster this way
+    if (n == 2.0) return r0 - epsilon * x * x / xmax;
+    if (n == 0.5) return r0 - epsilon * xmax * std::sqrt(x / xmax);
+
+    // TODO: Then effect sizes MUST be srictly positive
+
+    // Other integral degrees
+    if (utl::isinteger(n)) 
+        return r0 - epsilon * xmax * utl::pown(x / xmax, n);
+
+    // Compute the reciprocal and hope it is an integer
+    const double nrecip = 1.0 / n;
+
+    // Use the integral degree root then
+    if (utl::isinteger(nrecip)) 
+        return r0 - epsilon * xmax * utl::rootn(x / xmax, nrecip);
+
+    // If everything else has failed then use the bazooka
+    return r0 - epsilon * xmax * std::pow(x / xmax, n);
+
+    // Note: the power function is very computationally intensive.
+
+}
+
 // Function to perform one step of the life cycle
 void Population::cycle(Printer &print) {
 
     // print: a printer
+
+    // TODO: See if we can delegate some of that stuff to test better
 
     // Make sure the population is not extinct
     assert(individuals->size() > 0u);
@@ -262,18 +348,12 @@ void Population::cycle(Printer &print) {
         // Current local population size
         const size_t n = patchsizes[2u * deme + patch];
 
-        pow(tol / tolmax, nonlinear)
-
-        powint(tol / tolmax, nonlinear)
-
-        sqrt(tol / tolmax)
-
-        
-
         // Compute population growth rate
-        const double r = maxgrowth - tradeoff * tolmax * power(tol / tolmax, nonlinear, nlint);
+        const double r = pop::growth(maxgrowth, tradeoff, tol, tolmax, nonlinear);
 
-        // TODO: Sort out this mess
+        // Check
+        assert(r <= maxgrowth);
+        assert(r >= maxgrowth - tradeoff * tolmax);
 
         // Cover of the focal patch in the deme
         const double cover = patch ? pgood[deme] : 1.0 - pgood[deme];
@@ -420,7 +500,9 @@ bool Population::keepon() const { return time <= tend; }
 
 // Variable getters
 size_t Population::size() const { return individuals->size(); }
-int Population::getTime() const { return time; }
+size_t Population::getTime() const { return time; }
+
+// TODO: Define simple getters in header file for efficient inlining
 
 // Parameter getters
 double Population::getPGood(const size_t &deme) const { return pgood[deme]; }

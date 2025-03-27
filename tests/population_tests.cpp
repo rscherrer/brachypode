@@ -307,6 +307,34 @@ BOOST_AUTO_TEST_CASE(populationCanPrint) {
 
 }
 
+// Test the growth rate utility function
+BOOST_AUTO_TEST_CASE(growthRateCalculation) {
+
+    // Linear trade-off
+    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.1, 5.0, 10.0, 1.0), 1.5);
+    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.2, 5.0, 10.0, 1.0), 1.0);
+    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.4, 5.0, 10.0, 1.0), 0.0);
+
+    // Convex trade-off
+    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.1, 2.5, 10.0, 0.5), 1.5);
+    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.1, 0.625, 10.0, 0.25), 1.5);
+
+    // Concave trade-off
+    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.1, 5.0, 10.0, 2.0), 1.75);
+    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.1, 5.0, 10.0, 4.0), 1.875);
+
+    // All should have the same value at the start
+    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.1, 0.0, 10.0, 0.5), 2.0);
+    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.1, 0.0, 10.0, 1.0), 2.0);
+    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.1, 0.0, 10.0, 2.0), 2.0);
+
+    // All should have the same value at the end
+    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.1, 10.0, 10.0, 0.5), 1.0);
+    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.1, 10.0, 10.0, 1.0), 1.0);
+    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.1, 10.0, 10.0, 2.0), 1.0);
+
+}
+
 // Test that population with non-linear trade-off works
 BOOST_AUTO_TEST_CASE(populationWithNonLinearTradeOff) {
 
@@ -315,7 +343,7 @@ BOOST_AUTO_TEST_CASE(populationWithNonLinearTradeOff) {
 
     // Tweak
     pars.tradeoff = 0.5;
-    pars.linear = false;
+    pars.nonlinear = 0.5;
 
     // Architecture
     Architecture arch(pars);

@@ -11,13 +11,6 @@
 #include "individual.hpp"
 #include "utilities.hpp"
 
-namespace pop {
-
-    // Utility functions for the class
-    double growth(const double&, const double&, const double&, const double&, const double&);
-
-}
-
 class Population {
 
 public:
@@ -31,8 +24,8 @@ public:
     void moveon();
 
     // Checkers
-    void show() const;
     void check() const;
+    void show() const;
 
     // Main getters
     size_t size() const;
@@ -73,6 +66,7 @@ private:
     size_t tsave;                      // recording time
     size_t tchange;                    // time to initiate warming
     size_t twarming;                   // duration of the warming period
+    bool verbose;                      // whether to return advancement
 
     // Variables
     size_t time;

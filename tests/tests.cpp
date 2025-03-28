@@ -26,6 +26,7 @@ BOOST_AUTO_TEST_CASE(abuseTooManyArgs) {
     tst::checkError([&] { 
         doMain({"program", "parameter.txt", "onetoomany.txt"});
     }, "Too many arguments provided");
+
 }
 
 // Test that the simulation runs with a parameter file
@@ -39,6 +40,9 @@ BOOST_AUTO_TEST_CASE(useCaseWithParameterFile) {
     // Check that the program runs
     BOOST_CHECK_NO_THROW(doMain({"program", "parameters.txt"}));
 
+    // Cleanup
+    std::remove("parameters.txt");
+
 }
 
 // Test that error when invalid parameter file
@@ -47,24 +51,7 @@ BOOST_AUTO_TEST_CASE(abuseInvalidParameterFile) {
     // Check error
     tst::checkError([&] {
         doMain({"program", "nonexistent.txt"});
-    }, "Unable to open parameters.txt");
-
-}
-
-// Test that screen output can be rerouted properly
-BOOST_AUTO_TEST_CASE(useCaseWithScreenToLog) {
-
-    // Write a parameter file specifying to reroute
-    tst::write("parameters.txt", "savelog 1");
-
-    // Run the program
-    doMain({"program", "parameters.txt"});
-
-    // Read the log file
-    const std::string log = tst::readtext("log.txt");
-
-    // Check screen output
-    BOOST_CHECK_EQUAL(log, "Hello!");
+    }, "Unable to open file nonexistent.txt");
 
 }
 
@@ -85,6 +72,10 @@ BOOST_AUTO_TEST_CASE(useCaseWithArchitectureLoading) {
     // Same for other tests below: we only focus on the high-level
     // behavior of the program in this file.
 
+    // Cleanup
+    std::remove("parameters.txt");
+    std::remove("architecture.txt");
+
 }
 
 // Test that error when architecture file not found
@@ -97,6 +88,9 @@ BOOST_AUTO_TEST_CASE(abuseArchitectureFileNotFound) {
     tst::checkError([&] {
         doMain({"program", "parameters.txt"});
     }, "Unable to open file architecture.txt");
+
+    // Cleanup
+    std::remove("parameters.txt");
 
 }
 
@@ -115,6 +109,10 @@ BOOST_AUTO_TEST_CASE(useCaseWithArchitectureSaving) {
     // New simulation should read the architecture if present
     BOOST_CHECK_NO_THROW(doMain({"program", "parameters.txt"}));
 
+    // Cleanup
+    std::remove("parameters.txt");
+    std::remove("architecture.txt");
+
 }
 
 // Test that it works when saving the parameters
@@ -126,13 +124,23 @@ BOOST_AUTO_TEST_CASE(useCaseWithParameterSaving) {
     // Run a simulation
     doMain({"program", "parameters.txt"});
 
-    // Read the parameter log file
-    const std::string pars = tst::readtext("paramlog.txt");
+    // Read the saved parameters
+    Parameters pars1("paramlog.txt");
 
-    // Check
-    BOOST_CHECK_EQUAL(pars, "Hello!");
+    // Rerun the simulation with the saved parameters
+    doMain({"program", "paramlog.txt"});
+
+    // Read the overwritten parameters
+    Parameters pars2("paramlog.txt");
+
+    // Check that the (clock-generated) seed is the same
+    BOOST_CHECK_EQUAL(pars1.seed, pars2.seed);
 
     // TODO: Check properly those things
+
+    // Cleanup
+    std::remove("parameters.txt");
+    std::remove("paramlog.txt");
 
 }
 
@@ -145,6 +153,9 @@ BOOST_AUTO_TEST_CASE(useCaseUserDefinedOutput) {
     // Write a parameter file
     tst::write("parameters.txt", "savedat 1\nchoose 1");
 
+    // Pre-emptive cleanup
+    std::remove("traitmeans.dat");
+
     // Run the simulation
     doMain({"program", "parameters.txt"});
 
@@ -152,13 +163,18 @@ BOOST_AUTO_TEST_CASE(useCaseUserDefinedOutput) {
     const std::vector<double> values = tst::read("time.dat");
 
     // Check their values
-    for (auto &i : values)
+    for (auto i : values)
         BOOST_CHECK_EQUAL(values[i], i);
     
     // Check that no other output file was read
     tst::checkError([&] { 
         tst::read("traitmeans.dat"); 
     }, "Unable to open file traitmeans.dat");
+    
+    // Cleanup
+    std::remove("parameters.txt");
+    std::remove("whattosave.txt");
+    std::remove("time.dat");
     
 }
 
@@ -172,6 +188,9 @@ BOOST_AUTO_TEST_CASE(abuseWrongOutputRequestFile) {
     tst::checkError([&] {
         doMain({"program", "parameters.txt"});
     }, "Unable to open file whattosave.txt");
+
+    // Cleanup
+    std::remove("parameters.txt");
 
 }
 
@@ -190,6 +209,14 @@ BOOST_AUTO_TEST_CASE(useCaseAllOutputsIfNoChoice) {
     BOOST_CHECK_NO_THROW(tst::read("patchsizes.dat"));
     BOOST_CHECK_NO_THROW(tst::read("traitmeans.dat"));
     BOOST_CHECK_NO_THROW(tst::read("individuals.dat"));
+
+    // Cleanup
+    std::remove("parameters.txt");
+    std::remove("time.dat");
+    std::remove("popsize.dat");
+    std::remove("patchsizes.dat");
+    std::remove("traitmeans.dat");
+    std::remove("individuals.dat");
 
     // TODO: Do we want to bother with checking actual values here?
 
@@ -211,6 +238,9 @@ BOOST_AUTO_TEST_CASE(useCaseNothingIsSaved) {
     tst::checkError([&] {tst::read("traitmeans.dat");}, "Unable to open file traitmeans.dat");
     tst::checkError([&] {tst::read("individuals.dat");}, "Unable to open file individuals.dat");
 
+    // Cleanup
+    std::remove("parameters.txt");
+
 }
 
 // Test that it works when sowing individuals at random at the start
@@ -225,55 +255,48 @@ BOOST_AUTO_TEST_CASE(useCaseSowingIndividualsAtRandom) {
     // TODO: If this was part of a class I could test its behavior properly
     // TODO: I could test that without sowing all individuals are in the same deme?
 
+    // Cleanup
+    std::remove("parameters.txt");
+
 }
 
 // Test that it works when verbose is on
 BOOST_AUTO_TEST_CASE(useCaseWithVerbose) {
 
-    // Write a parameter file with verbose and log file
-    tst::write("parameters.txt", "verbose 1\nsavelog 1");
+    // Write a parameter file with verbose
+    tst::write("parameters.txt", "verbose 1\ntend 1\npopsize 10\npgood 3 1.0 1.0 1.0");
 
-    // Run the program
-    doMain({"program", "parameters.txt"});
+    // Capture output
+    const std::string output = tst::captureOutput([&] { doMain({"program", "parameters.txt"}); });
 
-    // Read the log file
-    const std::string log = tst::readtext("log.txt");
+    // Find relevant bits in output
+    BOOST_CHECK(output.find("Simulation started") != std::string::npos);
+    BOOST_CHECK(output.find("n = { 10 0 0 } at t = 0") != std::string::npos);
+    BOOST_CHECK(output.find("Simulation ended") != std::string::npos);
 
-    // Check
-    BOOST_CHECK_EQUAL(log, "Hello!");
-
-}
-
-// Test that a type 2 simulation (non-linear trade-off) works
-BOOST_AUTO_TEST_CASE(useCaseNonLinearTradeOff) {
-
-    // Write a parameter file with non-linear trade-off
-    tst::write("parameters.txt", "type 2");
-
-    // TODO: Change that to nonlinear or something
-
-    // Check that no error
-    BOOST_CHECK_NO_THROW(doMain({"program", "parameters.txt"}));
-
-    // TODO: Same, perhaps unnecessary if I had a class
+    // Cleanup
+    std::remove("parameters.txt");
 
 }
 
-// Test that extinction is handled well
+// Test that extinction is handled well (PROBABILISTIC)
 BOOST_AUTO_TEST_CASE(useCaseWithExtinction) {
 
     // Write a parameter file doomed to go extinct in one generation
-    tst::write("parameters.txt", "poopsize 1\nmaxgrowth 0\nsavelog 1");
+    tst::write("parameters.txt", "popsize 1\nmaxgrowth 0\ntradeoff 100\nallfreq 1");
+
+    // Note: there is a nonzero chance that the population does not
+    // go extinct.
 
     // Run the simulation
-    doMain({"program", "parameters.txt"});
+    const std::string output = tst::captureOutput([&] { doMain({"program", "parameters.txt"}); });
 
-    // Read the log file
-    const std::string log = tst::readtext("log.txt");
-
-    // Check
-    BOOST_CHECK_EQUAL(log, "Hello!");
+    // Check for the relevant bit
+    BOOST_CHECK(output.find("Population went extinct at t = 0") != std::string::npos);
 
     // TODO: Same here, could do with a class
+
+    // Cleanup
+    std::remove("parameters.txt");
 
 }

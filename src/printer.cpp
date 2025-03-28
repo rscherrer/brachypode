@@ -117,10 +117,10 @@ void Printer::save(const std::string &name, const size_t &x) {
 void Printer::close() {
 
     // For each buffer...
-    for (auto &buffer : buffers) {
+    for (auto &name : outputs) {
 
         // Close the buffer
-        buffer.second->close();
+        buffers[name]->close();
 
     }
 }

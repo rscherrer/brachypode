@@ -72,14 +72,22 @@ BOOST_AUTO_TEST_CASE(populationScreenOutput) {
     // Parameters
     Parameters pars;
 
+    // Tweak
+    pars.popsize = 10u;
+    pars.pgood = {1.0, 1.0, 1.0};
+    pars.verbose = true;
+
     // Architecture
     Architecture arch(pars);
 
     // Population
     Population pop(pars, arch);
 
+    // Printer
+    Printer print({"foo", "bar"});
+
     // Check that output is as expected
-    tst::checkOutput([&] { pop.show(); }, "n = { 0 0 0 0 0 } at t = 0\n");
+    tst::checkOutput([&] { pop.cycle(print); }, "n = { 10 0 0 } at t = 0\n");
 
     // TODO: Check linebreaks in output messages
 
@@ -168,7 +176,7 @@ BOOST_AUTO_TEST_CASE(populationUpdateClimateChange) {
 
 }
 
-// Test that the population goes extinct when expected
+// Test that the population goes extinct when expected (PROBABILISTIC)
 BOOST_AUTO_TEST_CASE(populationGoesExtinct) {
 
     // Parameters
@@ -176,6 +184,16 @@ BOOST_AUTO_TEST_CASE(populationGoesExtinct) {
 
     // Tweak
     pars.maxgrowth = 0.0;
+    pars.tradeoff = 100.0;
+    pars.allfreq = 1.0;
+
+    // Note: Since the demographics follow Ricker dynamics we cannot
+    // guarantee that the number of offspring will be zero, as this
+    // number is an exponential, but we can try to make what goes into
+    // that exponential very negative (e.g. population with high trait
+    // value and strong trade-off), to make the expected number of offspring
+    // very close to zero. Still, there will be a nonzero chance that the
+    // population does not go extinct in one generation.
 
     // Architecture
     Architecture arch(pars);
@@ -193,7 +211,7 @@ BOOST_AUTO_TEST_CASE(populationGoesExtinct) {
     BOOST_CHECK(pop.extinct());
 
     // Check message
-    tst::checkOutput([&] { pop.extinct(); }, "Population went extinct at t = 0");
+    tst::checkOutput([&] { pop.extinct(); }, "Population went extinct at t = 0\n");
 
 }
 
@@ -236,9 +254,12 @@ BOOST_AUTO_TEST_CASE(populationCanPrint) {
     // Tweak
     pars.popsize = 3u;
     pars.pgood = {0.0, 0.0};
+    pars.pgoodEnd = {0.0, 0.0};
     pars.allfreq = 1.0;
     pars.nloci = 5u;
     pars.effect = 0.1;
+    pars.tsave = 1u;
+    pars.sow = false;
 
     // Architecture
     Architecture arch(pars);
@@ -266,8 +287,8 @@ BOOST_AUTO_TEST_CASE(populationCanPrint) {
     std::vector<double> individuals = tst::read("individuals.dat");
 
     // Check sizes
-    BOOST_CHECK_EQUAL(time.size(), 0u);
-    BOOST_CHECK_EQUAL(popsize.size(), 0u);
+    BOOST_CHECK_EQUAL(time.size(), 1u);
+    BOOST_CHECK_EQUAL(popsize.size(), 1u);
     BOOST_CHECK_EQUAL(patchsizes.size(), 4u);
     BOOST_CHECK_EQUAL(traitmeans.size(), 4u);
     BOOST_CHECK_EQUAL(individuals.size(), 9u);
@@ -278,60 +299,32 @@ BOOST_AUTO_TEST_CASE(populationCanPrint) {
     // Check population size
     BOOST_CHECK_EQUAL(popsize[0u], 3.0);
 
-    // All individuals should be in first deme
-    BOOST_CHECK_EQUAL(patchsizes[0u], 3.0);
-    BOOST_CHECK_EQUAL(patchsizes[1u], 0.0);
+    // All individuals should be in facilitated patch of first deme
+    BOOST_CHECK_EQUAL(patchsizes[0u], 0.0);
+    BOOST_CHECK_EQUAL(patchsizes[1u], 3.0);
     BOOST_CHECK_EQUAL(patchsizes[2u], 0.0);
     BOOST_CHECK_EQUAL(patchsizes[3u], 0.0);
 
     // Five loci and allele frequency of one
-    BOOST_CHECK_EQUAL(traitmeans[0u], 0.5);
+    BOOST_CHECK_EQUAL(traitmeans[0u], 0.0);
+    BOOST_CHECK_EQUAL(traitmeans[1u], 0.5);
     BOOST_CHECK_EQUAL(traitmeans[2u], 0.0);
     BOOST_CHECK_EQUAL(traitmeans[3u], 0.0);
-    BOOST_CHECK_EQUAL(traitmeans[4u], 0.0);
 
-    // Check individual demes
+    // Check individuals are in the first deme
     BOOST_CHECK_EQUAL(individuals[0u], 0.0);
     BOOST_CHECK_EQUAL(individuals[3u], 0.0);
     BOOST_CHECK_EQUAL(individuals[6u], 0.0);
 
-    // Check individual patches
-    BOOST_CHECK_EQUAL(individuals[1u], 0.0);
-    BOOST_CHECK_EQUAL(individuals[4u], 0.0);
-    BOOST_CHECK_EQUAL(individuals[7u], 0.0);
+    // Check individuals are in the facilitated patch
+    BOOST_CHECK_EQUAL(individuals[1u], 1.0);
+    BOOST_CHECK_EQUAL(individuals[4u], 1.0);
+    BOOST_CHECK_EQUAL(individuals[7u], 1.0);
 
     // Check individual trait values
     BOOST_CHECK_EQUAL(individuals[2u], 0.5);
     BOOST_CHECK_EQUAL(individuals[5u], 0.5);
     BOOST_CHECK_EQUAL(individuals[8u], 0.5);
-
-}
-
-// Test the growth rate utility function
-BOOST_AUTO_TEST_CASE(growthRateCalculation) {
-
-    // Linear trade-off
-    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.1, 5.0, 10.0, 1.0), 1.5);
-    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.2, 5.0, 10.0, 1.0), 1.0);
-    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.4, 5.0, 10.0, 1.0), 0.0);
-
-    // Convex trade-off
-    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.1, 2.5, 10.0, 0.5), 1.5);
-    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.1, 0.625, 10.0, 0.25), 1.5);
-
-    // Concave trade-off
-    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.1, 5.0, 10.0, 2.0), 1.75);
-    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.1, 5.0, 10.0, 4.0), 1.875);
-
-    // All should have the same value at the start
-    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.1, 0.0, 10.0, 0.5), 2.0);
-    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.1, 0.0, 10.0, 1.0), 2.0);
-    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.1, 0.0, 10.0, 2.0), 2.0);
-
-    // All should have the same value at the end
-    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.1, 10.0, 10.0, 0.5), 1.0);
-    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.1, 10.0, 10.0, 1.0), 1.0);
-    BOOST_CHECK_EQUAL(pop::growth(2.0, 0.1, 10.0, 10.0, 2.0), 1.0);
 
 }
 

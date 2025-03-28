@@ -138,6 +138,12 @@ void Individual::recombine(const double &rho, const Individual &pollen) {
         else if (chromend < crossover && chromend < position) next = 1u;
         else next = 2u;
 
+        // Note: With this algorithm a locus sitting exactly on a chromosome
+        // end will be considered first and hence taken as part of the previous
+        // chromosome.
+
+        // TODO: Say that in the documentation
+
         // Depending on the case...
         switch (next) {
 

@@ -125,11 +125,10 @@ void tst::checkError(const std::function<void()>& func, const std::string& expec
 
 }
 
-// Helper function to test screen output
-void tst::checkOutput(const std::function<void()>& func, const std::string& expected) {
+// Function to capture screen output
+std::string tst::captureOutput(const std::function<void()>& func) {
 
     // func: function to run
-    // expected: expected error message
 
     // Redirect output
     std::ostringstream oss;
@@ -144,6 +143,22 @@ void tst::checkOutput(const std::function<void()>& func, const std::string& expe
 
     // Captured output
     std::string output = oss.str();
+
+    // Normalize line breaks
+    output.erase(std::remove(output.begin(), output.end(), '\r'), output.end());
+
+    // Return
+    return output;
+
+}
+
+// Helper function to test screen output
+void tst::checkOutput(const std::function<void()>& func, const std::string& expected) {
+
+    // func: function to run
+    // expected: expected error message
+
+    const std::string output = tst::captureOutput([&] { func(); });
 
     // Is it as expected?
     BOOST_CHECK_EQUAL(output, expected);

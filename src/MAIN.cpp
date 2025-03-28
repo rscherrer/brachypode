@@ -27,9 +27,6 @@ void doMain(const std::vector<std::string> &args) {
     // Create parameters (from file if needed)
     const Parameters pars(parfile);
 
-    // Redirect output to log file if needed
-    if (pars.savelog) std::freopen("log.txt", "w", stdout);
-
     // Verbose (after redirecting output)
     if (args.size() == 2u) std::cout << "Parameters read in succesfully\n";
 
@@ -86,9 +83,6 @@ void doMain(const std::vector<std::string> &args) {
     // At each time step...
     while (pop.keepon()) {
 
-        // Print progress if needed
-        if (pars.verbose) pop.show();
-
         // Update climate parameters if needed
         pop.update();
 
@@ -106,9 +100,6 @@ void doMain(const std::vector<std::string> &args) {
     // End of simulation
     std::cout << "Simulation ended\n";
 
-    // Close the log file if needed
-    if (pars.savelog) std::fclose(stdout);
-    
     // Close the streams to output files
     if (pars.savedat) print.close();
 

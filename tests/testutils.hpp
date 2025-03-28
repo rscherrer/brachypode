@@ -19,6 +19,7 @@ namespace tst
     void write(const std::string&, const std::string&);
     void checkError(const std::function<void()>&, const std::string&);
     void checkOutput(const std::function<void()>&, const std::string&);
+    std::string captureOutput(const std::function<void()>&);
 
 }
 

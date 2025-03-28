@@ -15,8 +15,8 @@ size_t clockseed() {
 // Constructor
 Parameters::Parameters(const std::string &filename) :
     popsize(10u),
-    pgood({0.8, 0.6, 0.5, 0.3, 0.1}),
-    pgoodEnd({0.8, 0.6, 0.5, 0.3, 0.1}),
+    pgood({0.8, 0.8, 0.8}),
+    pgoodEnd({0.1, 0.1, 0.1}),
     stress({4.0, 0.0}),
     stressEnd({4.0, 0.0}),
     capacities({100.0, 10000.0}),
@@ -26,23 +26,22 @@ Parameters::Parameters(const std::string &filename) :
     dispersal(0.01),
     mutation(0.0001),
     nchrom(1u),
-    nloci(50u),
+    nloci(10u),
     effect(0.1),
-    allfreq(0.5),
+    allfreq(0.1),
     tradeoff(0.1),
     nonlinear(1.0),
     selfing(0.95),
     recombination(1.0),
     tend(10u),
     tsave(20u),
-    tchange(100000),
-    twarming(1),
+    tchange(100000u),
+    twarming(1u),
     seed(clockseed()),
-    sow(true),
+    sow(false),
     loadarch(false),
     savepars(false),
-    savelog(false),
-    savearch(true),
+    savearch(false),
     savedat(false),
     choose(false),
     verbose(false)
@@ -251,7 +250,6 @@ void Parameters::read(const std::string &filename)
         else if (input == "sow") readin(file, sow, "sow");
         else if (input == "loadarch") readin(file, loadarch, "loadarch");
         else if (input == "savepars") readin(file, savepars, "savepars");
-        else if (input == "savelog") readin(file, savelog, "savelog");
         else if (input == "savearch") readin(file, savearch, "savearch");
         else if (input == "savedat") readin(file, savedat, "savedat");
         else if (input == "choose") readin(file, choose, "choose");
@@ -349,7 +347,6 @@ void Parameters::save(const std::string &filename) const
     file << "sow " << sow << '\n';
     file << "loadarch " << loadarch << '\n';
     file << "savepars " << savepars << '\n';
-    file << "savelog " << savelog << '\n';
     file << "savearch " << savearch << '\n';
     file << "savedat " << savedat << '\n';
     file << "choose " << choose << '\n';

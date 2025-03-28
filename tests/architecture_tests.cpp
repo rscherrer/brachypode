@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(errorWhenZeroChromosomesInArchitecture) {
     tst::write("architecture.txt", "0\n");
 
     // Check error
-    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "There should be at least one chromosome in architecture file");
+    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "There must be at least one chromosome in architecture file");
 
 }
 
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE(errorWhenChromosomeEndsNotInIncreasingOrder) {
     tst::write("architecture.txt", "3 0.1 0.8 0.3\n");
 
     // Check error
-    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Chromosome ends should be in increasing order in architecture file");
+    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Chromosome ends must be in strictly increasing order in architecture file");
 
 }
 
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(errorWhenChromosomesStartBeforeZero) {
     tst::write("architecture.txt", "3 -0.1 0.3 1.0\n");
 
     // Check error
-    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Chromosome ends should be positive in architecture file");
+    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Chromosome ends must be strictly positive in architecture file");
 
 }
 
@@ -154,13 +154,13 @@ BOOST_AUTO_TEST_CASE(errorWhenChromosomesDoNotEndAtOne) {
     tst::write("architecture.txt", "3 0.1 0.3 0.8\n");
 
     // Check error
-    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "End of the last chromosome should be one in architecture file");
+    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "End of the last chromosome must be one in architecture file");
 
     // Write another
     tst::write("architecture.txt", "3 0.1 0.3 1.1\n");
 
     // Check error
-    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "End of the last chromosome should be one in architecture file");
+    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "End of the last chromosome must be one in architecture file");
 
 }
 
@@ -182,7 +182,7 @@ BOOST_AUTO_TEST_CASE(errorWhenZeroLociInArchitecture) {
     tst::write("architecture.txt", "3 0.1 0.3 1.0\n0");
 
     // Check error
-    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "There should be at least one locus in architecture file");
+    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "There must be at least one locus in architecture file");
 
 }
 
@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_CASE(errorWhenLocusLocationsNotInIncreasingOrder) {
     tst::write("architecture.txt", "3 0.1 0.3 1.0\n3 0.1 0.3 0.2");
 
     // Check error
-    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Locus locations should be in increasing order in architecture file");
+    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Locus locations must be in strictly increasing order in architecture file");
 
 }
 
@@ -215,7 +215,7 @@ BOOST_AUTO_TEST_CASE(errorWhenLociStartBeforeZero) {
     tst::write("architecture.txt", "3 0.1 0.3 1.0\n3 -0.1 0.2 0.3");
 
     // Check error
-    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Locus location should be positive in architecture file");
+    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Locus location must be positive in architecture file");
 
 }
 
@@ -226,6 +226,6 @@ BOOST_AUTO_TEST_CASE(errorWhenLociGoBeyondOne) {
     tst::write("architecture.txt", "3 0.1 0.3 1.0\n3 0.1 0.2 1.3");
 
     // Check error
-    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Locus location should not be beyond the end of the last chromosome in architecture file");
+    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Locus location cannot be beyond the end of the last chromosome in architecture file");
 
 }

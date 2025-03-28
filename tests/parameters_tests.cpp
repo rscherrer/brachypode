@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE(parametersCreated) {
     // Check a few default values
     BOOST_CHECK_EQUAL(pars.popsize, 10u);
     BOOST_CHECK_EQUAL(pars.pgood[0u], 0.8);
-    BOOST_CHECK_EQUAL(pars.nloci, 50u);
+    BOOST_CHECK_EQUAL(pars.nloci, 10u);
 
 }
 
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(readParametersFailWhenValueCannotBeRead)
 BOOST_AUTO_TEST_CASE(checkFailsWhenInitialPopSizeIsZero) {
     
     tst::write("parameters.txt", "popsize 0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Initial population size cannot be zero");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Initial population size must be strictly positive");
 
 }
 
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenInitialPopSizeIsZero) {
 BOOST_AUTO_TEST_CASE(checkFailsWhenZeroDemes) {
     
     tst::write("parameters.txt", "pgood 0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "There cannot be zero demes");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Number of demes must be strictly positive");
 
 }
 
@@ -104,10 +104,10 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenZeroDemes) {
 BOOST_AUTO_TEST_CASE(checkFailsWhenPropGoodPatchesNotBetweenZeroAndOne) {
     
     tst::write("parameters.txt", "pgood 2 -0.1 1\npgoodEnd 0.1 0.1");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Proportion of good patches should be between zero and one");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Proportion of good patches must be between zero and one");
 
     tst::write("parameters.txt", "pgood 2 0.1 1.1\npgoodEnd 0.1 0.1");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Proportion of good patches should be between zero and one");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Proportion of good patches must be between zero and one");
 
 }
 
@@ -115,10 +115,10 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenPropGoodPatchesNotBetweenZeroAndOne) {
 BOOST_AUTO_TEST_CASE(checkFailsWhenPropGoodPatchesAfterWarmingNotBetweenZeroAndOne) {
     
     tst::write("parameters.txt", "pgood 2 0.1 0.1\npgoodEnd -0.1 1");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Proportion of good patches after warming should be between zero and one");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Proportion of good patches after warming must be between zero and one");
 
     tst::write("parameters.txt", "pgood 2 0.1 0.1\npgoodEnd 0.1 1.1");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Proportion of good patches after warming should be between zero and one");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Proportion of good patches after warming must be between zero and one");
 
 }
 
@@ -126,10 +126,10 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenPropGoodPatchesAfterWarmingNotBetweenZeroAndO
 BOOST_AUTO_TEST_CASE(checkFailsWhenCarryingCapacityNotPositive) {
 
     tst::write("parameters.txt", "capacities -1.0 100.0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Carrying capacity must be positive");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Carrying capacity must be strictly positive");
 
     tst::write("parameters.txt", "capacities 0.0 100.0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Carrying capacity must be positive");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Carrying capacity must be strictly positive");
 
 }
 
@@ -137,10 +137,10 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenCarryingCapacityNotPositive) {
 BOOST_AUTO_TEST_CASE(checkFailsWhenCarryingCapacityAfterWarmingNotPositive) {
 
     tst::write("parameters.txt", "capacitiesEnd -1.0 100.0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Carrying capacity after warming must be positive");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Carrying capacity after warming must be strictly positive");
 
     tst::write("parameters.txt", "capacitiesEnd 0.0 100.0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Carrying capacity after warming must be positive");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Carrying capacity after warming must be strictly positive");
 
 }
 
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenCarryingCapacityAfterWarmingNotPositive) {
 BOOST_AUTO_TEST_CASE(checkFailsWhenStressLevelNegative) {
     
     tst::write("parameters.txt", "stress -1.0 0.0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Stress level cannot be negative");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Stress level must be positive");
 
 }
 
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenStressLevelNegative) {
 BOOST_AUTO_TEST_CASE(checkFailsWhenStressLevelAfterWarmingNegative) {
     
     tst::write("parameters.txt", "stressEnd -1.0 0.0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Stress level after warming cannot be negative");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Stress level after warming must be positive");
 
 }
 
@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenStressLevelAfterWarmingNegative) {
 BOOST_AUTO_TEST_CASE(checkFailsWhenMaxGrowthRateNegative) {
     
     tst::write("parameters.txt", "maxgrowth -1.0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Maximum growth rate cannot be negative");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Maximum growth rate must be positive");
 
 }
 
@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenMaxGrowthRateNegative) {
 BOOST_AUTO_TEST_CASE(checkFailsWhenSteepnessNegative) {
     
     tst::write("parameters.txt", "steep -1.0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Steepness of the tolerance function cannot be negative");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Steepness of the tolerance function must be positive");
 
 }
 
@@ -180,10 +180,10 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenSteepnessNegative) {
 BOOST_AUTO_TEST_CASE(checkFailsWhenDispersalRateOutOfBounds) {
     
     tst::write("parameters.txt", "dispersal 1.2");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Dispersal rate should be between zero and one");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Dispersal rate must be between zero and one");
 
     tst::write("parameters.txt", "dispersal -0.1");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Dispersal rate should be between zero and one");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Dispersal rate must be between zero and one");
 
 }
 
@@ -191,10 +191,10 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenDispersalRateOutOfBounds) {
 BOOST_AUTO_TEST_CASE(checkFailsWhenMutationRateOutOfBounds) {
     
     tst::write("parameters.txt", "mutation 1.2");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Mutation rate should be between zero and one");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Mutation rate must be between zero and one");
 
     tst::write("parameters.txt", "mutation -0.1");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Mutation rate should be between zero and one");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Mutation rate must be between zero and one");
 
 }
 
@@ -202,7 +202,7 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenMutationRateOutOfBounds) {
 BOOST_AUTO_TEST_CASE(checkFailsWhenTooManyLoci) {
     
     tst::write("parameters.txt", "nloci 1001");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "There cannot be more than 1000 loci");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Number of loci must be 1000 at most");
 
 }
 
@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenTooManyLoci) {
 BOOST_AUTO_TEST_CASE(checkFailsWhenZeroChromosomes) {
     
     tst::write("parameters.txt", "nchrom 0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "There cannot be zero chromosomes");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Number of chromosomes must be stricly positive");
 
 }
 
@@ -218,7 +218,7 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenZeroChromosomes) {
 BOOST_AUTO_TEST_CASE(checkFailsWhenZeroLoci) {
     
     tst::write("parameters.txt", "nloci 0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "There cannot be zero loci");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Number of loci must be stricly positive");
 
 }
 
@@ -226,10 +226,10 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenZeroLoci) {
 BOOST_AUTO_TEST_CASE(checkFailsWhenAlleleFrequencyOutOfBounds) {
     
     tst::write("parameters.txt", "allfreq 1.2");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Initial allele frequency should be between zero and one");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Initial allele frequency must be between zero and one");
 
     tst::write("parameters.txt", "allfreq -0.1");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Initial allele frequency should be between zero and one");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Initial allele frequency must be between zero and one");
 
 }
 
@@ -237,7 +237,18 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenAlleleFrequencyOutOfBounds) {
 BOOST_AUTO_TEST_CASE(checkFailsWhenTradeOffNegative) {
     
     tst::write("parameters.txt", "tradeoff -1.0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Trade-off cannot be negative");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Trade-off strength must be positive");
+
+}
+
+// Test that fails when zero or negative non-linearity parameter
+BOOST_AUTO_TEST_CASE(checkFailsWhenWrongNonLinearTradeOff) {
+    
+    tst::write("parameters.txt", "tradeoff 0.5\nnonlinear 0");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Non-linearity parameter must be strictly positive");
+
+    tst::write("parameters.txt", "tradeoff 0.5\nnonlinear -0.5");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Non-linearity parameter must be strictly positive");
 
 }
 
@@ -256,7 +267,7 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenSelfingRateOutOfBounds) {
 BOOST_AUTO_TEST_CASE(checkFailsWhenRecombinationRateNegative) {
     
     tst::write("parameters.txt", "recombination -1.0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Recombination rate cannot be negative");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Recombination rate must be positive");
 
 }
 
@@ -264,7 +275,7 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenRecombinationRateNegative) {
 BOOST_AUTO_TEST_CASE(checkFailsWhenSimulationTimeZero) {
     
     tst::write("parameters.txt", "tend 0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Simulation time cannot be zero");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Simulation time must be strictly positive");
 
 }
 
@@ -272,18 +283,7 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenSimulationTimeZero) {
 BOOST_AUTO_TEST_CASE(checkFailsWhenSaveTimeIntervalZero) {
     
     tst::write("parameters.txt", "tsave 0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Cannot save data every zero time point");
-
-}
-
-// Test that fails when zero or negative non-linearity parameter
-BOOST_AUTO_TEST_CASE(checkFailsWhenWrongNonLinearTradeOff) {
-    
-    tst::write("parameters.txt", "tradeoff 0.5\nnonlinear 0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Non-linearity parameter should be strictly positive");
-
-    tst::write("parameters.txt", "tradeoff 0.5\nnonlinear -0.5");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Non-linearity parameter should be strictly positive");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Data saving frequency must be strictly positive");
 
 }
 

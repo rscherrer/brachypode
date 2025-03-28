@@ -139,13 +139,13 @@ void Architecture::read(const std::string &filename) {
 
         // Check order
         if (k > 0u && chromends[k] <= chromends[k - 1u])
-            throw std::runtime_error("Chromosome ends must be in increasing order in architecture file");
+            throw std::runtime_error("Chromosome ends must be in strictly increasing order in architecture file");
 
     }
 
     // Check end of the first chromosome
     if (chromends[0u] < 0.0)
-        throw std::runtime_error("Chromosome ends must be positive in architecture file");
+        throw std::runtime_error("Chromosome ends must be strictly positive in architecture file");
 
     // Check end of the last chromosome
     if (chromends.back() != 1.0) 
@@ -181,7 +181,7 @@ void Architecture::read(const std::string &filename) {
 
         // Check order
         if (l > 0u && locations[l] <= locations[l - 1]) 
-            throw std::runtime_error("Locus locations must be in increasing order in architecture file");
+            throw std::runtime_error("Locus locations must be in strictly increasing order in architecture file");
 
     }
 

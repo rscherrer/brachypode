@@ -54,7 +54,6 @@ struct Parameters {
     bool sow;                          // sow individuals at random
     bool loadarch;                     // load genetic architecture from file
     bool savepars;                     // save parameters to file
-    bool savelog;                      // redirect screen output to log file
     bool savearch;                     // save genetic architecture to file
     bool savedat;                      // save output into data files
     bool choose;                       // choose which output(s) to save

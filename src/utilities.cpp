@@ -2,6 +2,14 @@
 
 #include "utilities.hpp"
 
+// Function to tell if an integer is even
+bool utl::iseven(const int &n) {
+
+    // Is it divisible by two?
+    return n % 2 == 0;
+
+}
+
 // Function to tell if a number is an integer
 bool utl::isinteger(const double &x) {
 
@@ -10,82 +18,69 @@ bool utl::isinteger(const double &x) {
 
 }
 
-// Wrapper for efficient handling of integer power
-double utl::pown(double x, int n) {
+// Function for power with integer exponent (by squaring)
+double powint(double x, int n) {
 
     // x: value to exponentiate
     // n: exponent
 
+    // Is the exponent negative?
+    const bool isneg = n < 0;
+
+    // Work with positive
+    if (isneg) n = std::abs(n);
+
+    // Check
+    assert(n > 1);
+
+    // Note: this function is for internal use only and
+    // will not check whether the input is zero because
+    // this has been done in its parent function.
+
     // Initialize
-    int y = 1;
+    double y = 1.0;
 
     // For as long as it takes...
     while (n > 0) {
 
-        // Multiply by base if exponent is odd
-        if (n % 2 == 1)  
-            y *= x;
+        // Go down to even exponent
+        if (!utl::iseven(n)) y *= x;
 
-        // Square the base
+        // Square
         x *= x;
 
-        // Halve the exponent
+        // Decrease exponent
         n /= 2;
 
     }
 
+    // Check
+    assert(n == 0);
+
+    // Reciprocal if needed
+    if (isneg) return 1.0 / y;
+
+    // Return
     return y;
 
 }
 
-// Function to extract root using binary search
-double utl::rootn(const double &x, int n, const double &precis) {
+// Wrapper around the power function for handling integral exponents
+double utl::power(const double &x, const double &n) {
 
-    // x: value to extract the root of
-    // n: degree of the root
+    // Note: the pow() function will return NaN if the power
+    // is undefined.
 
-    // Degree cannot be zero
-    if (n == 0) 
-        std::runtime_error("Zeroeth root is undefined");
+    // Early exits to avoid loop
+    if (x == 0.0) return 0.0;
+    if (x == 1.0) return 1.0;
+    if (n == 0.0) return 1.0;
+    if (n == 1.0) return x;
 
-    // And only positive domain for even roots
-    if (x < 0 && n % 2 == 0)
-        throw std::runtime_error("Even root of negative number is not real");
+    // Fast function for integer exponents
+    if (isinteger(n)) return powint(x, static_cast<int>(n));
 
-    // Is the degree negative?
-    const bool isneg = n < 0;
-
-    // If so, work with positive counterpart
-    if (isneg) n = std::abs(n);
-
-    // Initialize values
-    double low = 0;
-    double high = x > 1.0 ? x : 1.0;
-
-    // For as long as it takes...
-    while (high - low > precis) {
-
-        // Find the midpoint
-        double mid = (low + high) / 2.0;
-
-        // Elevate to the right power
-        double midn = pown(mid, n);
-
-        // Have we converged?
-        if (std::abs(midn - x) < precis) return mid;
-
-        // If not, narrow the search
-        if (midn < x) low = mid; else high = mid;
-
-    }
-
-    // Final midpoint
-    const double mid = (low + high) / 2.0; 
-
-    // Reciprocal if negative degree
-    if (isneg) return 1.0 / mid;
-
-    // Otherwise return midpoint
-    return mid;
+    // Otherwise use heavy duty function
+    return std::pow(x, n);
 
 }

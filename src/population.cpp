@@ -26,6 +26,7 @@ Population::Population(const Parameters &pars, const Architecture &arch) :
     tsave(pars.tsave),
     tchange(pars.tchange),
     twarming(pars.twarming),
+    verbose(pars.verbose),
     time(0u),
     popsize(pars.popsize),
     demesizes(std::vector<size_t>(ndemes, 0u)),
@@ -230,48 +231,7 @@ void Population::check() const {
 
 }
 
-// Compute a growth rate efficiently
-double pop::growth(const double &r0, const double &epsilon, const double &x, const double &xmax, const double &n) {
-
-    // r0: maximum growth rate
-    // epsilon: trade-off parameter
-    // x: trait value
-    // xmax: maximum possible trait value
-    // n: non-linearity parameter (degree of the polynomial)
-
-    // Check
-    assert(xmax > 0.0);
-    assert(x >= 0.0);
-    assert(n > 0.0);
-
-    // TODO: Non-linearity parameter must be between zero and infinity
-
-    // Linear trade-off
-    if (n == 1.0) return r0 - epsilon * x;
-
-    // Second degree is faster this way
-    if (n == 2.0) return r0 - epsilon * x * x / xmax;
-    if (n == 0.5) return r0 - epsilon * xmax * std::sqrt(x / xmax);
-
-    // TODO: Then effect sizes MUST be srictly positive
-
-    // Other integral degrees
-    if (utl::isinteger(n)) 
-        return r0 - epsilon * xmax * utl::pown(x / xmax, n);
-
-    // Compute the reciprocal and hope it is an integer
-    const double nrecip = 1.0 / n;
-
-    // Use the integral degree root then
-    if (utl::isinteger(nrecip)) 
-        return r0 - epsilon * xmax * utl::rootn(x / xmax, nrecip);
-
-    // If everything else has failed then use the bazooka
-    return r0 - epsilon * xmax * std::pow(x / xmax, n);
-
-    // Note: the power function is very computationally intensive.
-
-}
+// TODO: Then effect sizes MUST be srictly positive
 
 // Function to perform one step of the life cycle
 void Population::cycle(Printer &print) {
@@ -318,6 +278,9 @@ void Population::cycle(Printer &print) {
 
     }
 
+    // Verbose if needed
+    if (verbose) show();
+
     // Save population size if needed
     if (tts) print.save("popsize", popsize);
 
@@ -348,10 +311,11 @@ void Population::cycle(Printer &print) {
         // Current local population size
         const size_t n = patchsizes[2u * deme + patch];
 
-        // Compute population growth rate
-        const double r = pop::growth(maxgrowth, tradeoff, tol, tolmax, nonlinear);
+        // Compute growth rate
+        const double r = maxgrowth - tradeoff * tolmax * utl::power(tol / tolmax, nonlinear);
 
         // Check
+        assert(!std::isnan(r));
         assert(r <= maxgrowth);
         assert(r >= maxgrowth - tradeoff * tolmax);
 
@@ -484,7 +448,7 @@ bool Population::extinct() const {
     if (individuals->size() == 0u) {
 
         // If not say it
-        std::cout << "The population went extinct at t = " << time << '\n';
+        std::cout << "Population went extinct at t = " << time << '\n';
 
         // Return true
         return true;
@@ -496,7 +460,7 @@ bool Population::extinct() const {
 }
 
 // Function to tell whether to keep on simulating
-bool Population::keepon() const { return time <= tend; }
+bool Population::keepon() const { return time < tend; }
 
 // Variable getters
 size_t Population::size() const { return individuals->size(); }

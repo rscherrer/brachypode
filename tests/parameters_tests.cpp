@@ -222,6 +222,19 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenZeroLoci) {
 
 }
 
+// TODO: Should I remove all created files?
+
+// Test that effect size cannot be negative or zero
+BOOST_AUTO_TEST_CASE(checkFailsWhenEffectSizeNegative) {
+
+    tst::write("parameters.txt", "effect 0");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Effect size of loci must be strictly positive");
+
+    tst::write("parameters.txt", "effect -0.1");
+    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Effect size of loci must be strictly positive");
+
+}
+
 // Test that initial allele frequency should be between zero and one
 BOOST_AUTO_TEST_CASE(checkFailsWhenAlleleFrequencyOutOfBounds) {
     

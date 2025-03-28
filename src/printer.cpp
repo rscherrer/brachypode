@@ -97,14 +97,6 @@ void Printer::save(const std::string &name, const double &x) {
 
 }
 
-// Version for an integer
-void Printer::save(const std::string &name, const int &x) {
-
-    // Convert and store
-    if (buffers[name]) buffers[name]->save(static_cast<double>(x));
-
-}
-
 // Version for an unsigned integer
 void Printer::save(const std::string &name, const size_t &x) {
 

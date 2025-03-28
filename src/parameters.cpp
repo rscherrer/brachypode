@@ -49,11 +49,11 @@ Parameters::Parameters(const std::string &filename) :
 
     // filename: optional parameter input file
 
-    // Check
-    check();
-
     // Read from file if needed
     if (filename != "") read(filename);
+
+    // Check
+    check();
 
 }
 
@@ -85,6 +85,7 @@ void Parameters::check() const {
     assert(nloci <= 1000u);
     assert(nchrom != 0u);
     assert(nloci != 0u);
+    assert(effect > 0.0);
     assert(allfreq >= 0.0);
     assert(allfreq <= 1.0);
     assert(tradeoff >= 0.0);
@@ -96,6 +97,8 @@ void Parameters::check() const {
     assert(tsave != 0u);
 
 }
+
+// TODO: Check where we check
 
 // Function to check if the next value could not be read
 void checkfail(std::ifstream &file, const std::string &name) {
@@ -152,21 +155,6 @@ void readin(std::ifstream &file, std::vector<double> &v, const size_t &n, std::s
 
 // Function to read in the next parameter value(s) as a single unsigned integer
 void readin(std::ifstream &file, size_t &x, const std::string &name) {
-
-    // file: input file stream
-    // x: parameter value
-    // name: name of the parameter being read in
-
-    // Read in the parameter value
-    file >> x;
-
-    // Check that the read was successful
-    checkfail(file, name);
-
-}
-
-// Function to read in the next parameter value(s) as a single integer
-void readin(std::ifstream &file, int &x, const std::string &name) {
 
     // file: input file stream
     // x: parameter value
@@ -259,9 +247,6 @@ void Parameters::read(const std::string &filename)
 
     }
 
-    // TODO: Make sure to say in the documentation that pgoodEnd must be entered after pgood
-    // TODO: Make sure to say also that pgoodEnd must be manually set to the same size as pgood
-
     // Close the file
     file.close();
 
@@ -290,6 +275,7 @@ void Parameters::read(const std::string &filename)
     if (nloci > 1000) throw std::runtime_error("Number of loci must be 1000 at most");
     if (nchrom == 0) throw std::runtime_error("Number of chromosomes must be stricly positive");
     if (nloci == 0u) throw std::runtime_error("Number of loci must be stricly positive");
+    if (effect <= 0.0) throw std::runtime_error("Effect size of loci must be strictly positive");
     if (allfreq < 0.0) throw std::runtime_error("Initial allele frequency must be between zero and one");
     if (allfreq > 1.0) throw std::runtime_error("Initial allele frequency must be between zero and one");
     if (tradeoff < 0.0) throw std::runtime_error("Trade-off strength must be positive");

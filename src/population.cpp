@@ -90,7 +90,7 @@ void Population::shuffle() {
 }
 
 // Function to linearly update a parameter value upon time step increment
-double lincrement(const double &x, const double &xfinal, const int &t, const int &tfinal) {
+double lincrement(const double &x, const double &xfinal, const size_t &t, const size_t &tfinal) {
 
     // x: current value of the parameter
     // xfinal: final value the parameter is supposed to reach

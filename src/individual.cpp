@@ -142,8 +142,6 @@ void Individual::recombine(const double &rho, const Individual &pollen) {
         // end will be considered first and hence taken as part of the previous
         // chromosome.
 
-        // TODO: Say that in the documentation
-
         // Depending on the case...
         switch (next) {
 

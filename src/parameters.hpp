@@ -59,8 +59,6 @@ struct Parameters {
     bool choose;                       // choose which output(s) to save
     bool verbose;                      // print progress to screen
 
-    // TODO: Make sure times are treated as unsigned everywhere
-
 };
 
 #endif

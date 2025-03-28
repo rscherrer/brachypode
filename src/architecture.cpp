@@ -2,8 +2,6 @@
 
 #include "architecture.hpp"
 
-// TODO: Say in the documentation that architecture loading will overwrite parameters
-
 // Constructor
 Architecture::Architecture(const Parameters &pars, const std::string &filename) :
     nchrom(pars.nchrom),
@@ -19,6 +17,9 @@ Architecture::Architecture(const Parameters &pars, const std::string &filename) 
 
     // Generate a new architecture
     make();
+
+    // Check
+    check();
 
     // Read in architecture if needed
     if (filename != "") read(filename);
@@ -46,6 +47,9 @@ void Architecture::check() const {
     // Locations in increasing order
     for (size_t i = 0u; i < locations.size() - 1u; ++i)
         assert(locations[i + 1u] > locations[i]);
+
+    // All effect sizes are positive
+    for (auto &effect : effects) assert(effect > 0.0);
 
 }
 
@@ -189,8 +193,25 @@ void Architecture::read(const std::string &filename) {
     if (locations[0u] < 0.0) throw std::runtime_error("Locus location must be positive in architecture file");
     if (locations.back() > chromends.back()) throw std::runtime_error("Locus location cannot be beyond the end of the last chromosome in architecture file");
 
-    // Read each effect size
-    for (size_t l = 0u; l < nloci; ++l) file >> effects[l];
+    // For each locus...
+    for (size_t l = 0u; l < nloci; ++l) {
+
+        // Read effect size
+        file >> effects[l];
+
+        // Check if could not read
+        if (file.fail())
+            throw std::runtime_error("Could not read the effect size of locus " + std::to_string(l) + " in architecture file");
+
+        // TODO: Test that
+
+        // Error if needed
+        if (effects[l] <= 0.0) 
+            throw std::runtime_error("Effect size must be strictly positive in architecture file");
+
+        // Test that
+
+    }
 
     // Close the file
     file.close();

@@ -24,6 +24,7 @@ public:
     Buffer(const size_t&, const std::string&);
 
     // Setters
+    void open();
     void save(const double&);
     void close();
 
@@ -41,6 +42,9 @@ public:
 
 private:
 
+    // Name of the file
+    std::string filename;
+
     // Maximum possible size of the buffer
     size_t maxsize;
 
@@ -51,7 +55,7 @@ private:
     // Smart pointer to an output file stream
     std::ofstream file;
 
-    // Internal setter
+    // Internal setters
     void flush();
 
 };

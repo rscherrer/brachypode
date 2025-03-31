@@ -3,11 +3,12 @@
 #include "buffer.hpp"
 
 // Constructor
-Buffer::Buffer(const size_t &n, const std::string &filename) :
+Buffer::Buffer(const size_t &n, const std::string &name) :
+    filename(name),
     maxsize(n),
     head(std::make_unique<std::vector<double> >()),
     tail(std::make_unique<std::vector<double> >()),
-    file(std::ofstream(filename.c_str(), std::ios::binary))
+    file(std::ofstream())
 {
 
     // n: size of the buffer
@@ -22,13 +23,21 @@ Buffer::Buffer(const size_t &n, const std::string &filename) :
     assert(tail->capacity() == maxsize);
 
     // Check that the containers are empty
-    assert(head->size() == 0u);
-    assert(tail->size() == 0u);
+    assert(head->empty());
+    assert(tail->empty());
+
+}
+
+// Function to open the file
+void Buffer::open() {
+
+    // Open the file
+    file.open(filename.c_str(), std::ios::binary);
 
     // Check that the file is open
     if (!file.is_open()) 
         throw std::runtime_error("Unable to open file " + filename);
-
+    
 }
 
 // Function to store a new value
@@ -63,8 +72,8 @@ void Buffer::flush() {
     tail->clear();
 
     // Make sure the buffer is empty
-    assert(head->size() == 0u);
-    assert(tail->size() == 0u);
+    assert(head->empty());
+    assert(tail->empty());
 
 }
 

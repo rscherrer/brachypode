@@ -64,7 +64,7 @@ void Parameters::check() const {
 
     // Check that the parameter values are valid
     assert(popsize != 0u);
-    assert(pgood.size() != 0u);
+    assert(!pgood.empty());
     assert(pgood.size() == pgoodEnd.size());
     for (size_t i = 0u; i < pgood.size(); ++i) {
         assert(pgood[i] >= 0.0);
@@ -256,7 +256,7 @@ void Parameters::read(const std::string &filename)
 
     // Check that the parameter values are valid
     if (popsize == 0u) throw std::runtime_error("Initial population size must be strictly positive");
-    if (pgood.size() == 0u) throw std::runtime_error("Number of demes must be strictly positive");
+    if (pgood.empty()) throw std::runtime_error("Number of demes must be strictly positive");
     assert(pgood.size() == pgoodEnd.size()); // should have been caught already
     for (size_t i = 0u; i < pgood.size(); ++i) {
         if (pgood[i] < 0.0) throw std::runtime_error("Proportion of good patches must be between zero and one");

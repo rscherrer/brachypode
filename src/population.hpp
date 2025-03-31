@@ -40,7 +40,7 @@ public:
     bool keepon() const { return time < tend; };
 
     // Function to tell whether the popultion has gone extinct
-    bool extinct() const { return individuals->size() == 0u; };
+    bool extinct() const { return individuals->empty(); };
 
     // Function to return the population size
     size_t size() const { return individuals->size(); };

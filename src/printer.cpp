@@ -22,7 +22,7 @@ Printer::Printer(const std::vector<std::string> &names, const double &mem) :
     memory(prt::memtosize(mem, 1E6)),
     outputs(names),
     valids(names),
-    buffers()
+    buffers(std::unordered_map<std::string, std::optional<Buffer> >())
 {
 
     // names: names of the output variables
@@ -38,6 +38,9 @@ bool in(const std::string &x, const std::vector<std::string> &v) {
 
     // x: the string to search for
     // v: the vector to search in
+
+    // Check
+    assert(!v.empty());
 
     // For each element in the vector...
     for (const std::string &s : v) {
@@ -90,16 +93,63 @@ void Printer::read(const std::string &filename) {
 // Function to open buffers
 void Printer::open() {
 
+    // Check
+    assert(!outputs.empty());
+
     // For each output...
     for (auto &name : outputs) {
 
+        // TODO: Use find wherever possible
+
         // Set up a buffer
-        buffers[name] = Buffer(memory, name + ".dat");
+        buffers[name].emplace(Buffer(memory, name + ".dat"));
+
+        // Open the buffer
+        buffers[name]->open();
+
+        // Check
+        assert(buffers[name]->isopen());
 
     }
 
     // Check
     assert(buffers.size() == outputs.size());
+
+}
+
+// Function to find a buffer in the list
+bool Printer::contains(const std::string &name) {
+
+    // Early exit
+    if (buffers.empty()) return false;
+
+    // Find the right buffer
+    const auto it = buffers.find(name);
+
+    // Check if it is found
+    return it != buffers.end();
+
+}
+
+// Function to tell if a buffer is open
+bool Printer::isopen(const std::string &name) {
+
+    // Early exit
+    if (!contains(name)) return false;
+
+    // Check if open
+    return buffers[name]->isopen();
+
+}
+
+// Function to get the capacity of a buffer
+bool Printer::isopen(const std::string &name) {
+
+    // Early exit
+    if (!contains(name)) return false;
+
+    // Check if open
+    return buffers[name]->capacity();
 
 }
 
@@ -109,13 +159,25 @@ void Printer::save(const std::string &name, const double &x) {
     // name: name of the buffer in which to save
     // x: value to save
 
+    // Early exit
+    if (!contains(name)) return;
+
+    // Check
+    assert(buffers[name]->isopen());
+
     // Store the value if the buffer is open 
-    if (buffers[name]) buffers[name]->save(x);
+    buffers[name]->save(x);
 
 }
 
 // Version for an unsigned integer
 void Printer::save(const std::string &name, const size_t &x) {
+
+    // Early exit
+    if (!contains(name)) return;
+
+    // Check
+    assert(buffers[name]->isopen());
 
     // Convert and store
     if (buffers[name]) buffers[name]->save(static_cast<double>(x));
@@ -124,6 +186,9 @@ void Printer::save(const std::string &name, const size_t &x) {
 
 // Function to close buffers
 void Printer::close() {
+
+    // Check
+    assert(!outputs.empty());
 
     // For each buffer...
     for (auto &name : outputs) {
@@ -136,6 +201,12 @@ void Printer::close() {
 
 // Function to check if all buffers are open
 bool Printer::ison() {
+
+    // Early exit if needed
+    if (buffers.empty()) return false;
+
+    // Check
+    assert(!buffers.empty());
 
     // For each buffer...
     for (auto &buffer : buffers) {

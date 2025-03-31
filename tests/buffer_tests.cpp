@@ -13,6 +13,9 @@ BOOST_AUTO_TEST_CASE(bufferOpensProperly) {
     // Create a buffer
     Buffer buffer(10u, "output.dat");
 
+    // Open it
+    buffer.open();
+
     // Check the size of the buffer
     BOOST_CHECK_EQUAL(buffer.capacity(), 10u);
 
@@ -31,7 +34,15 @@ BOOST_AUTO_TEST_CASE(bufferOpensProperly) {
 BOOST_AUTO_TEST_CASE(bufferCannotOpenFile) {
 
     // Should error when trying to open a file with empty name
-    tst::checkError([&] { Buffer buffer(10u, ""); }, "Unable to open file ");
+    tst::checkError([&] { 
+
+        // Create a buffer
+        Buffer buffer(10u, ""); 
+
+        // Open it
+        buffer.open();
+
+    }, "Unable to open file ");
 
 }
 
@@ -40,6 +51,9 @@ BOOST_AUTO_TEST_CASE(bufferStoresProperly) {
 
     // Create a buffer
     Buffer buffer(10u, "output.dat");
+
+    // Open it
+    buffer.open();
 
     // Store a value
     buffer.save(3.14);
@@ -58,6 +72,9 @@ BOOST_AUTO_TEST_CASE(bufferFlushesWhenFull) {
 
     // Create a buffer
     Buffer buffer(3u, "output.dat");
+
+    // Open it
+    buffer.open();
 
     // Store more data than the capacity permits
     buffer.save(0.1);
@@ -93,6 +110,9 @@ BOOST_AUTO_TEST_CASE(bufferClosesProperly) {
     // Create a buffer
     Buffer buffer(10u, "output.dat");
 
+    // Open it
+    buffer.open();
+
     // Save a value under the capacity
     buffer.save(3.14);
 
@@ -119,6 +139,9 @@ BOOST_AUTO_TEST_CASE(bufferClosesWithEmptyFile) {
 
     // Create a buffer
     Buffer buffer(10u, "output.dat");
+
+    // Open it
+    buffer.open();
 
     // Close it
     buffer.close();

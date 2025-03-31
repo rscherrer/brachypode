@@ -48,6 +48,9 @@ void Architecture::check() const {
     for (size_t i = 0u; i < locations.size() - 1u; ++i)
         assert(locations[i + 1u] > locations[i]);
 
+    // Check
+    assert(!effects.empty());
+
     // All effect sizes are positive
     for (auto &effect : effects) assert(effect > 0.0);
 
@@ -96,6 +99,9 @@ void Architecture::make() {
     assert(locations[0u] >= 0.0);
     assert(locations.back() <= chromends.back());
 
+    // Check
+    assert(!effects.empty());
+    
     // Compute maximum trait value
     for (double &effect : effects) tolmax += effect;
 

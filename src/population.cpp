@@ -58,7 +58,7 @@ Population::Population(const Parameters &pars, const Architecture &arch) :
 
     // Check
     assert(individuals->size() == popsize);
-    assert(newborns->size() == 0u);
+    assert(newborns->empty());
 
     // Sow individuals at random if needed
     if (pars.sow) shuffle();
@@ -70,6 +70,9 @@ void Population::shuffle() {
 
     // Prepare a random deme sampler
     auto pickDeme = rnd::random(0u, ndemes - 1u);
+
+    // Check
+    assert(!individuals->empty());
 
     // For each individual...
     for (Individual& ind : *individuals) {
@@ -197,7 +200,7 @@ void Population::check() const {
 
     // Check that the parameter values are valid
     assert(popsize != 0u);
-    assert(pgood.size() != 0u);
+    assert(!pgood.empty());
     assert(pgood.size() == pgoodEnd.size());
     assert(pgood.size() == ndemes);
     for (size_t i = 0u; i < pgood.size(); ++i) {
@@ -283,7 +286,7 @@ void Population::cycle(Printer &print) {
     // print: a printer
 
     // Make sure the population is not extinct
-    assert(individuals->size() > 0u);
+    assert(!individuals->empty());
 
     // Reset statistics
     reset();
@@ -293,6 +296,9 @@ void Population::cycle(Printer &print) {
 
     // Save time step if needed
     if (tts) print.save("time", time);
+
+    // Check
+    assert(!individuals->empty());
 
     // For each individual...
     for (Individual& ind : *individuals) {
@@ -341,6 +347,9 @@ void Population::cycle(Printer &print) {
 
     // Prepare to record the number of new individuals
     size_t totseeds = 0u;
+
+    // Check
+    assert(!individuals->empty());
 
     // For each individual...
     for (Individual& ind : *individuals) {
@@ -493,7 +502,7 @@ void Population::cycle(Printer &print) {
     newborns->clear();
 
     // Check
-    assert(newborns->size() == 0u);
+    assert(newborns->empty());
 
 }
 

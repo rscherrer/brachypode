@@ -156,6 +156,9 @@ BOOST_AUTO_TEST_CASE(useCaseUserDefinedOutput) {
     // Read the data if they exist
     const std::vector<double> values = tst::read("time.dat");
 
+    // Check
+    assert(!values.empty());
+
     // Check their values
     for (auto i : values)
         BOOST_CHECK_EQUAL(values[i], i);
@@ -215,6 +218,11 @@ BOOST_AUTO_TEST_CASE(useCaseAllOutputsIfNoChoice) {
 
     // Prepare to sum
     size_t n = 0.0;
+
+    // Check
+    assert(!popsizes.empty());
+
+    // TODO: Clean up Hanno's random utilities
 
     // Sum over generations
     for (auto popsize : popsizes) n += static_cast<size_t>(popsize);

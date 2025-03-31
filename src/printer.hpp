@@ -34,8 +34,11 @@ public:
     bool ison();
 
     // Buffer getters
-    bool isopen(const std::string &name) { return buffers[name]->isopen(); };
-    size_t capacity(const std::string &name) { return buffers[name]->capacity(); };
+    bool contains(const std::string&);
+    bool isopen(const std::string&);
+    size_t capacity(const std::string&);
+
+    // TODO: Avoid using detection in main run?
 
 private:
 

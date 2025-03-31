@@ -26,15 +26,17 @@ public:
     // Setters
     void read(const std::string&);
     void open();
+    void close();
+
+    // Buffer setters
     void save(const std::string&, const double&);
     void save(const std::string&, const size_t&);
-    void close();
 
     // Getters
     bool ison();
 
     // Buffer getters
-    bool contains(const std::string&);
+    bool exists(const std::string&);
     bool isopen(const std::string&);
     size_t capacity(const std::string&);
 

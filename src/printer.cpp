@@ -102,13 +102,19 @@ void Printer::open() {
         // TODO: Use find wherever possible
 
         // Set up a buffer
-        buffers[name].emplace(Buffer(memory, name + ".dat"));
+        buffers.emplace(name, Buffer(memory, name + ".dat"));
+
+        // Find the buffer
+        auto it = buffers.find(name);
+        
+        // Check
+        assert(it != buffers.end());
 
         // Open the buffer
-        buffers[name]->open();
+        it->second->open();
 
         // Check
-        assert(buffers[name]->isopen());
+        assert(it->second->isopen());
 
     }
 
@@ -117,16 +123,13 @@ void Printer::open() {
 
 }
 
-// Function to find a buffer in the list
-bool Printer::contains(const std::string &name) {
+// Function to tell if a buffer exists
+bool Printer::exists(const std::string &name) {
 
-    // Early exit
-    if (buffers.empty()) return false;
+    // Find the buffer
+    auto it = buffers.find(name);
 
-    // Find the right buffer
-    const auto it = buffers.find(name);
-
-    // Check if it is found
+    // Check if exists
     return it != buffers.end();
 
 }
@@ -134,22 +137,28 @@ bool Printer::contains(const std::string &name) {
 // Function to tell if a buffer is open
 bool Printer::isopen(const std::string &name) {
 
-    // Early exit
-    if (!contains(name)) return false;
+    // Find the buffer
+    auto it = buffers.find(name);
+
+    // Check
+    assert(it != buffers.end());
 
     // Check if open
-    return buffers[name]->isopen();
+    return it->second->isopen();
 
 }
 
 // Function to get the capacity of a buffer
-bool Printer::isopen(const std::string &name) {
+size_t Printer::capacity(const std::string &name) {
 
-    // Early exit
-    if (!contains(name)) return false;
+    // Find the buffer
+    auto it = buffers.find(name);
+    
+    // Check
+    assert(it != buffers.end());
 
-    // Check if open
-    return buffers[name]->capacity();
+    // Get capacity
+    return it->second->capacity();
 
 }
 
@@ -159,28 +168,34 @@ void Printer::save(const std::string &name, const double &x) {
     // name: name of the buffer in which to save
     // x: value to save
 
-    // Early exit
-    if (!contains(name)) return;
+    // Find the buffer
+    auto it = buffers.find(name);
+
+    // Make sure it exists
+    if (it == buffers.end()) return;
 
     // Check
-    assert(buffers[name]->isopen());
+    assert(it->second->isopen());
 
-    // Store the value if the buffer is open 
-    buffers[name]->save(x);
+    // Save if it does
+    it->second->save(static_cast<double>(x));
 
 }
 
 // Version for an unsigned integer
 void Printer::save(const std::string &name, const size_t &x) {
 
-    // Early exit
-    if (!contains(name)) return;
+    // Find the buffer
+    auto it = buffers.find(name);
+
+    // Make sure it exists
+    if (it == buffers.end()) return;
 
     // Check
-    assert(buffers[name]->isopen());
+    assert(it->second->isopen());
 
-    // Convert and store
-    if (buffers[name]) buffers[name]->save(static_cast<double>(x));
+    // Save if it does
+    it->second->save(static_cast<double>(x));
 
 }
 
@@ -191,10 +206,10 @@ void Printer::close() {
     assert(!outputs.empty());
 
     // For each buffer...
-    for (auto &name : outputs) {
+    for (auto &buffer : buffers) {
 
         // Close the buffer
-        buffers[name]->close();
+        buffer.second->close();
 
     }
 }

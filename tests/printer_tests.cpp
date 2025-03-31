@@ -60,10 +60,14 @@ BOOST_AUTO_TEST_CASE(printerReadsRequestedOutput) {
     // Open the buffers
     print.open();
 
+    // Check that the right buffers exist
+    BOOST_CHECK(print.exists("foo"));
+    BOOST_CHECK(print.exists("bar"));
+    BOOST_CHECK(!print.exists("baz"));
+
     // Check that the right buffers are open
     BOOST_CHECK(print.isopen("foo"));
     BOOST_CHECK(print.isopen("bar"));
-    BOOST_CHECK(!print.isopen("baz"));
 
     // Remove files
     std::remove("whattosave.txt");

@@ -27,7 +27,7 @@ void doMain(const std::vector<std::string> &args) {
     // Create parameters (from file if needed)
     const Parameters pars(parfile);
 
-    // Verbose (after redirecting output)
+    // Verbose
     if (args.size() == 2u) std::cout << "Parameters read in succesfully\n";
 
     // Seed the random number generator
@@ -63,6 +63,8 @@ void doMain(const std::vector<std::string> &args) {
         
         // Read outputs to save
         print.read("whattosave.txt");
+
+        // TODO: Resize vector of outputs
 
         // Verbose
         std::cout << "Requested output(s) read in succesfully\n";

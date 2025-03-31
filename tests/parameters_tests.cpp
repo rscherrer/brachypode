@@ -368,6 +368,22 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenPrecisionThresholdNegativeOrZero) {
 
 }
 
+// Test that buffer must be at least capable of containing one vlue
+BOOST_AUTO_TEST_CASE(checkFailsWhenMemoryTooSmall) {
+
+    // One byte should be too small
+    tst::write("parameters.txt", "memory 0.000001");
+
+    // Check
+    tst::checkError([&]{ 
+        Parameters pars("parameters.txt"); 
+    }, "Memory use per buffer must be at least " + std::to_string(sizeof(double)) + " bytes");
+
+    // Remove files
+    std::remove("parameters.txt");
+
+}
+
 // Test that simulation time cannot be zero
 BOOST_AUTO_TEST_CASE(checkFailsWhenSimulationTimeZero) {
     

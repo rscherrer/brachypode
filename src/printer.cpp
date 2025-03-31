@@ -2,14 +2,34 @@
 
 #include "printer.hpp"
 
+// Function to convert computer memory in number of values
+size_t prt::memtosize(const double &m, const double &u) {
+
+    // m: memory use
+    // u: the unit (e.g. 1 million for megabyte)
+
+    // Check
+    assert(m >= 0.0);
+    assert(u >= 0.0);
+
+    // How many values can be stored at most?
+    return std::floor(m * u / sizeof(double));
+
+}
+
 // Constructor
-Printer::Printer(const std::vector<std::string> &names) :
+Printer::Printer(const std::vector<std::string> &names, const double &mem) :
+    memory(prt::memtosize(mem, 1E6)),
     outputs(names),
     valids(names),
     buffers()
 {
 
     // names: names of the output variables
+    // mem: memory use (in MB)
+
+    // Check
+    assert(memory > 0u);
 
 }
 
@@ -68,15 +88,13 @@ void Printer::read(const std::string &filename) {
 }
 
 // Function to open buffers
-void Printer::open(const size_t &n) {
-
-    // n = buffer size
+void Printer::open() {
 
     // For each output...
     for (auto &name : outputs) {
 
         // Set up a buffer
-        buffers[name] = Buffer(n, name + ".dat");
+        buffers[name] = Buffer(memory, name + ".dat");
 
     }
 

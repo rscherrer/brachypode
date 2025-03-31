@@ -47,6 +47,7 @@ struct Parameters {
     double selfing;                    // rate of selfing
     double recombination;              // recombination rate
     double precis;                     // minimum possible realized carrying capacity
+    double memory;                     // memory used for data storage (in MB)
     size_t tend;                       // simulation time
     size_t tsave;                      // recording time
     size_t tchange;                    // time to initiate warming

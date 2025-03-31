@@ -7,26 +7,40 @@
 #include "buffer.hpp"
 #include <unordered_map>
 #include <optional>
+#include <cmath>
+
+namespace prt {
+
+    // Utility functions
+    size_t memtosize(const double&, const double&);
+
+}
 
 class Printer {
 
 public:
 
     // Constructor
-    Printer(const std::vector<std::string>&);
+    Printer(const std::vector<std::string>&, const double& = 1.0);
 
     // Setters
     void read(const std::string&);
-    void open(const size_t& = 1000u);
+    void open();
     void save(const std::string&, const double&);
     void save(const std::string&, const size_t&);
     void close();
 
     // Getters
     bool ison();
-    bool check(const std::string &name) { return buffers[name]->isopen(); };
+
+    // Buffer getters
+    bool isopen(const std::string &name) { return buffers[name]->isopen(); };
+    size_t capacity(const std::string &name) { return buffers[name]->capacity(); };
 
 private:
+
+    // Buffer size (in number of values)
+    size_t memory;
 
     // Output variable names
     std::vector<std::string> outputs;

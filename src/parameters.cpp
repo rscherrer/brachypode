@@ -34,6 +34,7 @@ Parameters::Parameters(const std::string &filename) :
     selfing(0.95),
     recombination(1.0),
     precis(1E-06),
+    memory(1.0),
     tend(10u),
     tsave(20u),
     tchange(100000u),
@@ -95,6 +96,7 @@ void Parameters::check() const {
     assert(selfing <= 1.0);
     assert(recombination >= 0.0);
     assert(precis > 0.0);
+    assert(memory * 1E6 > sizeof(double));
     assert(tend != 0u);
     assert(tsave != 0u);
 
@@ -231,6 +233,7 @@ void Parameters::read(const std::string &filename)
         else if (input == "selfing") readin(file, selfing, "selfing");
         else if (input == "recombination") readin(file, recombination, "recombination");
         else if (input == "precis") readin(file, precis, "precis");
+        else if (input == "memory") readin(file, memory, "memory");
         else if (input == "tend") readin(file, tend, "tend");
         else if (input == "tsave") readin(file, tsave, "tsave");
         else if (input == "tchange") readin(file, tchange, "tchange");
@@ -285,6 +288,7 @@ void Parameters::read(const std::string &filename)
     if (selfing > 1.0) throw std::runtime_error("Rate of selfing must be between zero and one");
     if (recombination < 0.0) throw std::runtime_error("Recombination rate must be positive");
     if (precis <= 0.0) throw std::runtime_error("Precision threshold must be strictly positive");
+    if (memory * 1E6 < sizeof(double)) throw std::runtime_error("Memory use per buffer must be at least " + std::to_string(sizeof(double)) + " bytes");
     if (tend == 0u) throw std::runtime_error("Simulation time must be strictly positive");
     if (tsave == 0u) throw std::runtime_error("Data saving frequency must be strictly positive");
     
@@ -331,6 +335,7 @@ void Parameters::save(const std::string &filename) const
     file << "selfing " << selfing << '\n';
     file << "recombination " << recombination << '\n';
     file << "precis " << precis << '\n';
+    file << "memory " << memory << '\n';
     file << "tend " << tend << '\n';
     file << "tsave " << tsave << '\n';
     file << "tchange " << tchange << '\n';

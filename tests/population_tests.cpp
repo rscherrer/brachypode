@@ -89,8 +89,6 @@ BOOST_AUTO_TEST_CASE(populationScreenOutput) {
     // Check that output is as expected
     tst::checkOutput([&] { pop.cycle(print); }, "n = { 10 0 0 } at t = 0\n");
 
-    // TODO: Check linebreaks in output messages
-
 }
 
 // Moving on works
@@ -165,11 +163,6 @@ BOOST_AUTO_TEST_CASE(populationUpdateClimateChange) {
     BOOST_CHECK_EQUAL(pop.getStress(1u), pars.stressEnd[1u]);
     BOOST_CHECK_EQUAL(pop.getCapacity(0u), pars.capacitiesEnd[0u]);
     BOOST_CHECK_EQUAL(pop.getCapacity(1u), pars.capacitiesEnd[1u]);
-
-    // TODO: Naming convention for getters
-    // TODO: Do I need getters for everything?
-    // TODO: Assert parameters in Population
-    // TODO: Could Printer be a member?
 
 }
 

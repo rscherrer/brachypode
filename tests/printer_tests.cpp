@@ -174,4 +174,9 @@ BOOST_AUTO_TEST_CASE(initializeWithCustomSize) {
     BOOST_CHECK_EQUAL(print.capacity("bar"), prt::memtosize(2.0, 1E6));
     BOOST_CHECK_EQUAL(print.capacity("baz"), prt::memtosize(2.0, 1E6));
 
+    // Remove files
+    std::remove("foo.dat");
+    std::remove("bar.dat");
+    std::remove("baz.dat");
+
 }

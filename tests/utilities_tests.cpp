@@ -7,8 +7,6 @@
 #include "../src/utilities.hpp"
 #include <boost/test/unit_test.hpp>
 
-// TODO: Test the integer checking function
-
 // Test the even checking function
 BOOST_AUTO_TEST_CASE(isEven) {
 

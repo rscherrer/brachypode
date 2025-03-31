@@ -9,8 +9,6 @@
 #include "../src/MAIN.hpp"
 #include <boost/test/unit_test.hpp>
 
-// TODO: Check screen output?
-
 // Test that the simulation runs
 BOOST_AUTO_TEST_CASE(useCase) {
 
@@ -31,8 +29,6 @@ BOOST_AUTO_TEST_CASE(abuseTooManyArgs) {
 
 // Test that the simulation runs with a parameter file
 BOOST_AUTO_TEST_CASE(useCaseWithParameterFile) {
-
-    // TODO: Maybe try with all the flags off
 
     // Write a parameter file
     tst::write("parameters.txt", "popsize 9");
@@ -136,8 +132,6 @@ BOOST_AUTO_TEST_CASE(useCaseWithParameterSaving) {
     // Check that the (clock-generated) seed is the same
     BOOST_CHECK_EQUAL(pars1.seed, pars2.seed);
 
-    // TODO: Check properly those things
-
     // Cleanup
     std::remove("parameters.txt");
     std::remove("paramlog.txt");
@@ -236,8 +230,6 @@ BOOST_AUTO_TEST_CASE(useCaseAllOutputsIfNoChoice) {
     std::remove("traitmeans.dat");
     std::remove("individuals.dat");
 
-    // TODO: Check where to remove files?
-
 }
 
 // Test that nothing is saved if no data saving
@@ -269,9 +261,6 @@ BOOST_AUTO_TEST_CASE(useCaseSowingIndividualsAtRandom) {
 
     // Check that no error
     BOOST_CHECK_NO_THROW(doMain({"program", "parameters.txt"}));
-
-    // TODO: If this was part of a class I could test its behavior properly
-    // TODO: I could test that without sowing all individuals are in the same deme?
 
     // Cleanup
     std::remove("parameters.txt");
@@ -311,8 +300,6 @@ BOOST_AUTO_TEST_CASE(useCaseWithExtinction) {
 
     // Check for the relevant bit
     BOOST_CHECK(output.find("Population went extinct at t = 0") != std::string::npos);
-
-    // TODO: Same here, could do with a class
 
     // Cleanup
     std::remove("parameters.txt");

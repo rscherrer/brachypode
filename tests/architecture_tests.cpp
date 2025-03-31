@@ -82,6 +82,9 @@ BOOST_AUTO_TEST_CASE(loadedArchitectureHasRightAttributes) {
     BOOST_CHECK_EQUAL(arch.effects[2u], 0.2);
     BOOST_CHECK_EQUAL(arch.effects[3u], 0.1);
 
+    // Remove files
+    std::remove("architecture.txt");
+
 }
 
 // Test that error when cannot read the file
@@ -101,6 +104,9 @@ BOOST_AUTO_TEST_CASE(errorWhenCannotReadNumberOfChromosomes) {
     // Check error
     tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Could not read the number of chromosomes in architecture file");
 
+    // Remove files
+    std::remove("architecture.txt");
+
 }
 
 // Test that error if the number of chromosomes is zero
@@ -111,6 +117,9 @@ BOOST_AUTO_TEST_CASE(errorWhenZeroChromosomesInArchitecture) {
 
     // Check error
     tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "There must be at least one chromosome in architecture file");
+
+    // Remove files
+    std::remove("architecture.txt");
 
 }
 
@@ -123,6 +132,9 @@ BOOST_AUTO_TEST_CASE(errorWhenCannotReadChromosomeEnd) {
     // Check error
     tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Could not read the end of chromosome 1 in architecture file");
 
+    // Remove files
+    std::remove("architecture.txt");
+
 }
 
 // Test that error when chromosome ends are not in increasing order
@@ -134,6 +146,9 @@ BOOST_AUTO_TEST_CASE(errorWhenChromosomeEndsNotInIncreasingOrder) {
     // Check error
     tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Chromosome ends must be in strictly increasing order in architecture file");
 
+    // Remove files
+    std::remove("architecture.txt");
+
 }
 
 // Test that error if chromosomes start before zero
@@ -144,6 +159,9 @@ BOOST_AUTO_TEST_CASE(errorWhenChromosomesStartBeforeZero) {
 
     // Check error
     tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Chromosome ends must be strictly positive in architecture file");
+
+    // Remove files
+    std::remove("architecture.txt");
 
 }
 
@@ -162,6 +180,9 @@ BOOST_AUTO_TEST_CASE(errorWhenChromosomesDoNotEndAtOne) {
     // Check error
     tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "End of the last chromosome must be one in architecture file");
 
+    // Remove files
+    std::remove("architecture.txt");
+
 }
 
 // Test that error if the number of loci cannot be read
@@ -172,6 +193,9 @@ BOOST_AUTO_TEST_CASE(errorWhenCannotReadNumberOfLoci) {
 
     // Check error
     tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Could not read the number of loci in architecture file");
+
+    // Remove files
+    std::remove("architecture.txt");
 
 }
 
@@ -184,6 +208,9 @@ BOOST_AUTO_TEST_CASE(errorWhenZeroLociInArchitecture) {
     // Check error
     tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "There must be at least one locus in architecture file");
 
+    // Remove files
+    std::remove("architecture.txt");
+
 }
 
 // Test that error when locus location cannot be read
@@ -194,6 +221,9 @@ BOOST_AUTO_TEST_CASE(errorWhenCannotReadLocusLocation) {
 
     // Check error
     tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Could not read the location of locus 3 in architecture file");
+
+    // Remove files
+    std::remove("architecture.txt");
 
 }
 
@@ -206,6 +236,9 @@ BOOST_AUTO_TEST_CASE(errorWhenLocusLocationsNotInIncreasingOrder) {
     // Check error
     tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Locus locations must be in strictly increasing order in architecture file");
 
+    // Remove files
+    std::remove("architecture.txt");
+
 }
 
 // Test that error when loci start before zero
@@ -216,6 +249,9 @@ BOOST_AUTO_TEST_CASE(errorWhenLociStartBeforeZero) {
 
     // Check error
     tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Locus location must be positive in architecture file");
+
+    // Remove files
+    std::remove("architecture.txt");
 
 }
 
@@ -228,6 +264,9 @@ BOOST_AUTO_TEST_CASE(errorWhenLociGoBeyondOne) {
     // Check error
     tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Locus location cannot be beyond the end of the last chromosome in architecture file");
 
+    // Remove files
+    std::remove("architecture.txt");
+
 }
 
 // Test that error when cannot read locus effect size
@@ -238,6 +277,9 @@ BOOST_AUTO_TEST_CASE(errorWhenCannotReadEffectSize) {
 
     // Check error
     tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Could not read the effect size of locus 3 in architecture file");
+
+    // Remove files
+    std::remove("architecture.txt");
 
 }
 
@@ -250,6 +292,9 @@ BOOST_AUTO_TEST_CASE(errorWhenEffectSizeNegative) {
     // Check error
     tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Effect size of locus 3 must be positive in architecture file");
 
+    // Remove files
+    std::remove("architecture.txt");
+
 }
 
 // Test that error when total effect size is zero
@@ -260,6 +305,9 @@ BOOST_AUTO_TEST_CASE(errorWhenTotalEffectSizeIsZero) {
 
     // Check error
     tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Sum of effect sizes must be strictly positive in architecture file");
+
+    // Remove files
+    std::remove("architecture.txt");
 
 }
 

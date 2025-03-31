@@ -101,9 +101,6 @@ void Printer::open() {
     // Check
     assert(buffers.size() == outputs.size());
 
-    // TODO: Make buffer size user defined
-    // TODO: Say we have opened the output files succesfully?
-
 }
 
 // Function to save data into a buffer

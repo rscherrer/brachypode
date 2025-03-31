@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE(errorWhenCannotReadChromosomeEnd) {
     tst::write("architecture.txt", "1 hello\n");
 
     // Check error
-    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Could not read the end of chromosome 0 in architecture file");
+    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Could not read the end of chromosome 1 in architecture file");
 
 }
 
@@ -193,7 +193,7 @@ BOOST_AUTO_TEST_CASE(errorWhenCannotReadLocusLocation) {
     tst::write("architecture.txt", "3 0.1 0.3 1.0\n3 0.1 0.2 hello");
 
     // Check error
-    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Could not read the location of locus 2 in architecture file");
+    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Could not read the location of locus 3 in architecture file");
 
 }
 
@@ -229,3 +229,37 @@ BOOST_AUTO_TEST_CASE(errorWhenLociGoBeyondOne) {
     tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Locus location cannot be beyond the end of the last chromosome in architecture file");
 
 }
+
+// Test that error when cannot read locus effect size
+BOOST_AUTO_TEST_CASE(errorWhenCannotReadEffectSize) {
+
+    // Write architecture file
+    tst::write("architecture.txt", "3 0.1 0.3 1.0\n3 0.1 0.2 0.3\n0.1 0.1 hello");
+
+    // Check error
+    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Could not read the effect size of locus 3 in architecture file");
+
+}
+
+// Test that error when negative effect size
+BOOST_AUTO_TEST_CASE(errorWhenEffectSizeNegative) {
+
+    // Write architecture file
+    tst::write("architecture.txt", "3 0.1 0.3 1.0\n3 0.1 0.2 0.3\n0.1 0.1 -0.1");
+
+    // Check error
+    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Effect size of locus 3 must be positive in architecture file");
+
+}
+
+// Test that error when total effect size is zero
+BOOST_AUTO_TEST_CASE(errorWhenTotalEffectSizeIsZero) {
+
+    // Write architecture file
+    tst::write("architecture.txt", "3 0.1 0.3 1.0\n3 0.1 0.2 0.3\n0.0 0.0 0.0");
+
+    // Check error
+    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Sum of effect sizes must be strictly positive in architecture file");
+
+}
+

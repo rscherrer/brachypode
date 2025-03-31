@@ -22,6 +22,9 @@ BOOST_AUTO_TEST_CASE(bufferOpensProperly) {
     // Check that the file has been open
     BOOST_CHECK(buffer.isopen());
 
+    // Remove files
+    std::remove("output.dat");
+
 }
 
 // Test that buffer errors when cannot open file
@@ -44,6 +47,9 @@ BOOST_AUTO_TEST_CASE(bufferStoresProperly) {
     // Check that the value was saved
     BOOST_CHECK_EQUAL(buffer.size(), 1u);
     BOOST_CHECK_EQUAL(buffer.last(), 3.14);
+
+    // Remove files
+    std::remove("output.dat");
 
 }
 
@@ -76,6 +82,9 @@ BOOST_AUTO_TEST_CASE(bufferFlushesWhenFull) {
     BOOST_CHECK_EQUAL(values[2u], 0.3);
     BOOST_CHECK_EQUAL(values[3u], 0.4);
 
+    // Remove files
+    std::remove("output.dat");
+
 }
 
 // Test that the buffer closes properly
@@ -100,6 +109,9 @@ BOOST_AUTO_TEST_CASE(bufferClosesProperly) {
     BOOST_CHECK_EQUAL(values.size(), 1u);
     BOOST_CHECK_EQUAL(values[0u], 3.14);
 
+    // Remove files
+    std::remove("output.dat");
+
 }
 
 // Special case of an empty file
@@ -116,5 +128,8 @@ BOOST_AUTO_TEST_CASE(bufferClosesWithEmptyFile) {
 
     // Make sure it is empty
     BOOST_CHECK_EQUAL(values.size(), 0u);
+
+    // Remove files
+    std::remove("output.dat");
 
 }

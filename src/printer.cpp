@@ -68,13 +68,15 @@ void Printer::read(const std::string &filename) {
 }
 
 // Function to open buffers
-void Printer::open() {
+void Printer::open(const size_t &n) {
+
+    // n = buffer size
 
     // For each output...
     for (auto &name : outputs) {
 
         // Set up a buffer
-        buffers[name] = Buffer(1000u, name + ".dat");
+        buffers[name] = Buffer(n, name + ".dat");
 
     }
 
@@ -82,7 +84,7 @@ void Printer::open() {
     assert(buffers.size() == outputs.size());
 
     // TODO: Make buffer size user defined
-    // TODO: Say we have opened the outputs files succesfully?
+    // TODO: Say we have opened the output files succesfully?
 
 }
 
@@ -116,9 +118,6 @@ void Printer::close() {
 
     }
 }
-
-// Function to check if a particular buffer is open
-bool Printer::check(const std::string &name) { return buffers[name]->isopen(); }
 
 // Function to check if all buffers are open
 bool Printer::ison() {

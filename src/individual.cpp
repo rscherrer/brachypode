@@ -204,10 +204,14 @@ void Individual::recombine(const double &rho, const Individual &pollen) {
 
 }
 
-// Getters
-size_t Individual::getDeme() const { return deme; }
-size_t Individual::getPatch() const { return patch; }
-size_t Individual::getNSeeds() const { return nseeds; }
-double Individual::getTolerance() const { return tolerance; }
-size_t Individual::getAllele(const size_t &l) const { return alleles.test(l); }
-size_t Individual::countAlleles() const { return alleles.count(); }
+// Function to check validity of members
+void Individual::check(const size_t &n) {
+
+    // n: number of demes
+
+    // Check
+    assert(patch < 2u);
+    assert(deme < n);
+    assert(tolerance >= 0.0);
+
+}

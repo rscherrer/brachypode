@@ -54,8 +54,6 @@ void doMain(const std::vector<std::string> &args) {
 
     // Save parameters if necessary
     if (pars.savepars) pars.save("paramlog.txt");
-    
-    // TODO: Check the right headers are included in the right files
 
     // Create a printer
     Printer print(valid());
@@ -71,8 +69,16 @@ void doMain(const std::vector<std::string> &args) {
 
     }
 
-    // Open the buffers if needed
-    if (pars.savedat) print.open();
+    // If needed...
+    if (pars.savedat) {
+        
+        // Open the buffers
+        print.open();
+
+        // Verbose
+        std::cout << "Output files open succesfully\n";
+
+    }
 
     // Create a population of individuals
     Population pop(pars, arch);
@@ -83,14 +89,25 @@ void doMain(const std::vector<std::string> &args) {
     // At each time step...
     while (pop.keepon()) {
 
+        // Check that parameters are still valid 
+        pop.check();
+
         // Update climate parameters if needed
         pop.update();
 
         // Go through the life cycle of the population
         pop.cycle(print);
 
-        // End if extinction
-        if (pop.extinct()) break;
+        // If extinction...
+        if (pop.extinct()) {
+
+            // Say it
+            std::cout << "Population went extinct at t = " << pop.getTime() << '\n';
+            
+            // Exit
+            break;
+
+        }
 
         // Move on
         pop.moveon();

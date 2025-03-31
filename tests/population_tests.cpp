@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(populationInitializesProperly) {
 
     // Sum all demes
     for (size_t i = 0u; i < pop.size(); ++i)
-        sum += pop.deme(i);
+        sum += pop.getDeme(i);
 
     // Check that all individuals are in the first deme
     BOOST_CHECK_EQUAL(sum, 0u);
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(populationSowsAtRandom) {
     size_t sum = 0u;
 
     for (size_t i = 0u; i < pop.size(); ++i) 
-        sum += pop.deme(i);
+        sum += pop.getDeme(i);
 
     // Check that individuals are scattered
     BOOST_CHECK(sum > 0u);
@@ -138,9 +138,6 @@ BOOST_AUTO_TEST_CASE(populationUpdateClimateChange) {
     // Population
     Population pop(pars, arch);
 
-    // Printer
-    Printer print({"foo", "bar"});
-
     // Go through one time step
     pop.moveon();
 
@@ -209,9 +206,6 @@ BOOST_AUTO_TEST_CASE(populationGoesExtinct) {
 
     // Check that the population went extinct
     BOOST_CHECK(pop.extinct());
-
-    // Check message
-    tst::checkOutput([&] { pop.extinct(); }, "Population went extinct at t = 0\n");
 
 }
 
@@ -326,6 +320,13 @@ BOOST_AUTO_TEST_CASE(populationCanPrint) {
     BOOST_CHECK_EQUAL(individuals[5u], 0.5);
     BOOST_CHECK_EQUAL(individuals[8u], 0.5);
 
+    // Remove files
+    std::remove("time.dat");
+    std::remove("popsize.dat");
+    std::remove("patchsizes.dat");
+    std::remove("traitmeans.dat");
+    std::remove("individuals.dat");
+
 }
 
 // Test that population with non-linear trade-off works
@@ -349,5 +350,289 @@ BOOST_AUTO_TEST_CASE(populationWithNonLinearTradeOff) {
 
     // Cycle
     BOOST_CHECK_NO_THROW(pop.cycle(print));
+
+}
+
+// Test growth rate computation
+BOOST_AUTO_TEST_CASE(growthRateComputation) {
+
+    // Linear trade-off
+    BOOST_CHECK_EQUAL(pop::growth(0.0, 10.0, 2.0, 0.1, 1.0), 2.0);
+    BOOST_CHECK_EQUAL(pop::growth(5.0, 10.0, 2.0, 0.1, 1.0), 1.5);
+    BOOST_CHECK_EQUAL(pop::growth(10.0, 10.0, 2.0, 0.1, 1.0), 1.0);
+
+    // Concave
+    BOOST_CHECK_EQUAL(pop::growth(0.0, 10.0, 2.0, 0.1, 2.0), 2.0);
+    BOOST_CHECK_EQUAL(pop::growth(5.0, 10.0, 2.0, 0.1, 2.0), 1.75);
+    BOOST_CHECK_EQUAL(pop::growth(10.0, 10.0, 2.0, 0.1, 2.0), 1.0);
+
+    // Convex
+    BOOST_CHECK_EQUAL(pop::growth(0.0, 10.0, 2.0, 0.1, 0.5), 2.0);
+    BOOST_CHECK_EQUAL(pop::growth(2.5, 10.0, 2.0, 0.1, 0.5), 1.5);
+    BOOST_CHECK_EQUAL(pop::growth(10.0, 10.0, 2.0, 0.1, 0.5), 1.0);
+
+    // No trade-off
+    BOOST_CHECK_EQUAL(pop::growth(5.0, 10.0, 2.0, 0.0, 0.5), 2.0);
+    BOOST_CHECK_EQUAL(pop::growth(5.0, 10.0, 2.0, 0.0, 1.0), 2.0);
+    BOOST_CHECK_EQUAL(pop::growth(5.0, 10.0, 2.0, 0.0, 2.0), 2.0);
+
+}
+
+// Test fitness computation
+BOOST_AUTO_TEST_CASE(fitnessComputation) {
+
+    // Fitness is one when growth rate is zero
+    BOOST_CHECK_EQUAL(pop::ricker(1.0, 0.0, 100.0), 1.0);
+
+    // Fitness is one when at carrying capacity
+    BOOST_CHECK_EQUAL(pop::ricker(100.0, 1.0, 100.0), 1.0);
+
+    // Fitness is the (exponential of the) growth rate when very very far from capacity
+    BOOST_CHECK_EQUAL(pop::ricker(0.0, 1.1, 100.0), std::exp(1.1));
+
+}
+
+// Test survival probability function
+BOOST_AUTO_TEST_CASE(survivalFunction) {
+
+    // Survival should be one when stress is zero
+    BOOST_CHECK_EQUAL(pop::survival(10.0, 0.0, 5.0), 1.0);
+
+    // Survival very low when stress is high
+    BOOST_CHECK(pop::survival(0.1, 5.0, 5.0) < 1E-6);
+
+    // But high if tolerance is also high
+    BOOST_CHECK_CLOSE(pop::survival(10.0, 5.0, 5.0), 1.0, 1E-6);
+
+    // Survival is exactly half when at inflection point
+    BOOST_CHECK_EQUAL(pop::survival(10.0, 10.0, 1.0), 0.5);
+    BOOST_CHECK_EQUAL(pop::survival(10.0, 10.0, 2.0), 0.5);
+    BOOST_CHECK_EQUAL(pop::survival(10.0, 10.0, 5.0), 0.5);
+
+    // Compute probabilities just before inflection
+    const double s1b = pop::survival(11.0, 10.0, 1.0);
+    const double s2b = pop::survival(11.0, 10.0, 2.0);
+    const double s3b = pop::survival(11.0, 10.0, 5.0);
+
+    // Just after
+    const double s1a = pop::survival(9.0, 10.0, 1.0);
+    const double s2a = pop::survival(9.0, 10.0, 2.0);
+    const double s3a = pop::survival(9.0, 10.0, 5.0);
+
+    // Survival should go down faster with steeper curve
+    BOOST_CHECK(s1b < s2b);
+    BOOST_CHECK(s2b < s3b);
+    BOOST_CHECK(s1a > s2a);
+    BOOST_CHECK(s2a > s3a);
+
+}
+
+// Population cycle with dispersal (PROBABILISTIC)
+BOOST_AUTO_TEST_CASE(populationCycleWithDispersal) {
+
+    // Parameters
+    Parameters pars;
+
+    // Tweak
+    pars.dispersal = 1.0;
+    pars.pgood = { 1.0, 1.0 };
+    pars.pgoodEnd = { 1.0, 1.0 };
+    pars.popsize = 2u;
+    pars.sow = false;
+
+    // Architecture
+    Architecture arch(pars);
+
+    // Create a population
+    Population pop(pars, arch);
+
+    // Printer
+    Printer print({"foo", "bar"});
+
+    // Check
+    assert(pop.getDeme(0u) == 0u);
+    assert(pop.getDeme(1u) == 0u);
+
+    // Cycle
+    pop.cycle(print);
+
+    // Note: the population could be extinct
+
+    // Check that dispersal has occurred
+    BOOST_CHECK_EQUAL(pop.getDeme(0u), 1u);
+
+}
+
+// Population cycle with no dispersal (PROBABILISTIC)
+BOOST_AUTO_TEST_CASE(populationCycleWithNoDispersal) {
+
+    // Parameters
+    Parameters pars;
+
+    // Tweak
+    pars.dispersal = 0.0;
+    pars.pgood = { 1.0, 1.0 };
+    pars.pgoodEnd = { 1.0, 1.0 };
+    pars.popsize = 2u;
+    pars.sow = false;
+
+    // Architecture
+    Architecture arch(pars);
+
+    // Create a population
+    Population pop(pars, arch);
+
+    // Printer
+    Printer print({"foo", "bar"});
+
+    // Check
+    assert(pop.getDeme(0u) == 0u);
+    assert(pop.getDeme(1u) == 0u);
+
+    // Cycle
+    pop.cycle(print);
+
+    // Note: the population could be extinct
+
+    // Check that no dispersal has occurred
+    BOOST_CHECK_EQUAL(pop.getDeme(0u), 0u);
+
+}
+
+// Population cycle with no dispersal cause one deme (PROBABILISTIC)
+BOOST_AUTO_TEST_CASE(populationCycleWithNoDispersalCuzOneDeme) {
+
+    // Parameters
+    Parameters pars;
+
+    // Tweak
+    pars.dispersal = 1.0;
+    pars.pgood = { 1.0 };
+    pars.pgoodEnd = { 1.0 };
+    pars.popsize = 2u;
+    pars.sow = false;
+
+    // Architecture
+    Architecture arch(pars);
+
+    // Create a population
+    Population pop(pars, arch);
+
+    // Printer
+    Printer print({"foo", "bar"});
+
+    // Check
+    assert(pop.getDeme(0u) == 0u);
+    assert(pop.getDeme(1u) == 0u);
+
+    // Cycle
+    pop.cycle(print);
+
+    // Note: the population could be extinct
+
+    // Check that no dispersal has occurred
+    BOOST_CHECK_EQUAL(pop.getDeme(0u), 0u);
+
+}
+
+// Test when seeds all land in unfacilitated patch
+BOOST_AUTO_TEST_CASE(populationCycleWithZeroPatchCover) {
+
+    // Parameters
+    Parameters pars;
+
+    // Tweak
+    pars.dispersal = 1.0;
+    pars.pgood = { 1.0, 0.0 };
+    pars.pgoodEnd = { 1.0, 0.0 };
+    pars.popsize = 100u;
+    pars.sow = false;
+
+    // Architecture
+    Architecture arch(pars);
+
+    // Create a population
+    Population pop(pars, arch);
+
+    // Printer
+    Printer print({"foo", "bar"});
+
+    // Check
+    assert(pop.getPatch(0u) == 1u);
+
+    // Cycle
+    pop.cycle(print);
+
+    // Note: the population could be extinct
+
+    // Check patch
+    BOOST_CHECK_EQUAL(pop.getPatch(0u), 0u);
+
+}
+
+// Test when seeds all land in facilitated patch
+BOOST_AUTO_TEST_CASE(populationCycleWithFullPatchCover) {
+
+    // Parameters
+    Parameters pars;
+
+    // Tweak
+    pars.dispersal = 1.0;
+    pars.pgood = { 1.0, 1.0 };
+    pars.pgoodEnd = { 1.0, 1.0 };
+    pars.popsize = 100u;
+    pars.sow = false;
+
+    // Architecture
+    Architecture arch(pars);
+
+    // Create a population
+    Population pop(pars, arch);
+
+    // Printer
+    Printer print({"foo", "bar"});
+
+    // Check
+    assert(pop.getPatch(0u) == 1u);
+
+    // Cycle
+    pop.cycle(print);
+
+    // Note: the population could be extinct
+
+    // Check patch
+    BOOST_CHECK_EQUAL(pop.getPatch(0u), 1u);
+
+}
+
+// Test that extinction occurs when too harsh to survive
+BOOST_AUTO_TEST_CASE(populationCycleTooHarshForSurvival) {
+
+    // Parameters
+    Parameters pars;
+
+    // Tweak
+    pars.dispersal = 1.0;
+    pars.pgood = { 0.0 };
+    pars.pgoodEnd = { 0.0 };
+    pars.popsize = 10u;
+    pars.sow = false;
+
+    // Architecture
+    Architecture arch(pars);
+
+    // Create a population
+    Population pop(pars, arch);
+
+    // Printer
+    Printer print({"foo", "bar"});
+
+    // Cycle
+    pop.cycle(print);
+
+    // Note: the population could be not extinct
+
+    // Check patch
+    BOOST_CHECK_EQUAL(pop.size(), 0u);
 
 }

@@ -33,6 +33,7 @@ Parameters::Parameters(const std::string &filename) :
     nonlinear(1.0),
     selfing(0.95),
     recombination(1.0),
+    precis(1E-06),
     tend(10u),
     tsave(20u),
     tchange(100000u),
@@ -49,11 +50,11 @@ Parameters::Parameters(const std::string &filename) :
 
     // filename: optional parameter input file
 
-    // Read from file if needed
-    if (filename != "") read(filename);
-
     // Check
     check();
+
+    // Read from file if needed
+    if (filename != "") read(filename);
 
 }
 
@@ -93,12 +94,11 @@ void Parameters::check() const {
     assert(selfing >= 0.0);
     assert(selfing <= 1.0);
     assert(recombination >= 0.0);
+    assert(precis > 0.0);
     assert(tend != 0u);
     assert(tsave != 0u);
 
 }
-
-// TODO: Check where we check
 
 // Function to check if the next value could not be read
 void checkfail(std::ifstream &file, const std::string &name) {
@@ -230,6 +230,7 @@ void Parameters::read(const std::string &filename)
         else if (input == "nonlinear") readin(file, nonlinear, "nonlinear");
         else if (input == "selfing") readin(file, selfing, "selfing");
         else if (input == "recombination") readin(file, recombination, "recombination");
+        else if (input == "precis") readin(file, precis, "precis");
         else if (input == "tend") readin(file, tend, "tend");
         else if (input == "tsave") readin(file, tsave, "tsave");
         else if (input == "tchange") readin(file, tchange, "tchange");
@@ -283,9 +284,13 @@ void Parameters::read(const std::string &filename)
     if (selfing < 0.0) throw std::runtime_error("Rate of selfing must be between zero and one");
     if (selfing > 1.0) throw std::runtime_error("Rate of selfing must be between zero and one");
     if (recombination < 0.0) throw std::runtime_error("Recombination rate must be positive");
+    if (precis <= 0.0) throw std::runtime_error("Precision threshold must be strictly positive");
     if (tend == 0u) throw std::runtime_error("Simulation time must be strictly positive");
     if (tsave == 0u) throw std::runtime_error("Data saving frequency must be strictly positive");
     
+    // Check
+    check();
+
 }
 
 // Save parameters to a file
@@ -325,6 +330,7 @@ void Parameters::save(const std::string &filename) const
     file << "nonlinear " << nonlinear << '\n';
     file << "selfing " << selfing << '\n';
     file << "recombination " << recombination << '\n';
+    file << "precis " << precis << '\n';
     file << "tend " << tend << '\n';
     file << "tsave " << tsave << '\n';
     file << "tchange " << tchange << '\n';

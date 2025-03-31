@@ -23,15 +23,21 @@ public:
     // Constructor
     Buffer(const size_t&, const std::string&);
 
-    // Getters
-    double last() const;
-    size_t capacity() const;
-    size_t size() const;
-    bool isopen() const;
-
     // Setters
     void save(const double&);
     void close();
+
+    // Function to return the last value stored
+    double last() const { return head->back(); };
+
+    // Function to return buffer capacity
+    size_t capacity() const { return head->capacity(); };
+
+    // Function to return the number of values stored 
+    size_t size() const { return head->size(); };
+
+    // Function to tell if the file is open
+    bool isopen() const { return file.is_open(); };
 
 private:
 

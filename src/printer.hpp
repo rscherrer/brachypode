@@ -17,15 +17,14 @@ public:
 
     // Setters
     void read(const std::string&);
-    void open();
+    void open(const size_t& = 1000u);
     void save(const std::string&, const double&);
     void save(const std::string&, const size_t&);
-    void save(const std::string&, const int&);
     void close();
 
     // Getters
     bool ison();
-    bool check(const std::string&);
+    bool check(const std::string &name) { return buffers[name]->isopen(); };
 
 private:
 

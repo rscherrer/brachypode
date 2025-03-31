@@ -28,13 +28,16 @@ public:
     void setNSeeds(const size_t&);
     void setTolerance(const double&);
 
-    // Getters
-    size_t getDeme() const;
-    size_t getPatch() const;
-    size_t getNSeeds() const;
-    size_t getAllele(const size_t&) const;
-    size_t countAlleles() const;
-    double getTolerance() const;
+    // Simple getters
+    size_t getDeme() const { return deme; };
+    size_t getPatch() const { return patch; };
+    size_t getNSeeds() const { return nseeds; };
+    size_t getAllele(const size_t &i) const { assert(i < alleles.size()); return alleles.test(i); }
+    size_t countAlleles() const { return alleles.count(); };
+    double getTolerance() const { return tolerance; };
+
+    // Checker
+    void check(const size_t&);
 
 private:
 

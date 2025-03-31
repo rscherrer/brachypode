@@ -22,6 +22,7 @@ Population::Population(const Parameters &pars, const Architecture &arch) :
     selfing(pars.selfing),
     recombination(pars.recombination),
     tolmax(arch.tolmax),
+    precis(pars.precis),
     tend(pars.tend),
     tsave(pars.tsave),
     tchange(pars.tchange),
@@ -222,6 +223,8 @@ void Population::check() const {
     assert(selfing >= 0.0);
     assert(selfing <= 1.0);
     assert(recombination >= 0.0);
+    assert(tolmax > 0.0);
+    assert(precis > 0.0);
     assert(tend != 0u);
     assert(tsave != 0u);
     assert(demesizes.size() == ndemes);
@@ -231,14 +234,53 @@ void Population::check() const {
 
 }
 
-// TODO: Then effect sizes MUST be srictly positive
+// Accessory function to compute the intrinsic population growth rate
+double pop::growth(
+    const double &x, const double &xmax, const double &rmax, 
+    const double &epsilon, const double &nu
+) {
+
+    // x: trait value
+    // xmax: maximum trait value
+    // rmax: maximum growth rate
+    // epsilon: trade-off strength
+    // nu: traded-off non-linearity
+
+    // Check
+    assert(xmax != 0.0);
+
+    // Compute growth rate
+    return rmax - epsilon * xmax * utl::power(x / xmax, nu);
+
+}
+
+// Accessory function to compute fitness according to Ricker
+double pop::ricker(const size_t &n, const double &r, const double &K) {
+
+    // r: per capita growth rate
+    // n: population density
+    // K: carrying capacity
+    
+    // Check
+    assert(K != 0.0);
+
+    // Compute fitness
+    return std::exp(r * (1.0 - n / K));
+
+}
+
+// Accessory function for computing survival probability
+double pop::survival(const double &x, const double &theta, const double &a) {
+
+    // Compute probability
+    return 1.0 / (1.0 + std::exp(a * (theta - x)));
+
+}
 
 // Function to perform one step of the life cycle
 void Population::cycle(Printer &print) {
 
     // print: a printer
-
-    // TODO: See if we can delegate some of that stuff to test better
 
     // Make sure the population is not extinct
     assert(individuals->size() > 0u);
@@ -251,9 +293,6 @@ void Population::cycle(Printer &print) {
 
     // Save time step if needed
     if (tts) print.save("time", time);
-
-    // Prepare to record the number of new individuals
-    size_t totseeds = 0u;
 
     // For each individual...
     for (Individual& ind : *individuals) {
@@ -300,6 +339,9 @@ void Population::cycle(Printer &print) {
         }
     }
 
+    // Prepare to record the number of new individuals
+    size_t totseeds = 0u;
+
     // For each individual...
     for (Individual& ind : *individuals) {
 
@@ -308,11 +350,8 @@ void Population::cycle(Printer &print) {
         const size_t deme = ind.getDeme();
         const size_t patch = ind.getPatch();
 
-        // Current local population size
-        const size_t n = patchsizes[2u * deme + patch];
-
         // Compute growth rate
-        const double r = maxgrowth - tradeoff * tolmax * utl::power(tol / tolmax, nonlinear);
+        const double r = pop::growth(tol, tolmax, maxgrowth, tradeoff, nonlinear);
 
         // Check
         assert(!std::isnan(r));
@@ -327,19 +366,25 @@ void Population::cycle(Printer &print) {
         assert(cover <= 1.0);
 
         // Total carrying capacity in the deme for the focal patch
-        const double Ktot = capacities[patch] * cover;
+        double Ktot = capacities[patch] * cover;
+
+        // Clamp
+        Ktot = Ktot < precis ? precis : Ktot;
 
         // Check
-        assert(Ktot >= 0.0);
+        assert(Ktot > 0.0);
+
+        // Current local population size
+        const size_t n = patchsizes[2u * deme + patch];
 
         // Expected number of seeds
-        const double enseeds = exp(r * (1.0 - n / Ktot));
+        const double fitness = pop::ricker(n, r, Ktot);
 
         // Check
-        assert(enseeds >= 0.0);
+        assert(fitness >= 0.0);
 
         // Realized number of seeds
-        const size_t nseeds = rnd::poisson(enseeds)(rnd::rng);
+        const size_t nseeds = rnd::poisson(fitness)(rnd::rng);
 
         // Record the number of seeds that will be produced
         ind.setNSeeds(nseeds);
@@ -352,11 +397,17 @@ void Population::cycle(Printer &print) {
     // Prepare space to welcome newborns
     newborns->reserve(totseeds);
 
+    // Check
+    assert(popsize == individuals->size());
+    assert(ndemes == pgood.size());
+
     // Prepare a partner sampler for outcrossing
-    auto getPollen = rnd::random(1u, popsize - 1u);
+    auto getPollen = rnd::random(0u, popsize - 1u - (popsize > 1u));
 
     // Prepare a deme sampler for seed dispersal
-    auto getDestination = rnd::random(1u, ndemes - 1u);
+    auto getDestination = rnd::random(0u, ndemes - 1u - (ndemes > 1u));
+
+    // Note: we set those distributions this way to avoid self.
 
     // For each adult plant...
     for (size_t i = 0u; i < individuals->size(); ++i) {
@@ -377,21 +428,27 @@ void Population::cycle(Printer &print) {
                 size_t k = getPollen(rnd::rng);
 
                 // Avoid selfing
-                if (k < i) k -= 1u;
+                k = k + (k >= i);
+
+                // Check
+                assert(k != i);
 
                 // Recombine the genomes of the two parents
                 newborns->back().recombine(recombination, (*individuals)[k]);
 
             }
 
-            // If the seed disperses to another site...
+            // Disperse the seed to another site if needed...
             if (ndemes > 1u && rnd::bernoulli(dispersal)(rnd::rng)) {
 
                 // Sample destination deme
                 size_t newdeme = getDestination(rnd::rng);
 
                 // Avoid the current deme
-                if (newdeme < ind.getDeme()) newdeme -= 1u;
+                newdeme = newdeme + (newdeme >= newborns->back().getDeme());
+                
+                // Check
+                assert(newdeme != newborns->back().getDeme());
 
                 // Send the seed there
                 newborns->back().setDeme(newdeme);
@@ -407,14 +464,21 @@ void Population::cycle(Printer &print) {
             // Does the seed mutate?
             newborns->back().mutate(mutation);
 
+            // Check
+            newborns->back().check(ndemes);
+
             // Patch where the seed has landed
             const size_t seedpatch = newborns->back().getPatch();
 
             // Trait value of the seedling
-            const double xoff = newborns->back().getTolerance();
+            const double xseed = newborns->back().getTolerance();
 
             // Compute the survival probability of the seedling
-            const double prob = 1.0 / (1.0 + exp(steep * (stress[seedpatch] - xoff)));
+            const double prob = pop::survival(xseed, stress[seedpatch], steep);
+
+            // Check
+            assert(prob >= 0.0);
+            assert(prob <= 1.0);
 
             // Remove the seedling if it does not survive
             if (!rnd::bernoulli(prob)(rnd::rng)) newborns->pop_back();
@@ -440,38 +504,3 @@ void Population::moveon() {
     ++time;
 
 }
-
-// Function to tell if the population has gone extinct
-bool Population::extinct() const {
-
-    // Is the population still there?
-    if (individuals->size() == 0u) {
-
-        // If not say it
-        std::cout << "Population went extinct at t = " << time << '\n';
-
-        // Return true
-        return true;
-
-    }
-
-    // Otherwise return false
-    return false;
-}
-
-// Function to tell whether to keep on simulating
-bool Population::keepon() const { return time < tend; }
-
-// Variable getters
-size_t Population::size() const { return individuals->size(); }
-size_t Population::getTime() const { return time; }
-
-// TODO: Define simple getters in header file for efficient inlining
-
-// Parameter getters
-double Population::getPGood(const size_t &deme) const { return pgood[deme]; }
-double Population::getStress(const size_t &patch) const { return stress[patch]; }
-double Population::getCapacity(const size_t &patch) const { return capacities[patch]; }
-
-// Individual getters
-size_t Population::deme(const size_t &i) const { return (*individuals)[i].getDeme(); }

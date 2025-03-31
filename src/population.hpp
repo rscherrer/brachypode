@@ -11,6 +11,15 @@
 #include "individual.hpp"
 #include "utilities.hpp"
 
+namespace pop {
+
+    // Accessory functions
+    double growth(const double&, const double&, const double&, const double&, const double&);
+    double ricker(const size_t&, const double&, const double&);
+    double survival(const double&, const double&, const double&);
+
+}
+
 class Population {
 
 public:
@@ -27,17 +36,22 @@ public:
     void check() const;
     void show() const;
 
-    // Main getters
-    size_t size() const;
-    bool keepon() const;
-    bool extinct() const;
-    size_t deme(const size_t&) const;
+    // Function to tell whether to keep on simulating
+    bool keepon() const { return time < tend; };
 
+    // Function to tell whether the popultion has gone extinct
+    bool extinct() const { return individuals->size() == 0u; };
+
+    // Function to return the population size
+    size_t size() const { return individuals->size(); };
+    
     // Other getters
-    size_t getTime() const;
-    double getPGood(const size_t&) const;
-    double getStress(const size_t&) const;
-    double getCapacity(const size_t&) const;
+    size_t getTime() const { return time; };
+    double getPGood(const size_t &i) const { assert(i < pgood.size()); return pgood[i]; };
+    double getStress(const size_t &i) const { assert(i < stress.size()); return stress[i]; };
+    double getCapacity(const size_t &i) const { assert(i < capacities.size()); return capacities[i]; };
+    size_t getDeme(const size_t &i) const { assert(i < individuals->size()); return (*individuals)[i].getDeme(); };
+    size_t getPatch(const size_t &i) const { assert(i < individuals->size()); return (*individuals)[i].getPatch(); };
 
 private:
 
@@ -62,6 +76,7 @@ private:
     double selfing;                    // rate of selfing
     double recombination;              // recombination rate
     double tolmax;                     // maximum stress tolerance possible 
+    double precis;                     // minimum possible realized carrying capacity
     size_t tend;                       // simulation time
     size_t tsave;                      // recording time
     size_t tchange;                    // time to initiate warming

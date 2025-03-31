@@ -139,7 +139,7 @@ void Architecture::read(const std::string &filename) {
 
         // Check if could not read
         if (file.fail())
-            throw std::runtime_error("Could not read the end of chromosome " + std::to_string(k) + " in architecture file");
+            throw std::runtime_error("Could not read the end of chromosome " + std::to_string(k + 1u) + " in architecture file");
 
         // Check order
         if (k > 0u && chromends[k] <= chromends[k - 1u])
@@ -181,7 +181,7 @@ void Architecture::read(const std::string &filename) {
 
         // Check if could not read
         if (file.fail())
-            throw std::runtime_error("Could not read the location of locus " + std::to_string(l) + " in architecture file");
+            throw std::runtime_error("Could not read the location of locus " + std::to_string(l + 1u) + " in architecture file");
 
         // Check order
         if (l > 0u && locations[l] <= locations[l - 1]) 
@@ -193,6 +193,9 @@ void Architecture::read(const std::string &filename) {
     if (locations[0u] < 0.0) throw std::runtime_error("Locus location must be positive in architecture file");
     if (locations.back() > chromends.back()) throw std::runtime_error("Locus location cannot be beyond the end of the last chromosome in architecture file");
 
+    // Reset maximum trait value
+    tolmax = 0.0;
+
     // For each locus...
     for (size_t l = 0u; l < nloci; ++l) {
 
@@ -201,17 +204,23 @@ void Architecture::read(const std::string &filename) {
 
         // Check if could not read
         if (file.fail())
-            throw std::runtime_error("Could not read the effect size of locus " + std::to_string(l) + " in architecture file");
+            throw std::runtime_error("Could not read the effect size of locus " + std::to_string(l + 1u) + " in architecture file");
 
-        // TODO: Test that
+        // Check sign
+        if (effects[l] < 0.0)
+            throw std::runtime_error("Effect size of locus " + std::to_string(l + 1u) + " must be positive in architecture file");
 
-        // Error if needed
-        if (effects[l] <= 0.0) 
-            throw std::runtime_error("Effect size must be strictly positive in architecture file");
-
-        // Test that
+        // Sum effect sizees
+        tolmax += effects[l];
 
     }
+
+    // Error if needed
+    if (tolmax == 0.0) 
+        throw std::runtime_error("Sum of effect sizes must be strictly positive in architecture file");
+
+    // Check
+    assert(tolmax > 0.0);
 
     // Close the file
     file.close();
@@ -220,11 +229,8 @@ void Architecture::read(const std::string &filename) {
     assert(locations.size() == nloci);
     assert(effects.size() == nloci);
 
-    // Reset maximum trait value
-    tolmax = 0.0;
-
-    // Re-compute maximum trait value
-    for (double &effect : effects) tolmax += effect;
+    // Check
+    check();
 
 }
 

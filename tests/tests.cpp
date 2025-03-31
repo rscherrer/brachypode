@@ -198,7 +198,7 @@ BOOST_AUTO_TEST_CASE(abuseWrongOutputRequestFile) {
 BOOST_AUTO_TEST_CASE(useCaseAllOutputsIfNoChoice) {
 
     // Write a parameter file with data saving but no choice
-    tst::write("parameters.txt", "savedat 1\nchoose 0");
+    tst::write("parameters.txt", "pgood 2 1.0 1.0\npgoodEnd 1.0 1.0\ntend 10\ntsave 1\nsavedat 1\nchoose 0");
 
     // Run the simulation
     doMain({"program", "parameters.txt"});
@@ -210,6 +210,24 @@ BOOST_AUTO_TEST_CASE(useCaseAllOutputsIfNoChoice) {
     BOOST_CHECK_NO_THROW(tst::read("traitmeans.dat"));
     BOOST_CHECK_NO_THROW(tst::read("individuals.dat"));
 
+    // Check some values
+    BOOST_CHECK_EQUAL(tst::read("time.dat").size(), 10u);
+    BOOST_CHECK_EQUAL(tst::read("popsize.dat").size(), 10u);
+    BOOST_CHECK_EQUAL(tst::read("patchsizes.dat").size(), 40u);
+    BOOST_CHECK_EQUAL(tst::read("traitmeans.dat").size(), 40u);
+
+    // Read the saved population sizes
+    const std::vector<double> popsizes = tst::read("popsize.dat");
+
+    // Prepare to sum
+    size_t n = 0.0;
+
+    // Sum over generations
+    for (auto popsize : popsizes) n += static_cast<size_t>(popsize);
+
+    // Check size
+    BOOST_CHECK_EQUAL(tst::read("individuals.dat").size(), 3u * n);
+
     // Cleanup
     std::remove("parameters.txt");
     std::remove("time.dat");
@@ -218,7 +236,7 @@ BOOST_AUTO_TEST_CASE(useCaseAllOutputsIfNoChoice) {
     std::remove("traitmeans.dat");
     std::remove("individuals.dat");
 
-    // TODO: Do we want to bother with checking actual values here?
+    // TODO: Check where to remove files?
 
 }
 

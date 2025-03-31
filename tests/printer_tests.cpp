@@ -35,6 +35,11 @@ BOOST_AUTO_TEST_CASE(printerOpensBuffers) {
     BOOST_CHECK(!print.check("bar"));
     BOOST_CHECK(!print.check("baz"));
 
+    // Remove files
+    std::remove("foo.dat");
+    std::remove("bar.dat");
+    std::remove("baz.dat");
+
 } 
 
 // Test that the printer can read requested output
@@ -59,6 +64,11 @@ BOOST_AUTO_TEST_CASE(printerReadsRequestedOutput) {
     BOOST_CHECK(print.check("foo"));
     BOOST_CHECK(print.check("bar"));
     BOOST_CHECK(!print.check("baz"));
+
+    // Remove files
+    std::remove("whattosave.txt");
+    std::remove("foo.dat");
+    std::remove("bar.dat");
 
 }
 
@@ -95,6 +105,11 @@ BOOST_AUTO_TEST_CASE(printerFailsWhenInvalidOutputRequested) {
         print.read("whattosave.txt");
     }, "Invalid output requested in whattosave.txt: qux");
 
+    // Remove files
+    std::remove("whattosave.txt");
+    std::remove("foo.dat");
+    std::remove("bar.dat");
+
 }
 
 // Test that saving into buffers works
@@ -115,9 +130,6 @@ BOOST_AUTO_TEST_CASE(savingIntoBuffers) {
     // An unsigned integer
     print.save("foo", static_cast<size_t>(42u));
 
-    // An integer
-    print.save("foo", -1);
-
     // Close
     print.close();
 
@@ -125,9 +137,13 @@ BOOST_AUTO_TEST_CASE(savingIntoBuffers) {
     std::vector<double> values = tst::read("foo.dat");
 
     // Check the saved value
-    BOOST_CHECK_EQUAL(values.size(), 3u);
+    BOOST_CHECK_EQUAL(values.size(), 2u);
     BOOST_CHECK_EQUAL(values[0u], 3.14);
     BOOST_CHECK_EQUAL(values[1u], 42.0);
-    BOOST_CHECK_EQUAL(values[2u], -1.0);
+
+    // Remove files
+    std::remove("foo.dat");
+    std::remove("bar.dat");
+    std::remove("baz.dat");
 
 }

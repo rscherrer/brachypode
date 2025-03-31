@@ -31,38 +31,6 @@ Buffer::Buffer(const size_t &n, const std::string &filename) :
 
 }
 
-// Function to return the last value stored
-double Buffer::last() const {
-
-    // Get last value
-    return head->back();
-
-}
-
-// Function to return the maximum capacity
-size_t Buffer::capacity() const {
-
-    // Get capacity
-    return head->capacity();
-
-}
-
-// Function to return the number of values stored
-size_t Buffer::size() const {
-
-    // Get size
-    return head->size();
-
-}
-
-// Function to check if the file is open
-bool Buffer::isopen() const {
-
-    // Check if the file is open
-    return file.is_open();
-
-}
-
 // Function to store a new value
 void Buffer::save(const double &x) {
 

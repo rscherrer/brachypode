@@ -46,6 +46,7 @@ struct Parameters {
     double nonlinear;                  // non-linearity of the tradeoff curve
     double selfing;                    // rate of selfing
     double recombination;              // recombination rate
+    double precis;                     // minimum possible realized carrying capacity
     size_t tend;                       // simulation time
     size_t tsave;                      // recording time
     size_t tchange;                    // time to initiate warming

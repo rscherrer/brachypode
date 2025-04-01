@@ -88,6 +88,9 @@ void Printer::read(const std::string &filename) {
     // Close the file
     file.close();
 
+    // Resize
+    outputs.shrink_to_fit();
+
 }
 
 // Function to open buffers
@@ -98,8 +101,6 @@ void Printer::open() {
 
     // For each output...
     for (auto &name : outputs) {
-
-        // TODO: Use find wherever possible
 
         // Set up a buffer
         buffers.emplace(name, Buffer(memory, name + ".dat"));

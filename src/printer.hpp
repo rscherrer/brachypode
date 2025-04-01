@@ -40,8 +40,6 @@ public:
     bool isopen(const std::string&);
     size_t capacity(const std::string&);
 
-    // TODO: Avoid using detection in main run?
-
 private:
 
     // Buffer size (in number of values)

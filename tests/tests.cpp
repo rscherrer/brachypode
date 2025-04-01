@@ -222,8 +222,6 @@ BOOST_AUTO_TEST_CASE(useCaseAllOutputsIfNoChoice) {
     // Check
     assert(!popsizes.empty());
 
-    // TODO: Clean up Hanno's random utilities
-
     // Sum over generations
     for (auto popsize : popsizes) n += static_cast<size_t>(popsize);
 

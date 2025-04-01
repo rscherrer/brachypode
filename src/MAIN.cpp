@@ -64,8 +64,6 @@ void doMain(const std::vector<std::string> &args) {
         // Read outputs to save
         print.read("whattosave.txt");
 
-        // TODO: Resize vector of outputs
-
         // Verbose
         std::cout << "Requested output(s) read in succesfully\n";
 

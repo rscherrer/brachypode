@@ -53,6 +53,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR})
 
+# Debug mode
+set(CMAKE_BUILD_TYPE "Debug")
+
 # Source code
 add_subdirectory(src)
 add_subdirectory(tests)
@@ -126,7 +129,7 @@ Then, run:
 ```shell
 mkdir build
 cd build
-cmake -DCMAKE_BUILD_TYPE=Debug ..
+cmake ..
 cmake --build .
 ```
 

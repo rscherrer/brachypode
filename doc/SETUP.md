@@ -41,6 +41,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR})
 
+# Release mode
+set(CMAKE_BUILD_TYPE "Release")
+
 # Source code
 add_subdirectory(src)
 ```
@@ -70,7 +73,7 @@ Then, run the following code from within the repository to create a build folder
 ```shell 
 mkdir build
 cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake ..
 cmake --build .
 ```
 

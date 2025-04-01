@@ -1,4 +1,3 @@
-```cmake
 # CMakeLists.txt
 
 # CMake
@@ -25,4 +24,3 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
 
 # Source code
 add_subdirectory(src)
-```

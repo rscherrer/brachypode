@@ -6,9 +6,15 @@ brachypoder/
 misc/
 
 # CMake setup
+vcpkg
 vcpkg/
 CMakeLists.txt
 */CMakeLists.txt
+
+# Third party
+valgrind/
+lcov/
+gprof/
 
 ##### Windows
 # Windows thumbnail cache files

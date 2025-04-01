@@ -26,15 +26,15 @@ struct Architecture {
     // constant after initialization for safety.
 
     // Hyperparameters
-    size_t nchrom;
     size_t nloci;
     double tolmax;
     
     // Parameters
-    std::vector<double> chromends; // ends of chromosomes
     std::vector<double> locations; // gene locations
     std::vector<double> effects;   // effect sizes
 
 };
+
+// TODO: Update general descriptions in headers
 
 #endif

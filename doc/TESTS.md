@@ -88,7 +88,7 @@ Finally, make sure that the following `CMakeLists.txt` file is saved in the `tes
 ```cmake
 # tests/CMakeLists.txt
 
-# Find Boost
+# Find Boost for tests
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
 # Model 'unit' files
@@ -97,15 +97,26 @@ file(GLOB_RECURSE unit ${CMAKE_SOURCE_DIR}/src/*.cpp)
 # Include test utilities
 include_directories(${CMAKE_SOURCE_DIR}/tests)
 
+# Find all test files ending with *tests.cpp
+file(GLOB TEST_FILES ${CMAKE_SOURCE_DIR}/tests/*tests.cpp)
+
 # Names of the test executables
-set(TESTS tests architecture_tests individual_tests buffer_tests printer_tests parameters_tests)
+set(TESTS tests parameters_tests architecture_tests individual_tests buffer_tests printer_tests population_tests utilities_tests)
 
 # Build each executable
-foreach(TEST IN LISTS TESTS)
-	add_executable(${TEST} ${CMAKE_SOURCE_DIR}/tests/${TEST}.cpp ${unit} ${CMAKE_SOURCE_DIR}/tests/testutils.cpp)
-	target_include_directories(${TEST} PRIVATE ${CMAKE_SOURE_DIR} ${CMAKE_SOURCE_DIR}/tests)
-	target_link_libraries(${TEST} PUBLIC Boost::unit_test_framework)
-	set_target_properties(${TEST} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/tests/$<0:>)
+foreach(TEST_FILE IN LISTS TEST_FILES)
+
+	# Extract the file name without the directory or extension
+    get_filename_component(TEST_NAME ${TEST_FILE} NAME_WE)
+
+	# Create an executable for the test
+	add_executable(${TEST_NAME} ${TEST_FILE} ${unit} ${CMAKE_SOURCE_DIR}/tests/testutils.cpp)
+	target_include_directories(${TEST_NAME} PRIVATE ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/tests)
+	target_link_libraries(${TEST_NAME} PUBLIC Boost::unit_test_framework)
+
+	# Set the output directory for the executable
+	set_target_properties(${TEST_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/tests/$<0:>)
+	
 endforeach()
 ```
 

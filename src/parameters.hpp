@@ -38,7 +38,6 @@ struct Parameters {
     double steep;                      // steepness of tolerance function
     double dispersal;                  // dispersal rate
     double mutation;                   // mutation rate
-    size_t nchrom;                     // number of chromosomes
     size_t nloci;                      // number of loci
     double effect;                     // locus effect size
     double allfreq;                    // initial frequency of allele 1

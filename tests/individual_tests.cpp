@@ -24,6 +24,28 @@ BOOST_AUTO_TEST_CASE(individualInitialization) {
 
 }
 
+// Test that an individual is initialized properly with maximum allele frequency
+BOOST_AUTO_TEST_CASE(individualInitializationWithAllMutations) {
+
+    // Parameters
+    Parameters pars;
+
+    // Tweak
+    pars.effect = 0.1;
+    pars.nloci = 20u;
+
+    // Create architecture
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(pars));
+
+    // Create individual
+    Individual ind(1.0, arch);
+
+    // Check attributes
+    BOOST_CHECK_EQUAL(ind.countAlleles(), 20u);
+    BOOST_CHECK_CLOSE(ind.getTolerance(), 2.0, 1E6);
+
+}
+
 // Test that an individual has its deme changed properly
 BOOST_AUTO_TEST_CASE(changeInDeme) {
 
@@ -146,19 +168,17 @@ BOOST_AUTO_TEST_CASE(fullMutationChangesTheWholeGenome) {
 // Test that no change if recombination is zero
 BOOST_AUTO_TEST_CASE(noChangeIfRecombinationIsZero) {
 
-    // Create architecture
-    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(Parameters()));
+    // Parameters
+    Parameters pars;
 
-    // Note: there cannot be free recombination since only one chromosome
+    // Create architecture
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(pars));
 
     // Create individual
     Individual ind(0.0, arch);
 
     // Create a pollen donor individual
-    Individual pollen(0.0, arch);
-
-    // Mutate the donor to make sure only 1-alleles
-    pollen.mutate(1.0);
+    Individual pollen(1.0, arch);
 
     // Recombine with rate zero
     ind.recombine(0.0, pollen);
@@ -168,23 +188,26 @@ BOOST_AUTO_TEST_CASE(noChangeIfRecombinationIsZero) {
 
 }
 
-// Test that recombination produces intermediate phenotypes
+// Test that recombination produces intermediate phenotypes (PROBABILISTIC)
 BOOST_AUTO_TEST_CASE(nonZeroRecombination) {
 
+    // Parameters
+    Parameters pars;
+
+    // Tweak
+    pars.nloci = 100u;
+
     // Create architecture
-    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(Parameters()));
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(pars));
 
     // Create individual
     Individual ind(0.0, arch);
 
     // Record allele sum
-    const size_t mum = ind.countAlleles();
+    const size_t mom = ind.countAlleles();
 
     // Create a pollen donor individual
-    Individual pollen(0.0, arch);
-
-    // Mutate the donor to make sure only 1-alleles
-    pollen.mutate(1.0);
+    Individual pollen(1.0, arch);
 
     // Record allele sum
     const size_t dad = pollen.countAlleles();
@@ -193,7 +216,7 @@ BOOST_AUTO_TEST_CASE(nonZeroRecombination) {
     ind.recombine(0.5, pollen);
 
     // New sum of alleles should be between original and pollen donor
-    BOOST_CHECK(ind.countAlleles() >= mum);
-    BOOST_CHECK(ind.countAlleles() <= dad);
+    BOOST_CHECK(ind.countAlleles() > mom);
+    BOOST_CHECK(ind.countAlleles() < dad);
 
 }

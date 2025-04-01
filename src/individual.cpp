@@ -95,6 +95,9 @@ void Individual::mutate(const double &mu) {
     }
 }
 
+// TODO: Remove chromosomes and free recombination
+// TODO: Check whether we need the iota gap sampler
+
 // Function to recombine genome with a pollen donor
 void Individual::recombine(const double &rho, const Individual &pollen) {
 
@@ -104,49 +107,29 @@ void Individual::recombine(const double &rho, const Individual &pollen) {
     // Exit if no recombination
     if (rho == 0.0) return;
 
+    // Check
+    assert(rho > 0.0);
+
     // Initialization
     size_t locus = 0u;
-    size_t chrom = 0u;
-
-    // Haplotypes have equal chances to be transmitted
-    auto getHaplotype = rnd::bernoulli(0.5);
 
     // Crossovers are sampled from an exponential distribution
     auto getNextCrossover = rnd::exponential(rho);
 
-    // Initialize the first crossover point beyond the end of the genome
-    double crossover = 1.1;
+    /// Sample the first crossover point
+    double crossover = getNextCrossover(rnd::rng);
 
-    // Sample the first crossover point
-    crossover = getNextCrossover(rnd::rng);
-
-    // Initialize the current position and chromosome end
+    // Initialize the current position
     double position = architecture->locations[0u];
-    double chromend = architecture->chromends[0u];
 
     // Sample the starting haplotype
-    size_t hap = getHaplotype(rnd::rng);
+    size_t hap = rnd::bernoulli(0.5)(rnd::rng);
 
     // While we progress through loci...
     while (locus < architecture->nloci) {
 
-        // What is the next thing coming up?
-        size_t next = static_cast<size_t>(crossover);
-
-        // Is it a crossover, a chromosome end, or a locus?
-        if (crossover < chromend && crossover < position) next = 0u;
-        else if (chromend < crossover && chromend < position) next = 1u;
-        else next = 2u;
-
-        // Note: With this algorithm a locus sitting exactly on a chromosome
-        // end will be considered first and hence taken as part of the previous
-        // chromosome.
-
-        // Depending on the case...
-        switch (next) {
-
-        // Upon crossover point...
-        case 0u:
+        // If the next thing coming up is a crossover point...
+        if (crossover < position) {
 
             // Switch haplotype
             hap = hap ? 0u : 1u;
@@ -154,35 +137,17 @@ void Individual::recombine(const double &rho, const Individual &pollen) {
             // Update current crossover location
             crossover += getNextCrossover(rnd::rng);
 
-            break;
+        } else {
 
-        // Upon free recombination point...
-        case 1u:
+            // Note: Otherwise, it is a locus
 
-            // Switch to random haplotype
-            hap = getHaplotype(rnd::rng);
-
-            // Move on to the next chromosome
-            ++chrom;
-
-            // Update chromosome end
-            if (chrom < architecture->nchrom) chromend = architecture->chromends[chrom];
-
-            // Make sure we are not beyond the last chromosome
-            assert(chrom < architecture->nchrom);
-
-            break;
-
-        // Upon gene...
-        default:
-
-            // If we are to read the pollen haplotype...
+            // If we are on the opposite (i.e. pollen) haplotype
             if (hap) {
 
                 // If the pollen has a different allele...
                 if (alleles.test(locus) != pollen.getAllele(locus)) {
 
-                    // Flip the allele
+                    // Flip the local allele
                     flip(locus);
                     
                 }
@@ -194,13 +159,11 @@ void Individual::recombine(const double &rho, const Individual &pollen) {
             // Update current position
             if (locus < architecture->nloci) position = architecture->locations[locus];
 
-            break;
         }
     }
 
     // Safety checks
     assert(locus == architecture->nloci);
-    assert(chrom == architecture->nchrom - 1u);
 
 }
 

@@ -25,7 +25,6 @@ Parameters::Parameters(const std::string &filename) :
     steep(2.0),
     dispersal(0.01),
     mutation(0.0001),
-    nchrom(1u),
     nloci(10u),
     effect(0.1),
     allfreq(0.1),
@@ -85,7 +84,6 @@ void Parameters::check() const {
     assert(mutation >= 0.0);
     assert(mutation <= 1.0);
     assert(nloci <= 1000u);
-    assert(nchrom != 0u);
     assert(nloci != 0u);
     assert(effect > 0.0);
     assert(allfreq >= 0.0);
@@ -224,7 +222,6 @@ void Parameters::read(const std::string &filename)
         else if (input == "steep") readin(file, steep, "steep");
         else if (input == "dispersal") readin(file, dispersal, "dispersal");
         else if (input == "mutation") readin(file, mutation, "mutation");
-        else if (input == "nchrom") readin(file, nchrom, "nchrom");
         else if (input == "nloci") readin(file, nloci, "nloci");
         else if (input == "effect") readin(file, effect, "effect");
         else if (input == "allfreq") readin(file, allfreq, "allfreq");
@@ -277,7 +274,6 @@ void Parameters::read(const std::string &filename)
     if (mutation < 0.0) throw std::runtime_error("Mutation rate must be between zero and one");
     if (mutation > 1.0) throw std::runtime_error("Mutation rate must be between zero and one");
     if (nloci > 1000) throw std::runtime_error("Number of loci must be 1000 at most");
-    if (nchrom == 0) throw std::runtime_error("Number of chromosomes must be stricly positive");
     if (nloci == 0u) throw std::runtime_error("Number of loci must be stricly positive");
     if (effect <= 0.0) throw std::runtime_error("Effect size of loci must be strictly positive");
     if (allfreq < 0.0) throw std::runtime_error("Initial allele frequency must be between zero and one");
@@ -326,7 +322,6 @@ void Parameters::save(const std::string &filename) const
     file << "steep " << steep << '\n';
     file << "dispersal " << dispersal << '\n';
     file << "mutation " << mutation << '\n';
-    file << "nchrom " << nchrom << '\n';
     file << "nloci " << nloci << '\n';
     file << "effect " << effect << '\n';
     file << "allfreq " << allfreq << '\n';

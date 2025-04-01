@@ -254,17 +254,6 @@ BOOST_AUTO_TEST_CASE(checkFailsWhenTooManyLoci) {
 
 }
 
-// Test that there cannot be zero chromosomes
-BOOST_AUTO_TEST_CASE(checkFailsWhenZeroChromosomes) {
-    
-    tst::write("parameters.txt", "nchrom 0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Number of chromosomes must be stricly positive");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
 // Test that there cannot be zero loci
 BOOST_AUTO_TEST_CASE(checkFailsWhenZeroLoci) {
     
@@ -426,5 +415,21 @@ BOOST_AUTO_TEST_CASE(parameterSavingWorks) {
 
     // Remove files
     std::remove("parameters.txt");
+
+}
+
+// Test when parameter saving does not work
+BOOST_AUTO_TEST_CASE(errorWhenSavingParameters) {
+
+    // Check
+    tst::checkError([&] {
+
+        // Create parameters
+        Parameters pars;
+
+        // Save
+        pars.save("");
+
+    }, "Unable to open file ");
 
 }

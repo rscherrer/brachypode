@@ -1,4 +1,4 @@
-# CMakeLists.txt
+# CMakeLists.txt (Release)
 
 # CMake
 cmake_minimum_required(VERSION 3.16)

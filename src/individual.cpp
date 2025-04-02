@@ -75,28 +75,26 @@ void Individual::mutate(const double &mu) {
     }
 
     // Prepare a next mutation sampler
-    auto getNextMutant = rnd::iotagap(mu);
+    auto getNextMutant = rnd::geometric(mu);
 
-    // Reset the sampler
-    getNextMutant.reset(0u);
+    // Initialize
+    size_t i = getNextMutant(rnd::rng);
 
     // For as long as it takes...
-    for (;;) {
-
-        // Sample the next mutation
-        const size_t i = getNextMutant(rnd::rng);
-
-        // Stop if we are beyond the end of the genome
-        if (i >= architecture->nloci) break;
+    while (i < architecture->nloci) {
 
         // Flip the sampled position
         flip(i);
 
-    }
-}
+        // Sample the next mutation
+        i += getNextMutant(rnd::rng);        
 
-// TODO: Remove chromosomes and free recombination
-// TODO: Check whether we need the iota gap sampler
+    }
+
+    // Check
+    assert(i >= architecture->nloci);
+
+}
 
 // Function to recombine genome with a pollen donor
 void Individual::recombine(const double &rho, const Individual &pollen) {

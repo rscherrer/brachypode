@@ -53,9 +53,16 @@ private:
     // Pointer to shared genetic parameters
     std::shared_ptr<Architecture> architecture;
 
-    // Private setter
+    // Private setters
     void flip(const size_t&);
+    void flipall();
 
+    // Mutation samplers
+    void mutateBernoulli(const double&);
+    void mutateShuffle(const double&);
+    void mutateGeometric(const double&);
+    void mutateBinomial(const double&);
+    
 };
 
 #endif

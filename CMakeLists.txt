@@ -1,4 +1,4 @@
-# CMakeLists.txt
+# CMakeLists.txt (Tests)
 
 # CMake
 cmake_minimum_required(VERSION 3.16)
@@ -28,6 +28,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED)
 # Boilerplate
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR})
+
+# Debug mode
+set(CMAKE_BUILD_TYPE "Debug")
 
 # Source code
 add_subdirectory(src)

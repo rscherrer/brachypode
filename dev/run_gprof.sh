@@ -24,15 +24,27 @@ cd "$BIN_DIR"
 # Create the parameters.txt file
 PARAM_FILE="parameters.txt"
 cat > "$PARAM_FILE" <<EOL
-tend 1000
+tend 100
 tsave 10
 verbose 1
 savedat 1
+nloci 1000
+mutation 0.01
+pgood 2 0.6 0.6
+pgoodEnd 0.6 0.6
+seed 1743763261145593612
 EOL
 echo "Created parameter file: $PARAM_FILE"
 
+# Start the timer
+SECONDS=0
+
 # Run the program with the parameter file to generate gmon.out
 ./brachypode "$PARAM_FILE"
+
+# Stop the timer and print the elapsed time
+ELAPSED_TIME=$SECONDS
+echo "Program execution time: $ELAPSED_TIME seconds"
 
 # Move gmon.out to the gprof directory
 mv gmon.out "../$GPROF_DIR/"

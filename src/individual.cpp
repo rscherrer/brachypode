@@ -55,24 +55,72 @@ void Individual::flip(const size_t &i) {
 
 }
 
-// Function to mutate the genome
-void Individual::mutate(const double &mu) {
+// Function to mutate all loci
+void Individual::flipall() {
 
-    // mu: mutation rate
+    // Flip every locus
+    for (size_t i = 0u; i < architecture->nloci; ++i) flip(i);
 
-    // No mutation if the rate is zero
-    if (mu == 0.0) return;
+}
 
-    // If the rate is one...
-    if (mu == 1.0) { 
+// Function to mutate using Bernoulli sampling
+void Individual::mutateBernoulli(const double &mu) {
+
+    // Prepare a mutation sampler
+    auto isMutation = rnd::bernoulli(mu);
+
+    // For each locus...
+    for (size_t i = 0u; i < architecture->nloci; ++i) {
+
+        // Mutate if needed
+        if (isMutation(rnd::rng)) flip(i);
+
+    }
+}
+
+// Function to sample a number of mutations and shuffle them around
+void Individual::mutateShuffle(const double &mu) {
+
+    // Sample the number of mutations
+    const size_t n = rnd::binomial(architecture->nloci, mu)(rnd::rng);
+
+    // Check
+    assert(n <= architecture->nloci);
+
+    // Exit if zero
+    if (n == 0u) return;
+
+    // If needed...
+    if (n == architecture->nloci) { 
         
-        // Flip each locus
-        for (size_t i = 0u; i < architecture->nloci; ++i) flip(i);
+        // Mutate all loci
+        flipall();
 
         // Exit
         return; 
-    
+
     }
+
+    // Prepare a vector
+    std::vector<size_t> indices(architecture->nloci);
+
+    // Fill it with indices
+    std::iota(indices.begin(), indices.end(), 0u);
+
+    // Shuffle them
+    std::shuffle(indices.begin(), indices.end(), rnd::rng);
+
+    // For each of the mutated loci... 
+    for (size_t i = 0u; i < n; ++i) {
+
+        // Flip the correct random locus
+        flip(indices[i]);
+
+    }
+}
+
+// Function to mutate using geometric sampling
+void Individual::mutateGeometric(const double &mu) {
 
     // Prepare a next mutation sampler
     auto getNextMutant = rnd::geometric(mu);
@@ -87,12 +135,93 @@ void Individual::mutate(const double &mu) {
         flip(i);
 
         // Sample the next mutation
-        i += getNextMutant(rnd::rng);        
+        i += getNextMutant(rnd::rng) + 1u;        
 
     }
 
     // Check
     assert(i >= architecture->nloci);
+
+}
+
+// Function to mutate using binomial sampling
+void Individual::mutateBinomial(const double &mu) {
+
+    // Sample the number of mutations
+    size_t n = rnd::binomial(architecture->nloci, mu)(rnd::rng);
+
+    // Check
+    assert(n <= architecture->nloci);
+
+    // Exit if zero
+    if (n == 0u) return;
+
+    // If needed...
+    if (n == architecture->nloci) { 
+        
+        // Mutate all loci
+        flipall();
+
+        // Exit
+        return; 
+
+    }
+
+    // Prepare a locus sampler
+    auto sampleLocus = rnd::random(0u, architecture->nloci);
+
+    // Prepare to record mutated loci
+    std::bitset<1000u> mutated;
+
+    // For as long as it takes...
+    while (n > 0u) {
+
+        // Sample a random locus
+        const size_t i = sampleLocus(rnd::rng);
+
+        // Check
+        assert(i < architecture->nloci);
+
+        // If it has not been hit yet...
+        if (!mutated.test(i)) {
+
+            // Flip it
+            flip(i);
+
+            // Record
+            mutated.set(i);
+
+            // Update counter
+            --n;
+
+        }
+    }
+
+    // Check
+    assert(n == 0u);
+
+}
+
+// Function to mutate the genome
+void Individual::mutate(const double &mu) {
+
+    // mu: mutation rate
+    
+    // No mutation if the rate is zero
+    if (mu == 0.0) return;
+
+    // If the rate is one...
+    if (mu == 1.0) { 
+        
+        // Mutate all loci
+        flipall();
+
+        // Exit
+        return;
+    
+    }
+    
+    mutateBernoulli(mu);
 
 }
 

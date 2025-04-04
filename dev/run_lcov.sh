@@ -56,11 +56,6 @@ if [ ! -f "$LCOV_DIR/index.html" ]; then
     exit 1
 fi
 
-# Open the report
-echo "Opening the coverage report..."
-
-xdg-open "$LCOV_DIR/index.html"
-
 # Final message to the user
 echo "Code coverage analysis completed! All output files are in the '$LCOV_DIR' directory."
 echo "You can view the coverage report by opening '$LCOV_DIR/index.html' in your browser."

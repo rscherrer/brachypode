@@ -253,7 +253,18 @@ double pop::growth(
     assert(xmax != 0.0);
 
     // Compute growth rate
-    return rmax - epsilon * xmax * utl::power(x / xmax, nu);
+    double r = rmax - epsilon * xmax * utl::power(x / xmax, nu);
+
+    // Clamp it to zero
+    r = r < 0.0 ? 0.0 : r;
+
+    // Check
+    assert(r >= 0.0);
+    assert(r <= rmax);
+    assert(r >= rmax - epsilon * xmax);
+
+    // Exit
+    return r;
 
 }
 
@@ -265,18 +276,37 @@ double pop::ricker(const size_t &n, const double &r, const double &K) {
     // K: carrying capacity
     
     // Check
-    assert(K != 0.0);
+    assert(K > 0.0);
+    assert(r >= 0.0);
 
     // Compute fitness
-    return std::exp(r * (1.0 - n / K));
+    const double fitness = std::exp(r * (1.0 - n / K));
+
+    // Check
+    assert(fitness >= 0.0);
+
+    // Exit
+    return fitness;
 
 }
 
 // Accessory function for computing survival probability
 double pop::survival(const double &x, const double &theta, const double &a) {
 
+    // Check
+    assert(x >= 0.0);
+    assert(theta >= 0.0);
+    assert(a >= 0.0);    
+
     // Compute probability
-    return 1.0 / (1.0 + std::exp(a * (theta - x)));
+    const double prob = 1.0 / (1.0 + std::exp(a * (theta - x)));
+
+    // Check
+    assert(prob >= 0.0);
+    assert(prob <= 1.0);
+
+    // Exit
+    return prob;
 
 }
 
@@ -370,6 +400,7 @@ void Population::cycle(Printer &print) {
         assert(!std::isnan(r));
         assert(r <= maxgrowth);
         assert(r >= maxgrowth - tradeoff * tolmax);
+        assert(r >= 0.0);
 
         // Cover of the focal patch in the deme
         const double cover = patch ? pgood[deme] : 1.0 - pgood[deme];

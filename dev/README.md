@@ -1,0 +1,1 @@
+This directory contains configuration files and helper scripts that were useful during the development of the program. They are not intended for use by the end user, are not designed to work across all platforms, and may require dependencies. For details about building the program, please check [this page](../doc/SETUP.md).

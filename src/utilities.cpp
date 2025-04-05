@@ -5,6 +5,8 @@
 // Function to tell if an integer is even
 bool utl::iseven(const int &n) {
 
+    // n: integer to check
+
     // Is it divisible by two?
     return n % 2 == 0;
 
@@ -12,6 +14,8 @@ bool utl::iseven(const int &n) {
 
 // Function to tell if a number is an integer
 bool utl::isinteger(const double &x) {
+
+    // x: number to check
 
     // Is the rounded version equal to the original?
     return std::floor(x) == x;
@@ -67,6 +71,9 @@ double powint(double x, int n) {
 
 // Wrapper around the power function for handling integral exponents
 double utl::power(const double &x, const double &n) {
+
+    // x: value to exponentiate
+    // n: exponent
 
     // Note: the pow() function will return NaN if the power
     // is undefined.

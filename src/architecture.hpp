@@ -35,6 +35,4 @@ struct Architecture {
 
 };
 
-// TODO: Update general descriptions in headers
-
 #endif

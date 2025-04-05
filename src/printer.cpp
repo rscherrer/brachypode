@@ -127,6 +127,8 @@ void Printer::open() {
 // Function to tell if a buffer exists
 bool Printer::exists(const std::string &name) {
 
+    // name: name of the buffer to check
+
     // Find the buffer
     auto it = buffers.find(name);
 
@@ -137,6 +139,8 @@ bool Printer::exists(const std::string &name) {
 
 // Function to tell if a buffer is open
 bool Printer::isopen(const std::string &name) {
+
+    // name: name of the buffer to check
 
     // Find the buffer
     auto it = buffers.find(name);
@@ -151,6 +155,8 @@ bool Printer::isopen(const std::string &name) {
 
 // Function to get the capacity of a buffer
 size_t Printer::capacity(const std::string &name) {
+
+    // name: name of the buffer to check
 
     // Find the buffer
     auto it = buffers.find(name);
@@ -185,6 +191,9 @@ void Printer::save(const std::string &name, const double &x) {
 
 // Version for an unsigned integer
 void Printer::save(const std::string &name, const size_t &x) {
+
+    // name: name of the buffer in which to save
+    // x: value to save
 
     // Find the buffer
     auto it = buffers.find(name);

@@ -247,7 +247,7 @@ double pop::growth(
     // xmax: maximum trait value
     // rmax: maximum growth rate
     // epsilon: trade-off strength
-    // nu: traded-off non-linearity
+    // nu: trade-off non-linearity
 
     // Check
     assert(xmax != 0.0);
@@ -271,8 +271,8 @@ double pop::growth(
 // Accessory function to compute fitness according to Ricker
 double pop::ricker(const size_t &n, const double &r, const double &K) {
 
-    // r: per capita growth rate
     // n: population density
+    // r: per capita growth rate
     // K: carrying capacity
     
     // Check
@@ -292,6 +292,10 @@ double pop::ricker(const size_t &n, const double &r, const double &K) {
 
 // Accessory function for computing survival probability
 double pop::survival(const double &x, const double &theta, const double &a) {
+
+    // x: trait value
+    // theta: stress level
+    // a: steepness of the survival function
 
     // Check
     assert(x >= 0.0);

@@ -12,7 +12,7 @@ Buffer::Buffer(const size_t &n, const std::string &name) :
 {
 
     // n: size of the buffer
-    // filename: name of the ouput file 
+    // name: name of the ouput file 
 
     // Reserve space
     head->reserve(maxsize);

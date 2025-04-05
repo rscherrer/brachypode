@@ -1,7 +1,9 @@
 #ifndef BRACHYPODE_UTILITIES_HPP
 #define BRACHYPODE_UTILITIES_HPP
 
-// This header contains the namespace Utility.
+// This header contains the namespace utl (utility).
+
+// TODO: Should I stick to headers? 
 
 #include <stdexcept>
 #include <cmath>

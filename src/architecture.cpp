@@ -46,8 +46,6 @@ void Architecture::check() const {
 
 }
 
-// TODO: Check function documentation
-
 // Function to generate a new architecture
 void Architecture::make() {
 

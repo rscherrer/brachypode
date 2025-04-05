@@ -3,8 +3,7 @@
 
 // This is the header for the namespace rnd (random). It contains aliases for
 // various kinds of probability distributions as well as a random number
-// generator. Note that the header rndutils.hpp (cc Hanno Hildebrandt) is 
-// needed for some distributions.
+// generator.
 
 // Example usage:
 //

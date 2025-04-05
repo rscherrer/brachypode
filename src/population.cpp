@@ -381,10 +381,6 @@ void Population::cycle(Printer &print) {
     // Check
     assert(!individuals->empty());
 
-    double meanfit = 0.0;
-    size_t nhigh = 0u;
-    double meanr = 0.0;
-
     // For each individual...
     for (Individual& ind : *individuals) {
 
@@ -426,19 +422,7 @@ void Population::cycle(Printer &print) {
 
         // Check
         assert(fitness >= 0.0);
-        //assert(fitness <= std::exp(r));
-
-        meanfit += fitness;
-        if (fitness > 1E6) ++nhigh; 
-        meanr += r;
-
-        if (fitness > 1E6) {
-
-            std::cout << r << '\n';
-            std::cout << n << '\n';
-            std::cout << Ktot << '\n';
-
-        }
+        assert(fitness <= std::exp(r));
 
         // Realized number of seeds
         const size_t nseeds = rnd::poisson(fitness)(rnd::rng);
@@ -450,14 +434,6 @@ void Population::cycle(Printer &print) {
         totseeds += nseeds;
 
     }
-
-    meanfit /= popsize;
-    meanr /= popsize;
-
-    //std::cout << totseeds << '\n';
-    //std::cout << meanfit << '\n';
-    //std::cout << nhigh << '\n';
-    //std::cout << meanr << '\n';
 
     // Prepare space to welcome newborns
     newborns->reserve(totseeds);

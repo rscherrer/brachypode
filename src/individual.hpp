@@ -22,6 +22,12 @@ public:
     void mutate(const double&);
     void recombine(const double&, const Individual&);
 
+    // Mutation samplers
+    void mutateBernoulli(const double&);
+    void mutateShuffle(const double&);
+    void mutateGeometric(const double&);
+    void mutateBinomial(const double&);
+    
     // Resetters
     void setDeme(const size_t&);
     void setPatch(const size_t&);
@@ -56,12 +62,6 @@ private:
     // Private setters
     void flip(const size_t&);
     void flipall();
-
-    // Mutation samplers
-    void mutateBernoulli(const double&);
-    void mutateShuffle(const double&);
-    void mutateGeometric(const double&);
-    void mutateBinomial(const double&);
     
 };
 

@@ -12,6 +12,9 @@ TESTS_DIR="./bin/tests"
 # Path to the Valgrind logs folder
 LOGS_DIR="./valgrind"
 
+# Root directory
+ROOT_DIR=$(pwd)
+
 # Check if the tests directory exists
 if [ ! -d "$TESTS_DIR" ]; then
     echo "Error: Tests directory '$TESTS_DIR' does not exist."
@@ -49,6 +52,6 @@ for TEST_EXECUTABLE in *; do
 done
 
 # Migrate log to top level
-mv "$TESTS_DIR/$LOGS_DIR" "$LOGS_DIR"
+mv "$TESTS_DIR/$LOGS_DIR" "$ROOT_DIR"
 
 echo "All tests completed! Valgrind logs are in the '$LOGS_DIR' directory."

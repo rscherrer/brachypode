@@ -19,7 +19,7 @@ fi
 cd "$TESTS_DIR"
 
 # Loop through all executables in the tests directory
-for TEST_EXECUTABLE in *; do
+for TEST_EXECUTABLE in *tests; do
     if [ -x "$TEST_EXECUTABLE" ]; then
 
         # Run tests

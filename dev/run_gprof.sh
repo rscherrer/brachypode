@@ -29,10 +29,11 @@ tsave 10
 verbose 1
 savedat 1
 nloci 1000
-mutation 0.01
-pgood 2 0.6 0.6
-pgoodEnd 0.6 0.6
-seed 1743763261145593612
+mutation 0.001
+pgood 1 1
+pgoodEnd 1
+effect 0.000000001
+savepars 1
 EOL
 echo "Created parameter file: $PARAM_FILE"
 

@@ -165,6 +165,90 @@ BOOST_AUTO_TEST_CASE(fullMutationChangesTheWholeGenome) {
 
 }
 
+// Test the different kinds of mutation
+BOOST_AUTO_TEST_CASE(differentMutationTypes) {
+
+    // Parameters
+    Parameters pars;
+
+    // Create architecture
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(pars));
+
+    // Create individual
+    Individual ind(0.0, arch);
+
+    // Mutate with some rate
+    BOOST_CHECK_NO_THROW(ind.mutate(0.9));
+    BOOST_CHECK_NO_THROW(ind.mutate(0.6));
+    BOOST_CHECK_NO_THROW(ind.mutate(0.05));
+    BOOST_CHECK_NO_THROW(ind.mutate(0.001));
+
+}
+
+// Test early exit in binomial mutation
+BOOST_AUTO_TEST_CASE(earlyExitInBinomialMutation) {
+
+    // Parameters
+    Parameters pars;
+
+    // Tweak
+    pars.nloci = 10u;
+
+    // Create architecture
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(pars));
+
+    // Create individual
+    Individual ind(0.0, arch);
+
+    // Binomial mutation with full probability
+    ind.mutateBinomial(1.0);
+
+    // Check that all alleles have been mutated
+    BOOST_CHECK_EQUAL(ind.countAlleles(), 10u); 
+
+    // Revert all mutations with shuffle
+    ind.mutateShuffle(1.0);
+
+    // Check
+    BOOST_CHECK_EQUAL(ind.countAlleles(), 0u);
+    
+    // Run with zero mutations
+    ind.mutateBinomial(0.0);
+
+    // Check
+    BOOST_CHECK_EQUAL(ind.countAlleles(), 0u);
+
+    // Same with shuffle
+    ind.mutateShuffle(0.0);
+
+    // Check
+    BOOST_CHECK_EQUAL(ind.countAlleles(), 0u);
+
+}
+
+// Cover binomial mutations with nonzero rate (PROBABILISTIC)
+BOOST_AUTO_TEST_CASE(nonZeroBinomialMutation) {
+
+    // Parameters
+    Parameters pars;
+
+    // Tweak
+    pars.nloci = 1000u;
+
+    // Create architecture
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(pars));
+
+    // Create individual
+    Individual ind(0.0, arch);
+
+    // Binomial mutation with some probability
+    ind.mutateBinomial(0.5);
+
+    // Check that some alleles have been mutated
+    BOOST_CHECK(ind.countAlleles() > 0u); 
+
+}
+
 // Test that no change if recombination is zero
 BOOST_AUTO_TEST_CASE(noChangeIfRecombinationIsZero) {
 
@@ -213,7 +297,7 @@ BOOST_AUTO_TEST_CASE(nonZeroRecombination) {
     const size_t dad = pollen.countAlleles();
 
     // Recombine with some rate
-    ind.recombine(0.5, pollen);
+    ind.recombine(30.0, pollen);
 
     // New sum of alleles should be between original and pollen donor
     BOOST_CHECK(ind.countAlleles() > mom);

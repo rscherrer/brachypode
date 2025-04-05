@@ -168,7 +168,7 @@ void Individual::mutateBinomial(const double &mu) {
     }
 
     // Prepare a locus sampler
-    auto sampleLocus = rnd::random(0u, architecture->nloci);
+    auto sampleLocus = rnd::random(0u, architecture->nloci - 1u);
 
     // Prepare to record mutated loci
     std::bitset<1000u> mutated;
@@ -221,8 +221,28 @@ void Individual::mutate(const double &mu) {
     
     }
     
-    mutateBernoulli(mu);
+    // Depending on the muation rate...
+    if (mu < 0.01) {
 
+        // Mutate using geometric sampling
+        mutateGeometric(mu);
+
+    } else if (mu < 0.1) {
+
+        // Mutate using binomial sampling
+        mutateBinomial(mu);
+
+    } else if (mu < 0.9) {
+
+        // Mutate using shuffle sampling
+        mutateShuffle(mu);
+
+    } else {
+
+        // Mutate using Bernoulli sampling
+        mutateBernoulli(mu);
+
+    }
 }
 
 // Function to recombine genome with a pollen donor
@@ -290,7 +310,7 @@ void Individual::recombine(const double &rho, const Individual &pollen) {
     }
 
     // Safety checks
-    assert(locus == architecture->nloci);
+    assert(locus == architecture->nloci); 
 
 }
 

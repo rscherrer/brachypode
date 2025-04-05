@@ -296,7 +296,7 @@ BOOST_AUTO_TEST_CASE(useCaseWithVerbose) {
 BOOST_AUTO_TEST_CASE(useCaseWithExtinction) {
 
     // Write a parameter file doomed to go extinct in one generation
-    tst::write("parameters.txt", "popsize 1\nmaxgrowth 0\ntradeoff 100\nallfreq 1");
+    tst::write("parameters.txt", "popsize 10\nmaxgrowth 0\ntradeoff 100\nallfreq 0\npgood 1 0.0\npgoodEnd 0.0\neffect 0.001\nnloci 100");
 
     // Note: there is a nonzero chance that the population does not
     // go extinct.

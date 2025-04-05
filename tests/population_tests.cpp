@@ -176,6 +176,9 @@ BOOST_AUTO_TEST_CASE(populationGoesExtinct) {
     pars.maxgrowth = 0.0;
     pars.tradeoff = 100.0;
     pars.allfreq = 1.0;
+    pars.effect = 0.1;
+    pars.pgood = { 0.0, 0.0 };
+    pars.pgoodEnd = { 0.0, 0.0 };
 
     // Note: Since the demographics follow Ricker dynamics we cannot
     // guarantee that the number of offspring will be zero, as this

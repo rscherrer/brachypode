@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE(abuseWrongOutputRequestFile) {
 BOOST_AUTO_TEST_CASE(useCaseAllOutputsIfNoChoice) {
 
     // Write a parameter file with data saving but no choice
-    tst::write("parameters.txt", "pgood 2 1.0 1.0\npgoodEnd 1.0 1.0\ntend 10\ntsave 1\nsavedat 1\nchoose 0");
+    tst::write("parameters.txt", "ndemes 2\npgood 0.8 0.8\npgoodEnd 0.1 0.1\ntend 10\ntsave 1\nsavedat 1\nchoose 0");
 
     // Run the simulation
     doMain({"program", "parameters.txt"});
@@ -277,7 +277,7 @@ BOOST_AUTO_TEST_CASE(useCaseSowingIndividualsAtRandom) {
 BOOST_AUTO_TEST_CASE(useCaseWithVerbose) {
 
     // Write a parameter file with verbose
-    tst::write("parameters.txt", "verbose 1\ntend 1\npopsize 10\npgood 3 1.0 1.0 1.0");
+    tst::write("parameters.txt", "verbose 1\ntend 1\npopsize 10\nndemes 3\npgood 1 1 1\npgoodEnd 0 0 0");
 
     // Capture output
     const std::string output = tst::captureOutput([&] { doMain({"program", "parameters.txt"}); });
@@ -296,7 +296,7 @@ BOOST_AUTO_TEST_CASE(useCaseWithVerbose) {
 BOOST_AUTO_TEST_CASE(useCaseWithExtinction) {
 
     // Write a parameter file doomed to go extinct in one generation
-    tst::write("parameters.txt", "popsize 10\nmaxgrowth 0\ntradeoff 100\nallfreq 0\npgood 1 0.0\npgoodEnd 0.0\neffect 0.001\nnloci 100");
+    tst::write("parameters.txt", "popsize 10\nmaxgrowth 0\ntradeoff 100\nallfreq 0\nndemes 1\npgood 0.0\npgoodEnd 0.0\neffect 0.001\nnloci 100");
 
     // Note: there is a nonzero chance that the population does not
     // go extinct.

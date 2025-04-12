@@ -5,13 +5,13 @@
 // of the parameters of the simulation. All parameters have default values that can be 
 // modified by reading in a parameter text file with user-defined values.
 
-#include <fstream>
 #include <iostream>
 #include <chrono>
-#include <cassert>
 #include <cstdint>
-#include <string>
-#include <vector>
+
+#include "reader.hpp"
+
+// TODO: Space out wherever applicable?
 
 struct Parameters {
 
@@ -23,11 +23,9 @@ struct Parameters {
     void read(const std::string&);
     void save(const std::string&) const;
 
-    // Note: parameters are public for easy access but should be made
-    // constant after initialization for safety. 
-
     // Parameters
     size_t popsize;                    // initial population size
+    size_t ndemes;                     // number of demes
     std::vector<double> pgood;         // proportion of good patches in each deme
     std::vector<double> pgoodEnd;      // pgood after climate change
     std::vector<double> stress;        // stress level in each patch
@@ -45,8 +43,8 @@ struct Parameters {
     double nonlinear;                  // non-linearity of the tradeoff curve
     double selfing;                    // rate of selfing
     double recombination;              // recombination rate
-    double precis;                     // minimum possible realized carrying capacity
-    double memory;                     // memory used for data storage (in MB)
+    double minrealk;                   // minimum possible realized carrying capacity
+    double memsave;                    // memory used for data storage (in MB)
     size_t tend;                       // simulation time
     size_t tsave;                      // recording time
     size_t tchange;                    // time to initiate warming

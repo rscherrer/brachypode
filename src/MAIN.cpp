@@ -56,7 +56,7 @@ void doMain(const std::vector<std::string> &args) {
     if (pars.savepars) pars.save("paramlog.txt");
 
     // Create a printer
-    Printer print(valid(), pars.memory);
+    Printer print(valid(), pars.memsave);
 
     // If needed...
     if (pars.savedat && pars.choose) {

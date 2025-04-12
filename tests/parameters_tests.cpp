@@ -24,37 +24,97 @@ BOOST_AUTO_TEST_CASE(parametersCreated) {
 BOOST_AUTO_TEST_CASE(readParameters)
 {
 
-    // Write a file with custom parameters
-    tst::write("parameters.txt", "popsize 42\nselfing 0.8734565362532\n");
+    // Prepare content of parameter file
+    std::ostringstream content;
+
+    // Add lines
+    content << "popsize 10\n";
+    content << "ndemes 2\n";
+    content << "pgood 0.1 0.2\n";
+    content << "pgoodEnd 0.1 0.2\n";
+    content << "capacities 10 20\n";
+    content << "capacitiesEnd 10 20\n";
+    content << "stress 0.1 0.2\n";
+    content << "stressEnd 0.1 0.2\n";
+    content << "maxgrowth 0.1\n";
+    content << "steep 0.1\n";
+    content << "dispersal 0.1\n";
+    content << "mutation 0.1\n";
+    content << "recombination 0.1\n";
+    content << "nloci 4\n";
+    content << "effect 0.1\n";
+    content << "tradeoff 0.1\n";
+    content << "nonlinear 0.1\n";
+    content << "selfing 0.1\n";
+    content << "allfreq 0.1\n";
+    content << "minrealk 0.1\n";
+    content << "memsave 0.1\n";
+    content << "tend 10\n"; 
+    content << "tsave 1\n";
+    content << "twarming 10\n";
+    content << "tchange 10\n";
+    content << "seed 42\n";
+    content << "sow 1\n";
+    content << "loadarch 0\n";
+    content << "savepars 1\n";
+    content << "savearch 1\n";
+    content << "savedat 1\n";
+    content << "choose 1\n";
+    content << "verbose 1\n";
 
     // Read the parameter file
     Parameters pars("parameters.txt");
 
     // Check that the parameters have been updated
-    BOOST_CHECK_EQUAL(pars.popsize, 42u);
-    BOOST_CHECK_EQUAL(pars.selfing, 0.8734565362532);
+    BOOST_CHECK_EQUAL(pars.popsize, 10u);
+    BOOST_CHECK_EQUAL(pars.ndemes, 2u);
+    BOOST_CHECK_EQUAL(pars.pgood[0u], 0.1);
+    BOOST_CHECK_EQUAL(pars.pgood[1u], 0.2);
+    BOOST_CHECK_EQUAL(pars.pgoodEnd[0u], 0.1);
+    BOOST_CHECK_EQUAL(pars.pgoodEnd[1u], 0.2);
+    BOOST_CHECK_EQUAL(pars.capacities[0u], 10.0);
+    BOOST_CHECK_EQUAL(pars.capacities[1u], 20.0);
+    BOOST_CHECK_EQUAL(pars.capacitiesEnd[0u], 10.0);
+    BOOST_CHECK_EQUAL(pars.capacitiesEnd[1u], 20.0);
+    BOOST_CHECK_EQUAL(pars.stress[0u], 0.1);
+    BOOST_CHECK_EQUAL(pars.stress[1u], 0.2);
+    BOOST_CHECK_EQUAL(pars.stressEnd[0u], 0.1);
+    BOOST_CHECK_EQUAL(pars.stressEnd[1u], 0.2);
+    BOOST_CHECK_EQUAL(pars.maxgrowth, 0.1);
+    BOOST_CHECK_EQUAL(pars.steep, 0.1);
+    BOOST_CHECK_EQUAL(pars.dispersal, 0.1);
+    BOOST_CHECK_EQUAL(pars.mutation, 0.1);
+    BOOST_CHECK_EQUAL(pars.recombination, 0.1);
+    BOOST_CHECK_EQUAL(pars.nloci, 4u);
+    BOOST_CHECK_EQUAL(pars.effect, 0.1);
+    BOOST_CHECK_EQUAL(pars.tradeoff, 0.1);
+    BOOST_CHECK_EQUAL(pars.nonlinear, 0.1);
+    BOOST_CHECK_EQUAL(pars.selfing, 0.1);
+    BOOST_CHECK_EQUAL(pars.allfreq, 0.1);
+    BOOST_CHECK_EQUAL(pars.minrealk, 0.1);
+    BOOST_CHECK_EQUAL(pars.memsave, 0.1);
+    BOOST_CHECK_EQUAL(pars.tend, 10u);
+    BOOST_CHECK_EQUAL(pars.tsave, 1u);
+    BOOST_CHECK_EQUAL(pars.twarming, 10u);
+    BOOST_CHECK_EQUAL(pars.tchange, 10u);
+    BOOST_CHECK_EQUAL(pars.seed, 42u);
+    BOOST_CHECK(pars.sow);
+    BOOST_CHECK(!pars.loadarch);
+    BOOST_CHECK(pars.savepars);
+    BOOST_CHECK(pars.savearch);
+    BOOST_CHECK(pars.savedat);
+    BOOST_CHECK(pars.choose);
+    BOOST_CHECK(pars.verbose);
 
     // Remove files
     std::remove("parameters.txt");
 
 }
 
-// Test that parameter reading fails when the file does not exist
-BOOST_AUTO_TEST_CASE(readParametersFailWhenNoFile)
-{
-
-    // Try to...
-    tst::checkError([&]() {
-
-        // Read non-existing file
-        Parameters pars("nonexistent.txt");
-
-    }, "Unable to open file nonexistent.txt");
-
-}
+// TODO: Test missing file in main
 
 // Test that parameter reading fails when invalid parameters are provided
-BOOST_AUTO_TEST_CASE(readParametersFailWhenInvalidParameters)
+BOOST_AUTO_TEST_CASE(readInvalidParameters)
 {
 
     // Write a file with invalid parameters
@@ -66,333 +126,578 @@ BOOST_AUTO_TEST_CASE(readParametersFailWhenInvalidParameters)
         // Read the file
         Parameters pars("parameters.txt");
 
-    }, "Invalid parameter name: invalid");
+    }, "Invalid parameter: invalid in line 3 of file parameters.txt");
 
     // Remove files
     std::remove("parameters.txt");
 
 }
 
-// Test that parameter reading fails when a value could not be read in
-BOOST_AUTO_TEST_CASE(readParametersFailWhenValueCannotBeRead)
+// Test error upon invalid starting population size
+BOOST_AUTO_TEST_CASE(readInvalidPopSize)
 {
 
-    // Write a file with invalid value
-    tst::write("parameters.txt", "popsize 10\nselfing invalid\n");
-
-    // Try to...
-    tst::checkError([&]() {
-
-        // Read the file
-        Parameters pars("parameters.txt");
-
-    }, "Could not read value for parameter: selfing");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
-// Test that error when initial population size is zero
-BOOST_AUTO_TEST_CASE(checkFailsWhenInitialPopSizeIsZero) {
-    
-    tst::write("parameters.txt", "popsize 0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Initial population size must be strictly positive");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
-// Test that error when zero demes
-BOOST_AUTO_TEST_CASE(checkFailsWhenZeroDemes) {
-    
-    tst::write("parameters.txt", "pgood 0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Number of demes must be strictly positive");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
-// Test that the proportion of good patches should be between zero and one
-BOOST_AUTO_TEST_CASE(checkFailsWhenPropGoodPatchesNotBetweenZeroAndOne) {
-    
-    tst::write("parameters.txt", "pgood 2 -0.1 1\npgoodEnd 0.1 0.1");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Proportion of good patches must be between zero and one");
-
-    tst::write("parameters.txt", "pgood 2 0.1 1.1\npgoodEnd 0.1 0.1");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Proportion of good patches must be between zero and one");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
-// Test that the proportion of good patches after warming should be between zero and one
-BOOST_AUTO_TEST_CASE(checkFailsWhenPropGoodPatchesAfterWarmingNotBetweenZeroAndOne) {
-    
-    tst::write("parameters.txt", "pgood 2 0.1 0.1\npgoodEnd -0.1 1");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Proportion of good patches after warming must be between zero and one");
-
-    tst::write("parameters.txt", "pgood 2 0.1 0.1\npgoodEnd 0.1 1.1");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Proportion of good patches after warming must be between zero and one");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
-// Test that carrying capacity must be positive
-BOOST_AUTO_TEST_CASE(checkFailsWhenCarryingCapacityNotPositive) {
-
-    tst::write("parameters.txt", "capacities -1.0 100.0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Carrying capacity must be strictly positive");
-
-    tst::write("parameters.txt", "capacities 0.0 100.0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Carrying capacity must be strictly positive");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
-// Test that carrying capacity after warming cannot be negative
-BOOST_AUTO_TEST_CASE(checkFailsWhenCarryingCapacityAfterWarmingNotPositive) {
-
-    tst::write("parameters.txt", "capacitiesEnd -1.0 100.0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Carrying capacity after warming must be strictly positive");
-
-    tst::write("parameters.txt", "capacitiesEnd 0.0 100.0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Carrying capacity after warming must be strictly positive");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
-// Test that stress level cannot be negative
-BOOST_AUTO_TEST_CASE(checkFailsWhenStressLevelNegative) {
-    
-    tst::write("parameters.txt", "stress -1.0 0.0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Stress level must be positive");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
-// Test that stress level after warming cannot be negative
-BOOST_AUTO_TEST_CASE(checkFailsWhenStressLevelAfterWarmingNegative) {
-    
-    tst::write("parameters.txt", "stressEnd -1.0 0.0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Stress level after warming must be positive");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
-// Test that maximum growth rate cannot be negative
-BOOST_AUTO_TEST_CASE(checkFailsWhenMaxGrowthRateNegative) {
-    
-    tst::write("parameters.txt", "maxgrowth -1.0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Maximum growth rate must be positive");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
-// Test that steepness of the tolerance function cannot be negative
-BOOST_AUTO_TEST_CASE(checkFailsWhenSteepnessNegative) {
-    
-    tst::write("parameters.txt", "steep -1.0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Steepness of the tolerance function must be positive");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
-// Test that dispersal rate should be between zero and one
-BOOST_AUTO_TEST_CASE(checkFailsWhenDispersalRateOutOfBounds) {
-    
-    tst::write("parameters.txt", "dispersal 1.2");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Dispersal rate must be between zero and one");
-
-    tst::write("parameters.txt", "dispersal -0.1");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Dispersal rate must be between zero and one");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
-// Test that mutation rate should be between zero and one
-BOOST_AUTO_TEST_CASE(checkFailsWhenMutationRateOutOfBounds) {
-    
-    tst::write("parameters.txt", "mutation 1.2");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Mutation rate must be between zero and one");
-
-    tst::write("parameters.txt", "mutation -0.1");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Mutation rate must be between zero and one");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
-// Test that there cannot be more than 1000 loci
-BOOST_AUTO_TEST_CASE(checkFailsWhenTooManyLoci) {
-    
-    tst::write("parameters.txt", "nloci 1001");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Number of loci must be 1000 at most");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
-// Test that there cannot be zero loci
-BOOST_AUTO_TEST_CASE(checkFailsWhenZeroLoci) {
-    
-    tst::write("parameters.txt", "nloci 0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Number of loci must be stricly positive");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
-// Test that effect size cannot be negative or zero
-BOOST_AUTO_TEST_CASE(checkFailsWhenEffectSizeNegative) {
-
-    tst::write("parameters.txt", "effect 0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Effect size of loci must be strictly positive");
-
-    tst::write("parameters.txt", "effect -0.1");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Effect size of loci must be strictly positive");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
-// Test that initial allele frequency should be between zero and one
-BOOST_AUTO_TEST_CASE(checkFailsWhenAlleleFrequencyOutOfBounds) {
-    
-    tst::write("parameters.txt", "allfreq 1.2");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Initial allele frequency must be between zero and one");
-
-    tst::write("parameters.txt", "allfreq -0.1");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Initial allele frequency must be between zero and one");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
-// Test that trade-off cannot be negative
-BOOST_AUTO_TEST_CASE(checkFailsWhenTradeOffNegative) {
-    
-    tst::write("parameters.txt", "tradeoff -1.0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Trade-off strength must be positive");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
-// Test that fails when zero or negative non-linearity parameter
-BOOST_AUTO_TEST_CASE(checkFailsWhenWrongNonLinearTradeOff) {
-    
-    tst::write("parameters.txt", "tradeoff 0.5\nnonlinear 0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Non-linearity parameter must be strictly positive");
-
-    tst::write("parameters.txt", "tradeoff 0.5\nnonlinear -0.5");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Non-linearity parameter must be strictly positive");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
-// Test that rate of selfing must be between zero and one
-BOOST_AUTO_TEST_CASE(checkFailsWhenSelfingRateOutOfBounds) {
-    
-    tst::write("parameters.txt", "selfing 1.2");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Rate of selfing must be between zero and one");
-
-    tst::write("parameters.txt", "selfing -0.1");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Rate of selfing must be between zero and one");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
-// Test that recombination rate cannot be negative
-BOOST_AUTO_TEST_CASE(checkFailsWhenRecombinationRateNegative) {
-    
-    tst::write("parameters.txt", "recombination -1.0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Recombination rate must be positive");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
-// Test that precision threshold cannot be negative
-BOOST_AUTO_TEST_CASE(checkFailsWhenPrecisionThresholdNegativeOrZero) {
-    
-    tst::write("parameters.txt", "precis -1.0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Precision threshold must be strictly positive");
-
-    tst::write("parameters.txt", "precis 0.0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Precision threshold must be strictly positive");
-
-    // Remove files
-    std::remove("parameters.txt");
-
-}
-
-// Test that buffer must be at least capable of containing one vlue
-BOOST_AUTO_TEST_CASE(checkFailsWhenMemoryTooSmall) {
-
-    // One byte should be too small
-    tst::write("parameters.txt", "memory 0.000001");
+    // Write a file with invalid population size
+    tst::write("p1.txt", "popsize 0\n");
+    tst::write("p2.txt", "popsize 10 10\n");
 
     // Check
-    tst::checkError([&]{ 
-        Parameters pars("parameters.txt"); 
-    }, "Memory use per buffer must be at least " + std::to_string(sizeof(double)) + " bytes");
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Parameter popsize must be strictly positive in line 1 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Too many values for parameter popsize in line 1 of file p2.txt");
 
     // Remove files
-    std::remove("parameters.txt");
+    std::remove("p1.txt");
+    std::remove("p2.txt");
 
 }
 
-// Test that simulation time cannot be zero
-BOOST_AUTO_TEST_CASE(checkFailsWhenSimulationTimeZero) {
-    
-    tst::write("parameters.txt", "tend 0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Simulation time must be strictly positive");
+// Test error upon invalid number of demes
+BOOST_AUTO_TEST_CASE(readInvalidNDemes)
+{
+
+    // Write a file with invalid number of demes
+    tst::write("p1.txt", "ndemes 0\n");
+    tst::write("p2.txt", "ndemes 10 10\n");
+
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Parameter ndemes must be strictly positive in line 1 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Too many values for parameter ndemes in line 1 of file p2.txt");
 
     // Remove files
-    std::remove("parameters.txt");
+    std::remove("p1.txt");
+    std::remove("p2.txt");
 
 }
 
-// Test that save time interval cannot be zero
-BOOST_AUTO_TEST_CASE(checkFailsWhenSaveTimeIntervalZero) {
-    
-    tst::write("parameters.txt", "tsave 0");
-    tst::checkError([&]{ Parameters pars("parameters.txt"); }, "Data saving frequency must be strictly positive");
+// Test error upon invalid proportion of good patches
+BOOST_AUTO_TEST_CASE(readInvalidPGood)
+{
+
+    // Write a file with invalid proportion of good patches
+    tst::write("p1.txt", "ndemes 2\npgood 0.5 0.5 0.5\npgoodEnd 0.5 0.5\n");
+    tst::write("p2.txt", "ndemes 2\npgood 0.5\npgoodEnd 0.5 0.5\n");
+    tst::write("p3.txt", "ndemes 2\npgood 0.5 1.5\npgoodEnd 0.5 0.5\n");
+
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter pgood in line 2 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Too few values for parameter pgood in line 2 of file p2.txt");
+    tst::checkError([&]() { Parameters pars("p3.txt"); }, "Parameter pgood must be between 0 and 1 in line 2 of file p3.txt");
 
     // Remove files
-    std::remove("parameters.txt");
+    std::remove("p1.txt");
+    std::remove("p2.txt");
+    std::remove("p3.txt");
 
+}
+
+// Test error upon invalid proportion of good patches after warming
+BOOST_AUTO_TEST_CASE(readInvalidPGoodEnd)
+{
+
+    // Write a file with invalid proportion of good patches after warming
+    tst::write("p1.txt", "ndemes 2\npgood 0.5 0.5\npgoodEnd 0.5 0.5 0.5\n");
+    tst::write("p2.txt", "ndemes 2\npgood 0.5 0.5\npgoodEnd 0.5\n");
+    tst::write("p3.txt", "ndemes 2\npgood 0.5 0.5\npgoodEnd 0.5 1.5\n");
+
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter pgoodEnd in line 3 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Too few values for parameter pgoodEnd in line 3 of file p2.txt");
+    tst::checkError([&]() { Parameters pars("p3.txt"); }, "Parameter pgoodEnd must be between 0 and 1 in line 3 of file p3.txt");
+
+    // Remove files
+    std::remove("p1.txt");
+    std::remove("p2.txt");
+    std::remove("p3.txt");
+
+}
+
+// Test error upon invalid stress levels
+BOOST_AUTO_TEST_CASE(readInvalidStress)
+{
+
+    // Write a file with invalid stress levels
+    tst::write("p1.txt", "stress 0.5 0.5 0.5");
+    tst::write("p2.txt", "stress 0.5");
+    tst::write("p3.txt", "stress 0.5 -0.5");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter stress in line 1 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Too few values for parameter stress in line 1 of file p2.txt");
+    tst::checkError([&]() { Parameters pars("p3.txt"); }, "Parameter stress must be positive in line 1 of file p3.txt");
+
+    // Remove files
+    std::remove("p1.txt");
+    std::remove("p2.txt");
+    std::remove("p3.txt");
+
+}
+
+// Test error upon invalid stress levels after warming
+BOOST_AUTO_TEST_CASE(readInvalidStressEnd)
+{
+
+    // Write a file with invalid stress levels after warming
+    tst::write("p1.txt", "stressEnd 0.5 0.5 0.5");
+    tst::write("p2.txt", "stressEnd 0.5");
+    tst::write("p3.txt", "stressEnd 0.5 -0.5");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter stressEnd in line 1 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Too few values for parameter stressEnd in line 1 of file p2.txt");
+    tst::checkError([&]() { Parameters pars("p3.txt"); }, "Parameter stressEnd must be positive in line 1 of file p3.txt");
+
+    // Remove files
+    std::remove("p1.txt");
+    std::remove("p2.txt");
+    std::remove("p3.txt");
+
+}
+
+// Test error upon invalid carrying capacities
+BOOST_AUTO_TEST_CASE(readInvalidCapacities)
+{
+
+    // Write a file with invalid carrying capacities
+    tst::write("p1.txt", "capacities 0.5 0.5 0.5");
+    tst::write("p2.txt", "capacities 0.5");
+    tst::write("p3.txt", "capacities 10 0");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter capacities in line 1 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Too few values for parameter capacities in line 1 of file p2.txt");
+    tst::checkError([&]() { Parameters pars("p3.txt"); }, "Parameter capacities must be strictly positive in line 1 of file p3.txt");
+
+    // Remove files
+    std::remove("p1.txt");
+    std::remove("p2.txt");
+    std::remove("p3.txt");
+
+}
+
+// Test error upon invalid carrying capacities after warming
+BOOST_AUTO_TEST_CASE(readInvalidCapacitiesEnd)
+{
+
+    // Write a file with invalid carrying capacities after warming
+    tst::write("p1.txt", "capacitiesEnd 0.5 0.5 0.5");
+    tst::write("p2.txt", "capacitiesEnd 0.5");
+    tst::write("p3.txt", "capacitiesEnd 10 0");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter capacitiesEnd in line 1 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Too few values for parameter capacitiesEnd in line 1 of file p2.txt");
+    tst::checkError([&]() { Parameters pars("p3.txt"); }, "Parameter capacitiesEnd must be strictly positive in line 1 of file p3.txt");
+
+    // Remove files
+    std::remove("p1.txt");
+    std::remove("p2.txt");
+    std::remove("p3.txt");
+
+}
+
+// Test error upon invalid maximum growth rate
+BOOST_AUTO_TEST_CASE(readInvalidMaxGrowth)
+{
+
+    // Write a file with invalid maximum growth rate
+    tst::write("p1.txt", "maxgrowth 0.5 0.5");
+    tst::write("p2.txt", "maxgrowth -0.5");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter maxgrowth in line 1 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Parameter maxgrowth must be positive in line 1 of file p2.txt");
+
+    // Remove files
+    std::remove("p1.txt");
+    std::remove("p2.txt");
+
+}
+
+// Test error upon invalid steepness of the tolerance function
+BOOST_AUTO_TEST_CASE(readInvalidSteep)
+{
+
+    // Write a file with invalid steepness of the tolerance function
+    tst::write("p1.txt", "steep 0.5 0.5");
+    tst::write("p2.txt", "steep -0.5");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter steep in line 1 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Parameter steep must be positive in line 1 of file p2.txt");
+
+    // Remove files
+    std::remove("p1.txt");
+    std::remove("p2.txt");
+
+}
+
+// Test error upon invalid dispersal rate
+BOOST_AUTO_TEST_CASE(readInvalidDispersal)
+{
+
+    // Write a file with invalid dispersal rate
+    tst::write("p1.txt", "dispersal 0.5 0.5");
+    tst::write("p2.txt", "dispersal 1.1");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter dispersal in line 1 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Parameter dispersal must be between 0 and 1 in line 1 of file p2.txt");
+
+    // Remove files
+    std::remove("p1.txt");
+    std::remove("p2.txt");
+
+}
+
+// Test error upon invalid mutation rate
+BOOST_AUTO_TEST_CASE(readInvalidMutation)
+{
+
+    // Write a file with invalid mutation rate
+    tst::write("p1.txt", "mutation 0.5 0.5");
+    tst::write("p2.txt", "mutation 1.1");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter mutation in line 1 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Parameter mutation must be between 0 and 1 in line 1 of file p2.txt");
+
+    // Remove files
+    std::remove("p1.txt");
+    std::remove("p2.txt");
+
+}
+
+// Test error upon invalid number of loci
+BOOST_AUTO_TEST_CASE(readInvalidNLoci)
+{
+
+    // Write a file with invalid number of loci
+    tst::write("p1.txt", "nloci 10 10");
+    tst::write("p2.txt", "nloci 1001");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter nloci in line 1 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Parameter nloci must be between 1 and 1000 in line 1 of file p2.txt");
+
+    // Remove files
+    std::remove("p1.txt");
+    std::remove("p2.txt");
+
+}
+
+// Test error upon invalid effect size
+BOOST_AUTO_TEST_CASE(readInvalidEffect)
+{
+
+    // Write a file with invalid effect size
+    tst::write("p1.txt", "effect 0.5 0.5");
+    tst::write("p2.txt", "effect 0.0");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter effect in line 1 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Parameter effect must be strictly positive in line 1 of file p2.txt");
+
+    // Remove files
+    std::remove("p1.txt");
+    std::remove("p2.txt");
+
+}
+
+// Test error upon invalid starting allele frequency
+BOOST_AUTO_TEST_CASE(readInvalidAllFreq)
+{
+
+    // Write a file with invalid starting allele frequency
+    tst::write("p1.txt", "allfreq 0.5 0.5");
+    tst::write("p2.txt", "allfreq 1.1");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter allfreq in line 1 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Parameter allfreq must be between 0 and 1 in line 1 of file p2.txt");
+
+    // Remove files
+    std::remove("p1.txt");
+    std::remove("p2.txt");
+
+}
+
+// Test error upon invalid tradeoff
+BOOST_AUTO_TEST_CASE(readInvalidTradeOff)
+{
+
+    // Write a file with invalid tradeoff
+    tst::write("p1.txt", "tradeoff 0.5 0.5");
+    tst::write("p2.txt", "tradeoff -0.5");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter tradeoff in line 1 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Parameter tradeoff must be positive in line 1 of file p2.txt");
+
+    // Remove files
+    std::remove("p1.txt");
+    std::remove("p2.txt");
+
+}
+
+// Test error upon invalid nonlinear effect
+BOOST_AUTO_TEST_CASE(readInvalidNonlinear)
+{
+
+    // Write a file with invalid nonlinear effect
+    tst::write("p1.txt", "nonlinear 0.5 0.5");
+    tst::write("p2.txt", "nonlinear 0");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter nonlinear in line 1 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Parameter nonlinear must be strictly positive in line 1 of file p2.txt");
+
+    // Remove files
+    std::remove("p1.txt");
+    std::remove("p2.txt");
+
+}
+
+// Test error upon invalid selfing rate
+BOOST_AUTO_TEST_CASE(readInvalidSelfing)
+{
+
+    // Write a file with invalid selfing rate
+    tst::write("p1.txt", "selfing 0.5 0.5");
+    tst::write("p2.txt", "selfing 1.1");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter selfing in line 1 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Parameter selfing must be between 0 and 1 in line 1 of file p2.txt");
+
+    // Remove files
+    std::remove("p1.txt");
+    std::remove("p2.txt");
+
+}
+
+// Test error upon invalid minimum realized carrying capacity
+BOOST_AUTO_TEST_CASE(readInvalidMinRealK)
+{
+
+    // Write a file with invalid minimum realized carrying capacity
+    tst::write("p1.txt", "minrealk 0.5 0.5");
+    tst::write("p2.txt", "minrealk 0");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter minrealk in line 1 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Parameter minrealk must be strictly positive in line 1 of file p2.txt");
+
+    // Remove files
+    std::remove("p1.txt");
+    std::remove("p2.txt");
+
+}
+
+// Test error upon invalid saving memory
+BOOST_AUTO_TEST_CASE(readInvalidMemSave)
+{
+
+    // Write a file with invalid saving memory
+    tst::write("p1.txt", "memsave 0.5 0.5");
+    tst::write("p2.txt", "memsave 0.00000001");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter memsave in line 1 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Parameter memsave must be enough MB to store a double in line 1 of file p2.txt");
+
+    // Remove files
+    std::remove("p1.txt");
+    std::remove("p2.txt");
+
+}
+
+// Test error upon invalid end time
+BOOST_AUTO_TEST_CASE(readInvalidTEnd)
+{
+
+    // Write a file with invalid end time
+    tst::write("p1.txt", "tend 10 10");
+    tst::write("p2.txt", "tend 0");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter tend in line 1 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Parameter tend must be strictly positive in line 1 of file p2.txt");
+
+    // Remove files
+    std::remove("p1.txt");
+    std::remove("p2.txt");
+
+}
+
+// Test error upon invalid save time
+BOOST_AUTO_TEST_CASE(readInvalidTSave)
+{
+
+    // Write a file with invalid save time
+    tst::write("p1.txt", "tsave 10 10");
+    tst::write("p2.txt", "tsave 0");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter tsave in line 1 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Parameter tsave must be strictly positive in line 1 of file p2.txt");
+
+    // Remove files
+    std::remove("p1.txt");
+    std::remove("p2.txt");
+
+}
+
+// Test error upon invalid warming time
+BOOST_AUTO_TEST_CASE(readInvalidTChange)
+{
+
+    // Write a file with invalid warming time
+    tst::write("p1.txt", "tchange 10 10");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter tchange in line 1 of file p1.txt");
+    
+    // Remove files
+    std::remove("p1.txt");
+    
+}
+
+// Test error upon invalid warming duration
+BOOST_AUTO_TEST_CASE(readInvalidTWarming)
+{
+
+    // Write a file with invalid warming duration
+    tst::write("p1.txt", "twarming 10 10");
+    tst::write("p2.txt", "twarming 0");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter twarming in line 1 of file p1.txt");
+    tst::checkError([&]() { Parameters pars("p2.txt"); }, "Parameter twarming must be strictly positive in line 1 of file p2.txt");
+
+    // Remove files
+    std::remove("p1.txt");
+    std::remove("p2.txt");
+    
+}
+
+// Test error upon invalid seed
+BOOST_AUTO_TEST_CASE(readInvalidSeed)
+{
+
+    // Write a file with invalid seed
+    tst::write("p1.txt", "seed 10 10");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter seed in line 1 of file p1.txt");
+    
+    // Remove files
+    std::remove("p1.txt");
+    
+}
+
+// Test that error upon invalid sowing flag
+BOOST_AUTO_TEST_CASE(readInvalidSow)
+{
+
+    // Write a file with invalid sowing flag
+    tst::write("p1.txt", "sow 1 1");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter sow in line 1 of file p1.txt");
+    
+    // Remove files
+    std::remove("p1.txt");
+    
+}
+
+// Test that error upon invalid architecture loading flag
+BOOST_AUTO_TEST_CASE(readInvalidLoadArch)
+{
+
+    // Write a file with invalid architecture loading flag
+    tst::write("p1.txt", "loadarch 1 1");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter loadarch in line 1 of file p1.txt");
+    
+    // Remove files
+    std::remove("p1.txt");
+    
+}
+
+// Test that error upon invalid parameter saving flag
+BOOST_AUTO_TEST_CASE(readInvalidSavePars)
+{
+
+    // Write a file with invalid parameter saving flag
+    tst::write("p1.txt", "savepars 1 1");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter savepars in line 1 of file p1.txt");
+    
+    // Remove files
+    std::remove("p1.txt");
+    
+}
+
+// Test that error upon invalid architecture saving flag
+BOOST_AUTO_TEST_CASE(readInvalidSaveArch)
+{
+
+    // Write a file with invalid architecture saving flag
+    tst::write("p1.txt", "savearch 1 1");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter savearch in line 1 of file p1.txt");
+    
+    // Remove files
+    std::remove("p1.txt");
+    
+}
+
+// Test that error upon invalid data saving flag
+BOOST_AUTO_TEST_CASE(readInvalidSaveDat)
+{
+
+    // Write a file with invalid data saving flag
+    tst::write("p1.txt", "savedat 1 1");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter savedat in line 1 of file p1.txt");
+    
+    // Remove files
+    std::remove("p1.txt");
+    
+}
+
+// Test that error upon invalid choice flag
+BOOST_AUTO_TEST_CASE(readInvalidChoose)
+{
+
+    // Write a file with invalid choice flag
+    tst::write("p1.txt", "choose 1 1");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter choose in line 1 of file p1.txt");
+    
+    // Remove files
+    std::remove("p1.txt");
+    
+}
+
+// Test that error upon invalid verbosity flag
+BOOST_AUTO_TEST_CASE(readInvalidVerbose)
+{
+
+    // Write a file with invalid verbosity flag
+    tst::write("p1.txt", "verbose 1 1");
+    
+    // Check
+    tst::checkError([&]() { Parameters pars("p1.txt"); }, "Too many values for parameter verbose in line 1 of file p1.txt");
+    
+    // Remove files
+    std::remove("p1.txt");
+    
 }
 
 // Test that the parameter saving function works

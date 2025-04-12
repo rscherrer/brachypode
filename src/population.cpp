@@ -6,7 +6,7 @@
 Population::Population(const Parameters &pars, const Architecture &arch) :
     individuals(std::make_unique<std::vector<Individual> >()),
     newborns(std::make_unique<std::vector<Individual> >()),
-    ndemes(pars.pgood.size()),
+    ndemes(pars.ndemes),
     pgood(pars.pgood),
     pgoodEnd(pars.pgoodEnd),
     stress(pars.stress),
@@ -22,7 +22,7 @@ Population::Population(const Parameters &pars, const Architecture &arch) :
     selfing(pars.selfing),
     recombination(pars.recombination),
     tolmax(arch.tolmax),
-    precis(pars.precis),
+    minrealk(pars.minrealk),
     tend(pars.tend),
     tsave(pars.tsave),
     tchange(pars.tchange),
@@ -111,11 +111,19 @@ double lincrement(const double &x, const double &xfinal, const size_t &t, const 
 // Update climate-related parameters
 void Population::update() {
 
+    // TODO: Explain that at tchange the climate has not changed yet
+
     // Early exit if warming has not started
     if (time <= tchange) return;
 
+    // Check
+    assert(twarming > 0u);
+
     // Time at which climate change ends
     const size_t tfinal = tchange + twarming;
+
+    // Check
+    assert(tfinal > tchange);
 
     // Early exit if warming is over
     if (time > tfinal) return;
@@ -200,7 +208,7 @@ void Population::check() const {
 
     // Check that the parameter values are valid
     assert(popsize != 0u);
-    assert(!pgood.empty());
+    assert(ndemes != 0u);
     assert(pgood.size() == pgoodEnd.size());
     assert(pgood.size() == ndemes);
     for (size_t i = 0u; i < pgood.size(); ++i) {
@@ -227,7 +235,7 @@ void Population::check() const {
     assert(selfing <= 1.0);
     assert(recombination >= 0.0);
     assert(tolmax > 0.0);
-    assert(precis > 0.0);
+    assert(minrealk > 0.0);
     assert(tend != 0u);
     assert(tsave != 0u);
     assert(demesizes.size() == ndemes);
@@ -413,7 +421,7 @@ void Population::cycle(Printer &print) {
         double Ktot = capacities[patch] * cover;
 
         // Clamp
-        Ktot = Ktot < precis ? precis : Ktot;
+        Ktot = Ktot < minrealk ? minrealk : Ktot;
 
         // Check
         assert(Ktot > 0.0);

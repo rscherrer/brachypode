@@ -15,6 +15,7 @@ size_t clockseed() {
 // Constructor
 Parameters::Parameters(const std::string &filename) :
     popsize(10u),
+    ndemes(3u),
     pgood({0.8, 0.8, 0.8}),
     pgoodEnd({0.1, 0.1, 0.1}),
     stress({4.0, 0.0}),
@@ -32,8 +33,8 @@ Parameters::Parameters(const std::string &filename) :
     nonlinear(1.0),
     selfing(0.95),
     recombination(1.0),
-    precis(1E-06),
-    memory(1.0),
+    minrealk(1E-06),
+    memsave(1.0),
     tend(10u),
     tsave(20u),
     tchange(100000u),
@@ -50,9 +51,6 @@ Parameters::Parameters(const std::string &filename) :
 
     // filename: optional parameter input file
 
-    // Check
-    check();
-
     // Read from file if needed
     if (filename != "") read(filename);
 
@@ -62,124 +60,32 @@ Parameters::Parameters(const std::string &filename) :
 void Parameters::check() const {
 
     // Check that the parameter values are valid
-    assert(popsize != 0u);
-    assert(!pgood.empty());
+    assert(chk::isstrictpos(popsize != 0u));
+    assert(chk::isstrictpos(ndemes));
+    assert(pgood.size() == ndemes);
     assert(pgood.size() == pgoodEnd.size());
-    for (size_t i = 0u; i < pgood.size(); ++i) {
-        assert(pgood[i] >= 0.0);
-        assert(pgood[i] <= 1.0);
-        assert(pgoodEnd[i] >= 0.0);
-        assert(pgoodEnd[i] <= 1.0);
-    }
-    for (size_t i = 0u; i < 2u; ++i) {
-        assert(capacities[i] > 0.0);
-        assert(capacitiesEnd[i] > 0.0);
-        assert(stress[i] >= 0.0);
-        assert(stressEnd[i] >= 0.0);
-    }
-    assert(maxgrowth >= 0.0);
-    assert(steep >= 0.0);
-    assert(dispersal >= 0.0);
-    assert(dispersal <= 1.0);
-    assert(mutation >= 0.0);
-    assert(mutation <= 1.0);
-    assert(nloci <= 1000u);
-    assert(nloci != 0u);
-    assert(effect > 0.0);
-    assert(allfreq >= 0.0);
-    assert(allfreq <= 1.0);
-    assert(tradeoff >= 0.0);
-    assert(nonlinear > 0.0);
-    assert(selfing >= 0.0);
-    assert(selfing <= 1.0);
-    assert(recombination >= 0.0);
-    assert(precis > 0.0);
-    assert(memory * 1E6 > sizeof(double));
-    assert(tend != 0u);
-    assert(tsave != 0u);
-
-}
-
-// Function to check if the next value could not be read
-void checkfail(std::ifstream &file, const std::string &name) {
-
-    // file: input file stream
-    // name: name of the parameter being read in
-
-    // Check if the next value could not be read
-    if (file.fail())
-        throw std::runtime_error("Could not read value for parameter: " + name);
-
-}
-
-// Function to read in the next parameter value(s) as a single double
-void readin(std::ifstream &file, double &x, const std::string &name) {
-
-    // file: input file stream
-    // x: parameter value
-    // name: name of the parameter being read in
-
-    // Read in the parameter value
-    file >> x;
-
-    // Check that the read was successful
-    checkfail(file, name);
-
-}
-
-// Function to read in the next parameter value(s) as a vector of doubles
-void readin(std::ifstream &file, std::vector<double> &v, const size_t &n, std::string name) {
-
-    // file: input file stream
-    // v: vector to update
-    // n: number of parameter values
-    // name: name of the vector of parameters being read in
-
-    // Resize the vector
-    v.resize(n);
-
-    // Read in the number of parameter values
-    for (size_t i = 0u; i < n; ++i) {
-
-        // Read in the parameter value
-        file >> v[i];
-
-        // Add index to the name if provided
-        if (name != "") name += "[" + std::to_string(i) + "]";
-
-        // Check that the read was successful
-        checkfail(file, name);
-
-    }
-}
-
-// Function to read in the next parameter value(s) as a single unsigned integer
-void readin(std::ifstream &file, size_t &x, const std::string &name) {
-
-    // file: input file stream
-    // x: parameter value
-    // name: name of the parameter being read in
-
-    // Read in the parameter value
-    file >> x;
-
-    // Check that the read was successful
-    checkfail(file, name);
-
-}
-
-// Function to read in the next parameter value(s) as a single boolean
-void readin(std::ifstream &file, bool &x, const std::string &name) {
-
-    // file: input file stream
-    // x: parameter value
-    // name: name of the parameter being read in
-
-    // Read in the parameter value
-    file >> x;
-
-    // Check that the read was successful
-    checkfail(file, name);
+    for (auto &p : pgood) assert(chk::isproportion(p));
+    for (auto &p : pgoodEnd) assert(chk::isproportion(p));
+    for (auto &x : capacities) assert(chk::isstrictpos(x));
+    for (auto &x : capacitiesEnd) assert(chk::isstrictpos(x));
+    for (auto &x : stress) assert(chk::ispositive(x));
+    for (auto &x : stressEnd) assert(chk::ispositive(x));
+    assert(chk::ispositive(maxgrowth));
+    assert(chk::ispositive(steep));
+    assert(chk::isproportion(dispersal));
+    assert(chk::isproportion(mutation));
+    assert(chk::isproportion(nloci / 1000.0));
+    assert(chk::isstrictpos(effect));
+    assert(chk::isproportion(allfreq));
+    assert(chk::ispositive(tradeoff));
+    assert(chk::isstrictpos(nonlinear));
+    assert(chk::isproportion(selfing));
+    assert(chk::ispositive(recombination));
+    assert(chk::isstrictpos(minrealk));
+    assert(chk::isenoughmb(memsave));
+    assert(chk::isstrictpos(tend));
+    assert(chk::isstrictpos(tsave));
+    assert(chk::isstrictpos(twarming));
 
 }
 
@@ -189,105 +95,75 @@ void Parameters::read(const std::string &filename)
 
     // filename: name of the file to read parameters from
 
-    // Open input file stream
-    std::ifstream file(filename.c_str());
+    // Create a reader
+    Reader reader(filename);
 
-    // Check that the file is open
-    if (!file.is_open()) 
-        throw std::runtime_error("Unable to open file " + filename);
+    // Open it
+    reader.open();
 
-    // Prepare to read in
-    std::string input;
-
-    // We need to know the number of demes
-    size_t ndemes = pgood.size();
+    // TODO: Move reader header call here
 
     // For each line in the file...
-    while (file >> input) {
+    while (!reader.iseof()) {
 
-        // Read the next entry as parameter value(s)
-        if (input == "popsize") readin(file, popsize, "popsize");
-        else if (input == "pgood") {
-            
-            readin(file, ndemes, "ndemes");
-            readin(file, pgood, ndemes, "pgood");
+        // Read a line
+        reader.readline();
 
-        }
-        else if (input == "pgoodEnd") readin(file, pgoodEnd, ndemes, "pgoodEnd");
-        else if (input == "capacities") readin(file, capacities, 2u, "capacities");
-        else if (input == "capacitiesEnd") readin(file, capacitiesEnd, 2u, "capacitiesEnd");
-        else if (input == "stress") readin(file, stress, 2u, "stress");
-        else if (input == "stressEnd") readin(file, stressEnd, 2u, "stressEnd");
-        else if (input == "maxgrowth") readin(file, maxgrowth, "maxgrowth");
-        else if (input == "steep") readin(file, steep, "steep");
-        else if (input == "dispersal") readin(file, dispersal, "dispersal");
-        else if (input == "mutation") readin(file, mutation, "mutation");
-        else if (input == "nloci") readin(file, nloci, "nloci");
-        else if (input == "effect") readin(file, effect, "effect");
-        else if (input == "allfreq") readin(file, allfreq, "allfreq");
-        else if (input == "tradeoff") readin(file, tradeoff, "tradeoff");
-        else if (input == "nonlinear") readin(file, nonlinear, "nonlinear");
-        else if (input == "selfing") readin(file, selfing, "selfing");
-        else if (input == "recombination") readin(file, recombination, "recombination");
-        else if (input == "precis") readin(file, precis, "precis");
-        else if (input == "memory") readin(file, memory, "memory");
-        else if (input == "tend") readin(file, tend, "tend");
-        else if (input == "tsave") readin(file, tsave, "tsave");
-        else if (input == "tchange") readin(file, tchange, "tchange");
-        else if (input == "twarming") readin(file, twarming, "twarming");
-        else if (input == "seed") readin(file, seed, "seed");
-        else if (input == "sow") readin(file, sow, "sow");
-        else if (input == "loadarch") readin(file, loadarch, "loadarch");
-        else if (input == "savepars") readin(file, savepars, "savepars");
-        else if (input == "savearch") readin(file, savearch, "savearch");
-        else if (input == "savedat") readin(file, savedat, "savedat");
-        else if (input == "choose") readin(file, choose, "choose");
-        else if (input == "verbose") readin(file, verbose, "verbose");
-        else
-            throw std::runtime_error("Invalid parameter name: " + input);
+        // Skip empty line
+        if (reader.isempty()) continue;
+
+        // Skip if comment line
+        if (reader.iscomment()) continue;
+
+        // Check
+        assert(!reader.isempty());
+        assert(!reader.iscomment());
+        
+        // Current parameter name 
+        std::string name = reader.getname();
+
+        // Read the parameter value(s)
+        if (name == "popsize") reader.readvalue(popsize, "strictpos");
+        else if (name == "ndemes") reader.readvalue(ndemes, "strictpos");
+        else if (name == "pgood") reader.readvalues(pgood, ndemes, "proportion");
+        else if (name == "pgoodEnd") reader.readvalues(pgoodEnd, ndemes, "proportion");
+        else if (name == "capacities") reader.readvalues(capacities, 2u, "strictpos");
+        else if (name == "capacitiesEnd") reader.readvalues(capacitiesEnd, 2u, "strictpos");
+        else if (name == "stress") reader.readvalues(stress, 2u, "positive");
+        else if (name == "stressEnd") reader.readvalues(stressEnd, 2u, "positive");
+        else if (name == "maxgrowth") reader.readvalue(maxgrowth, "positive");
+        else if (name == "steep") reader.readvalue(steep, "positive");
+        else if (name == "dispersal") reader.readvalue(dispersal, "proportion");
+        else if (name == "mutation") reader.readvalue(mutation, "proportion");
+        else if (name == "nloci") reader.readvalue(nloci, "onetothousand");
+        else if (name == "effect") reader.readvalue(effect, "strictpos");
+        else if (name == "allfreq") reader.readvalue(allfreq, "proportion");
+        else if (name == "tradeoff") reader.readvalue(tradeoff, "positive");
+        else if (name == "nonlinear") reader.readvalue(nonlinear, "strictpos");
+        else if (name == "selfing") reader.readvalue(selfing, "proportion");
+        else if (name == "recombination") reader.readvalue(recombination, "positive");
+        else if (name == "minrealk") reader.readvalue(minrealk, "strictpos");
+        else if (name == "memsave") reader.readvalue(memsave, "enoughmb");
+        else if (name == "tend") reader.readvalue(tend, "strictpos");
+        else if (name == "tsave") reader.readvalue(tsave, "strictpos");
+        else if (name == "tchange") reader.readvalue(tchange);
+        else if (name == "twarming") reader.readvalue(twarming, "strictpos");
+        else if (name == "seed") reader.readvalue(seed);
+        else if (name == "sow") reader.readvalue(sow);
+        else if (name == "loadarch") reader.readvalue(loadarch);
+        else if (name == "savepars") reader.readvalue(savepars);
+        else if (name == "savearch") reader.readvalue(savearch);
+        else if (name == "savedat") reader.readvalue(savedat);
+        else if (name == "choose") reader.readvalue(choose);
+        else if (name == "verbose") reader.readvalue(verbose);
+        else 
+            reader.readerror();
 
     }
 
     // Close the file
-    file.close();
+    reader.close();
 
-    // Check that the parameter values are valid
-    if (popsize == 0u) throw std::runtime_error("Initial population size must be strictly positive");
-    if (pgood.empty()) throw std::runtime_error("Number of demes must be strictly positive");
-    assert(pgood.size() == pgoodEnd.size()); // should have been caught already
-    for (size_t i = 0u; i < pgood.size(); ++i) {
-        if (pgood[i] < 0.0) throw std::runtime_error("Proportion of good patches must be between zero and one");
-        if (pgood[i] > 1.0) throw std::runtime_error("Proportion of good patches must be between zero and one");
-        if (pgoodEnd[i] < 0.0) throw std::runtime_error("Proportion of good patches after warming must be between zero and one");
-        if (pgoodEnd[i] > 1.0) throw std::runtime_error("Proportion of good patches after warming must be between zero and one");
-    }
-    for (size_t i = 0u; i < 2u; ++i) {
-        if (capacities[i] <= 0.0) throw std::runtime_error("Carrying capacity must be strictly positive");
-        if (capacitiesEnd[i] <= 0.0) throw std::runtime_error("Carrying capacity after warming must be strictly positive");
-        if (stress[i] < 0.0) throw std::runtime_error("Stress level must be positive");
-        if (stressEnd[i] < 0.0) throw std::runtime_error("Stress level after warming must be positive");
-    }
-    if (maxgrowth < 0.0) throw std::runtime_error("Maximum growth rate must be positive");
-    if (steep < 0.0) throw std::runtime_error("Steepness of the tolerance function must be positive");
-    if (dispersal < 0.0) throw std::runtime_error("Dispersal rate must be between zero and one");
-    if (dispersal > 1.0) throw std::runtime_error("Dispersal rate must be between zero and one");
-    if (mutation < 0.0) throw std::runtime_error("Mutation rate must be between zero and one");
-    if (mutation > 1.0) throw std::runtime_error("Mutation rate must be between zero and one");
-    if (nloci > 1000) throw std::runtime_error("Number of loci must be 1000 at most");
-    if (nloci == 0u) throw std::runtime_error("Number of loci must be stricly positive");
-    if (effect <= 0.0) throw std::runtime_error("Effect size of loci must be strictly positive");
-    if (allfreq < 0.0) throw std::runtime_error("Initial allele frequency must be between zero and one");
-    if (allfreq > 1.0) throw std::runtime_error("Initial allele frequency must be between zero and one");
-    if (tradeoff < 0.0) throw std::runtime_error("Trade-off strength must be positive");
-    if (nonlinear <= 0.0) throw std::runtime_error("Non-linearity parameter must be strictly positive");
-    if (selfing < 0.0) throw std::runtime_error("Rate of selfing must be between zero and one");
-    if (selfing > 1.0) throw std::runtime_error("Rate of selfing must be between zero and one");
-    if (recombination < 0.0) throw std::runtime_error("Recombination rate must be positive");
-    if (precis <= 0.0) throw std::runtime_error("Precision threshold must be strictly positive");
-    if (memory * 1E6 < sizeof(double)) throw std::runtime_error("Memory use per buffer must be at least " + std::to_string(sizeof(double)) + " bytes");
-    if (tend == 0u) throw std::runtime_error("Simulation time must be strictly positive");
-    if (tsave == 0u) throw std::runtime_error("Data saving frequency must be strictly positive");
-    
     // Check
     check();
 
@@ -308,7 +184,8 @@ void Parameters::save(const std::string &filename) const
 
     // Write parameters to the file
     file << "popsize " << popsize << '\n';
-    file << "pgood " << pgood.size();
+    file << "ndemes " << ndemes << '\n'; 
+    file << "pgood ";
     for (size_t i = 0u; i < pgood.size(); ++i) file << ' ' << pgood[i];
     file << '\n';
     file << "pgoodEnd";
@@ -329,8 +206,8 @@ void Parameters::save(const std::string &filename) const
     file << "nonlinear " << nonlinear << '\n';
     file << "selfing " << selfing << '\n';
     file << "recombination " << recombination << '\n';
-    file << "precis " << precis << '\n';
-    file << "memory " << memory << '\n';
+    file << "minrealk " << minrealk << '\n';
+    file << "memsave " << memsave << '\n';
     file << "tend " << tend << '\n';
     file << "tsave " << tsave << '\n';
     file << "tchange " << tchange << '\n';

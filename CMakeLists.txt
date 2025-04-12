@@ -1,4 +1,4 @@
-# CMakeLists.txt (Coverage)
+# CMakeLists.txt (Tests)
 
 # CMake
 cmake_minimum_required(VERSION 3.16)
@@ -30,18 +30,7 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR})
 
 # Debug mode
-set(CMAKE_BUILD_TYPE "Coverage")
-
-# Set up code coverage
-message(STATUS "Building with code coverage enabled")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -O0 -g")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage -O0 -g")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
-
-# Debugging messages for flags
-message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
-message(STATUS "CMAKE_C_FLAGS: ${CMAKE_C_FLAGS}")
-message(STATUS "CMAKE_EXE_LINKER_FLAGS: ${CMAKE_EXE_LINKER_FLAGS}")
+set(CMAKE_BUILD_TYPE "Debug")
 
 # Source code
 add_subdirectory(src)

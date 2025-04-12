@@ -1,33 +1,41 @@
 ## List of parameters
 
-Note: hereafter "sites" refer to the demes and "patches" refer to facilitated and unfacilitated portions, respectively, within each site. Patch-specific parameters always take two values, the first one for the unfacilitated patch and the second one for the facilitated patch.
+Here we provide an explanation of the various parameters of the model (passed though a parameter file, e.g. `parameters.txt`), as well as their default value(s) when no parameter file is supplied, and their valid ranges. For more information, please refer to the source code or the scientific manuscript accompanying this project (link will be made available once published).
 
-* `type`: the type of fitness function (`1` for type I -- the "quantitative genetics" model -- and `2` for type II -- the "ecophyiological tradeoff" model). In brief, in the type I model fitness depends only on trait `z`, while in the type II model fitness depends on the level of stress tolerance `x` and competitiveness `y`, both dependent on `z` and with a trade-off between the two.
-* `popsize`: initial number of individuals
-* `pgood`: the number of sites followed by the proportions of facilitated ("good") patches in each site, e.g. `3 0.5 0.4 0.1` for three sites with 50, 40 and 10% cover in facilitated patches, respectively
-* `maxgrowths`: the maximum per capita growth rate in each patch. This corresponds to the basal number of offspring produced per individual per generation, before selection and density-dependence apply. When `type` is `2` there is only one basal growth rate, so only the first value of `maxgrowths` is used (the second is set to equal the first one).
-* `stress`: the level of environmental stress in each patch. If `type` is `1`, then it refers to the point along phenotypic axis `z` that maximizes growth rate in the local patch (the "optimal" value of trait `z`). If `type` is `2`, then the growth rate of the individual depends on its stress tolerance level `x` relative to environmental stress (the growth rate is a logistic function decaying as stress goes up, with inflexion point located at `x`).
-* `zwidths`: the niche width in each patch. This is the standard deviation of the Gaussian curve of growth rate as a function of trait `z`. Only applicable when `type` is `1`.
-* `capacities`: the carrying capacity in each patch, in number of individuals per unit area. This is used to apply density-dependent population regulation. The growth rate of individuals is reduced, even more that the number of individuals locally competing approaches the carrying capacity. This is only used when `type` is `1`. When `type` is `2`, the realized growth rate of an individual depends on its competitive weight `y` relative to that of other individuals, and so the "carrying capacity" becomes emergent from the density and competitive weights of the individuals present. 
-* `steep`: the intensity of the decay of the growth rate function when external stress is at its inflexion point (i.e. when external stress is equal to the level of stress tolerance of the individual, `x`). This corresponds to the absolute value of the (negative) slope of the curve at this point. Only applicable if `type` is `2`.
-* `dispersal`: the rate of dispersal among sites, between zero and one. This is the number of individuals sampled each generation to migrate (migrants can end up in any other deme with equal probability).
-* `mutation`: the mutation rate per locus, between zero and one (i.e. probability that a given allele flips to its opposite when an offspring is born).
-* `nchrom`: the number of chromosomes.
-* `nloci`: the number of loci coding for trait `z`.
-* `effect`: the effect size of single loci, i.e. the effect on trait `z` when one allele mutates. This value cannot be negative.
-* `allfreq`: the initial frequency of the 1-allele in the population.
-* `xmax`: the maximum possible stress tolerance level `x`. This value is reached when all loci have allele `1`. Trait `x` cannot be negative.
-* `ymax`: the maximum level of competitiveness `y`. This value is reached when all loci have allele `0`. Trait `y` cannot be negative.
-* `tradeoff`: the trade-off between stress tolerance `x` and competitiveness `y`. Should be positive. The higher this trade-off, the least a given value of trait `z` can translate into both a high `x` and a high `y`.
-* `selfing`: the proportion of offspring arising from selfing, between zero and one. Those offspring are clones of their parent plant. The rest of the offspring, produced through outcrossing, are produced by their mother plant but recombine with pollen randomly sampled from the entire population (this reflects the long-range dispersal ability of pollens).
-* `recombination`: the recombination rate. This approximates the number of crossover events per individual per sexual reproduction event (not exactly its mean number though). Crossover events are randomly sampled along the genome, with distances exponentially distributed between consecutive crossovers. The recombination rate is the rate of this exponential distribution.
-* `tend`: simulation time, in discrete generations.
-* `tsave`: frequency with which to save the data, in number of generations.
-* `seed`: the seed to use for the pseudo random number generator. If not supplied, the seed will be automatically set based on the exact time the simulation was launched. 
-* `sow`: whether or not (`1` or `0`, respectively) the founder individuals should be randomly scattered throughout demes and patches at the start of the simulation
-* `loadarch`: whether or not to load the genetic architecture from an existing file.
-* `savepars`: whether or not to save the parameters used in the simulation (including the automatically generated seed if applicable)
-* `savelog`: whether or not to redirect the screen output of the program to a file instead
-* `savearch`: whether or not to save the genetic architecture used in the simulation (if `loadarch` is `1` the architecture file will simply be overwritten with itself)
-* `talkative`: whether or not to output to screen (or file if `savelog` is `1`) the numbers of individuals in each site at every generation
-* `choose`: whether or not to choose a subset of data to save
+Not that hereafter, "positive" means including zero, while "strictly positive" means excluding zero. Also note that missing parameters in the parameter file will take their default value.
+
+| Parameter name | Default value(s) | Accepted values | Description | No. values | Notes |
+|--|--|--|--|--|--|
+| `popsize` | `10` | Positive integers | Number of individuals in the starting population | `1` |
+| `ndemes` | `3` | Positive integers | Number of demes in the landscape | 1 | If set, make sure that `pgood` and `pgoodEnd` have the right number of values
+| `pgood` | `0.8 0.8 0.8` | Decimals from zero to one | Proportion of the area covered by good patches in each deme | `ndemes` | If set, make sure that `ndemes` is set (or defaults) to read the right number of values
+| `pgoodEnd` | `0.1 0.1 0.1` | Decimals from zero to one | Same as `pgood` but at the end of the period of climate change | `ndemes` | If set, make sure that `ndemes` is set (or defaults) to read the right number of values
+| `stress` | `4 0` | Positive decimals | Amount of stress in the unfacilitated and facilitated patches, respectively | 2 |
+| `stressEnd` | `4 0` | Positive decimals | Same as `stress` but at the end of the period of climate change | 2 |
+| `capacities` | `100 10000` | Strictly positive decimals | Carrying capacity per unit area in unfacilated and facilitated patches, respectively | 2 |
+| `capacitiesEnd` | `100 10000` | Strictly positive decimals | Same as `capacities` but at the end of the period of climate change | 2 |
+| `maxgrowth` | `4` | Positive decimals | Maximum achievable intrinsic growth rate in a Ricker-type population model | 1 |
+| `steep` | `2` | Positive decimals | Magnitude of the downward slope of the survival probability function at its inflection point | 1 |
+| `dispersal` | `0.01` | Decimals from zero to one | Per capita probability of any individual to disperse to another (random) deme during the dispersal step | 1 |
+| `mutation` | `0.0001` | Decimals from zero to one | Probability of any given locus to flip to its opposite allele during the mutation process | 1 |
+| `nloci` | `10` | Strictly positive integers | Number of loci in the genome | 1 |
+| `effect` | `0.1` | Strictly positive decimals | Additive contribution to the phenotype of the one-allele at any given locus | 1 | Equal across all loci if the genetic architecture is generated anew (`loadarch 0`), but can differ among loci if `architecture.txt` is provided (`loadarch 1`, see details [here](ARCHITECTURE.md)) |
+| `allfreq` | `0.1` | Decimals from zero to one | Frequency of the one-allele in the starting population | 1 |
+| `tradeoff` | `0.1` | Positive decimals | Magnitude of the negative linear effect of an increase in stress tolerance on the intrinsic reproductive output of any given individual | 1 |
+| `nonlinear` | `1` | Strictly positive decimals | Degree of the polynomial describing the decrease of intrinsic reproductive output with increased stress tolerance | 1 | Below 1 for convex, above 1 for concave, 1 for linear curve |
+| `selfing` | `0.95` | Decimals from zero to one | Probability of each offspring produced to be a clone of its parent plant (and not of sexual reproduction with a pollen donor) | 1 |
+| `recombination` | `1` | Positive decimals | Average distance between consecutive crossovers during the recombination process, 1 being the length of the genome | 1 | Set 0 for no recombination 
+| `precis` | `1e-06` | Strictly positive decimals | The minimum value that the realized carrying capacity can take within a patch | 1 | Should be very small
+| `memsave` | `1` | Decimals strictly greater than the size of a double precision floating point number (usually 8 bytes, i.e. 8e-06 MB, on a 64 bit system), in MB ** | Memory that can be filled in by each data saving buffer (in MB) before writing to file | 1 | There will be as many open buffers as there are output files to save (see details [here](OUTPUT.md))
+| `tend` | `10` | Strictly positive integers | Number of simulation time steps | 1 |
+| `tsave` | `20` | Strictly positive integers | Frequency of data saving (in time steps) | 1 |
+| `tchange` | `100000` | Positive integers | Time at which climate change starts | 1 |
+| `twarming` | `1` | Strictly positive integers | Duration of the climate change period (in time steps) | 1 |
+| `seed` | Clock-generated | Positive integers | Seed of the pseudo-random number generator | 1 | The clock is used to generate a pseudo-random seed. Make sure to set `savepars` to 1 to be able to retrieve the generated seed and reproduce a given simulation. | 
+| `sow` | `0` | One or zero | Whether or not the individuals should be randomly distributed across demes at the start of the simulation | 1 |
+| `loadarch` | `0` | One or zero | Whether the genetic architecture should be read from a file named `architecture.txt` instead of being generated anew | 1 | Check [here](ARCHITECTURE.md) for details
+| `savepars` | `0` | One or zero | Whether or not to save the parameters into a parameter log file called `paramlog.txt` | 1 |
+| `savearch` | `0` | One or zero | Whether or not to save the genetic architecture into a text file called `architecture.txt` | 1 |
+| `savedat` | `0` | One or zero | Whether or not to save output data | 1 | Check [here](OUTPUT.md) for details
+| `choose` | `0` | One or zero | Whether or not to choose which output variables to save by providing a `whattosave.txt` file | 1 | See [here](OUTPUT.md) for how this works |
+| `verbose` | `0` | One or zero | Whether or not to display progress at each time step to the screen | 1 | |

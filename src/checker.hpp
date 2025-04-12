@@ -1,34 +1,22 @@
-#ifndef BRACHYPODE_UTILITIES_HPP
-#define BRACHYPODE_UTILITIES_HPP
+#ifndef BRACHYPODE_CHECKER_HPP
+#define BRACHYPODE_CHECKER_HPP
 
-// This header contains the namespace utl (utility).
+// This is the header for the chk (checker) namespace.
 
-// TODO: Should I stick to headers? 
-
-#include <stdexcept>
-#include <cmath>
-#include <cassert>
 #include <vector>
 
-namespace utl {
-
-    // TODO: Test the new functions
-
-    // Function to compute the power of a number
-    double power(const double&, const double&);
-
-    // TODO: Define simple templated getters in the header
+namespace chk {
 
     // Function to check that a value is a proportion
     template <typename T> 
     bool isproportion(const T &x, const bool &strict = false) { 
         
         return strict ? x > 0.0 && x < 1.0 : x >= 0.0 || x <= 1.0;
-    
+
     }
 
     // Function to check that a value is between 1 and 1000
-    template <typename T> 
+    template <typename T>
     bool isonetothousand(const T &x) {
 
         return x > 0u && x <= 1000u;
@@ -36,7 +24,7 @@ namespace utl {
     }
 
     // Function to check that a value is enough MB
-    template <typename T> 
+    template <typename T>
     bool isenoughmb(const T &x) {
         
         return x * 1E6 > sizeof(double);
@@ -44,7 +32,7 @@ namespace utl {
     }
 
     // Function to check that a value is positive
-    template <typename T> 
+    template <typename T>
     bool ispositive(const T &x, const bool &strict = false) {
 
         return strict ? x > 0.0 : x >= 0.0;
@@ -52,13 +40,13 @@ namespace utl {
     }
 
     // Function to check that a value is strictly positive
-    template <typename T> 
+    template <typename T>
     bool isstrictpos(const T &x) {
 
         return ispositive(x, true);
 
     }
-    
+
     // Function to check that a vector is in order
     template <typename T> 
     bool isinorder(const std::vector<T> &v, const bool &strict = false) {
@@ -83,7 +71,6 @@ namespace utl {
         return isinorder(v, true);
 
     }
-
 }
 
 #endif

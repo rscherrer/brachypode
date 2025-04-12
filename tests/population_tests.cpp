@@ -73,7 +73,9 @@ BOOST_AUTO_TEST_CASE(populationScreenOutput) {
     Parameters pars;
 
     // Tweak
+    pars.ndemes = 3u;
     pars.popsize = 10u;
+    pars.ndemes = 3u;
     pars.pgood = {1.0, 1.0, 1.0};
     pars.verbose = true;
 
@@ -127,6 +129,7 @@ BOOST_AUTO_TEST_CASE(populationUpdateClimateChange) {
     pars.stressEnd = { 1.0, 6.0 };
     pars.capacities = { 50.0, 100.0 };
     pars.capacitiesEnd = { 20.0, 50.0 };
+    pars.ndemes = 2u;
     pars.pgood = { 0.1, 0.5 };
     pars.pgoodEnd = { 0.1, 0.4 }; 
 
@@ -177,6 +180,7 @@ BOOST_AUTO_TEST_CASE(populationGoesExtinct) {
     pars.tradeoff = 100.0;
     pars.allfreq = 1.0;
     pars.effect = 0.1;
+    pars.ndemes = 2u;
     pars.pgood = { 0.0, 0.0 };
     pars.pgoodEnd = { 0.0, 0.0 };
 
@@ -243,6 +247,7 @@ BOOST_AUTO_TEST_CASE(populationCanPrint) {
 
     // Tweak
     pars.popsize = 3u;
+    pars.ndemes = 2u;
     pars.pgood = {0.0, 0.0};
     pars.pgoodEnd = {0.0, 0.0};
     pars.allfreq = 1.0;
@@ -431,6 +436,7 @@ BOOST_AUTO_TEST_CASE(populationCycleWithDispersal) {
 
     // Tweak
     pars.dispersal = 1.0;
+    pars.ndemes = 2u;
     pars.pgood = { 1.0, 1.0 };
     pars.pgoodEnd = { 1.0, 1.0 };
     pars.popsize = 2u;
@@ -467,6 +473,7 @@ BOOST_AUTO_TEST_CASE(populationCycleWithNoDispersal) {
 
     // Tweak
     pars.dispersal = 0.0;
+    pars.ndemes = 2u;
     pars.pgood = { 1.0, 1.0 };
     pars.pgoodEnd = { 1.0, 1.0 };
     pars.popsize = 2u;
@@ -503,6 +510,7 @@ BOOST_AUTO_TEST_CASE(populationCycleWithNoDispersalCuzOneDeme) {
 
     // Tweak
     pars.dispersal = 1.0;
+    pars.ndemes = 1u;
     pars.pgood = { 1.0 };
     pars.pgoodEnd = { 1.0 };
     pars.popsize = 2u;
@@ -539,6 +547,7 @@ BOOST_AUTO_TEST_CASE(populationCycleWithZeroPatchCover) {
 
     // Tweak
     pars.dispersal = 1.0;
+    pars.ndemes = 2u;
     pars.pgood = { 1.0, 0.0 };
     pars.pgoodEnd = { 1.0, 0.0 };
     pars.popsize = 100u;
@@ -574,6 +583,7 @@ BOOST_AUTO_TEST_CASE(populationCycleWithFullPatchCover) {
 
     // Tweak
     pars.dispersal = 1.0;
+    pars.ndemes = 2u;
     pars.pgood = { 1.0, 1.0 };
     pars.pgoodEnd = { 1.0, 1.0 };
     pars.popsize = 100u;
@@ -609,6 +619,7 @@ BOOST_AUTO_TEST_CASE(populationCycleTooHarshForSurvival) {
 
     // Tweak
     pars.dispersal = 1.0;
+    pars.ndemes = 1u;
     pars.pgood = { 0.0 };
     pars.pgoodEnd = { 0.0 };
     pars.popsize = 10u;

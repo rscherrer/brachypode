@@ -10,6 +10,9 @@
 
 #include "parameters.hpp"
 #include "random.hpp"
+#include "utilities.hpp"
+
+// TODO: Maybe move utilities to parameters.hpp
  
 struct Architecture {
 
@@ -21,9 +24,6 @@ struct Architecture {
     void make();
     void read(const std::string&);
     void save(const std::string&) const;
-
-    // Note: parameters are public for easy access but should be made
-    // constant after initialization for safety.
 
     // Hyperparameters
     size_t nloci;

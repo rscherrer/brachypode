@@ -18,15 +18,15 @@ size_t prt::memtosize(const double &m, const double &u) {
 }
 
 // Constructor
-Printer::Printer(const std::vector<std::string> &names, const double &mem) :
-    memory(prt::memtosize(mem, 1E6)),
+Printer::Printer(const std::vector<std::string> &names, const double &memsave) :
+    memory(prt::memtosize(memsave, 1E6)),
     outputs(names),
     valids(names),
     buffers(std::unordered_map<std::string, std::optional<Buffer> >())
 {
 
     // names: names of the output variables
-    // mem: memory use (in MB)
+    // memsave: memory use (in MB)
 
     // Check
     assert(memory > 0u);

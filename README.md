@@ -4,15 +4,15 @@ This is the repository for a program simulating the evolution of an annual grass
 
 ## Description
 
-This is an agent-based simulation where sessile individuals dwel in a metapopulation consisting of multiple demes, and each deme contains a facilitated and an unfactilitated habitat patch (facilitated patches are basically the undergrowth of nurse shrubs). The individuals possess genes that determine some level of tolerance against the harsh conditions encountered outside of the shrubs, which trade off with reproductive output. See manuscript for more details.
+The model is an agent-based simulation where sessile individuals dwel in a metapopulation consisting of multiple demes, and each deme contains a facilitated and an unfactilitated habitat patch (facilitated patches are basically the undergrowth of nurse shrubs). The individuals possess genes that determine some level of tolerance against the harsh conditions encountered outside of the shrubs, which trade off with reproductive output.
 
 ## Installation
 
-This program is written in C++ and can be compiled using any modern C++ compiler and build system. [Here](doc/SETUP.md) we provide an example setup to build the program on several platforms using the build system CMake.
+This program must be compiled. It is written in C++ and can be compiled using any modern C++ compiler and build system. [Here](doc/SETUP.md) we provide an example setup to build the program on several platforms using CMake.
 
 ## Usage
 
-This program is a command-line interface program. Assuming the name of the executable is `brachypode`, use the following command in the terminal from the working directory to run a simulation with default parameter values:
+This program has a command-line interface. Assuming the name of the compiled executable is `brachypode`, use the following command in the terminal from the working directory to run a simulation with default parameter values:
 
 ```shell
 ./brachypode
@@ -28,25 +28,23 @@ where `parameters.txt` is a text file containing a list of parameter names and v
 
 ### Parameters
 
-The file `parameters.txt` should look like:
+The parameter file should look like this:
 
 ```
-type 1
 popsize 10
-pgood 3 0.8 0.6 0.5 0.3 0.1
-maxgrowths 1 2
+pgood 3 0.8 0.6 0.5
+pgoodEnd 0.8 0.6 0.5
 stress 4 0
-zwidths 1 2
-capacities 100 10000
+stressEnd 4 0
+capacities 100 1000
+capacities 100 1000
+maxgrowth 2
 steep 2
 dispersal 0.1
 mutation 0.0001
-nchrom 1
 nloci 50
 effect 0.1
 allfreq 0.5
-xmax 5
-ymax 5
 tradeoff 1
 selfing 0.95
 recombination 1
@@ -58,11 +56,10 @@ loadarch 0
 savepars 1
 savelog 0
 savearch 1
-talkative 0
 choose 0
 ```
 
-and should be present within the working directory where the simulation is launched. Click [here](doc/PARAMETERS.md) for a detailed description of the parameters and their meaning.
+ In the parameter file, each line should contain a parameter name followed by its value(s). If there are several values, they should be separated by spaces. Invalid parameter names or values will result in an error. Click [here](doc/PARAMETERS.md) for a description of the available parameters and their meaning.
 
 ### Genetic architecture
 

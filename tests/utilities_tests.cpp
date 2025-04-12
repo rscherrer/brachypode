@@ -7,30 +7,6 @@
 #include "../src/utilities.hpp"
 #include <boost/test/unit_test.hpp>
 
-// Test the even checking function
-BOOST_AUTO_TEST_CASE(isEven) {
-
-    // Known values
-    BOOST_CHECK(!utl::iseven(1));
-    BOOST_CHECK(utl::iseven(2));
-    BOOST_CHECK(!utl::iseven(3));
-    BOOST_CHECK(!utl::iseven(999));
-    BOOST_CHECK(utl::iseven(1000));
-
-}
-
-// Test the integer checking function
-BOOST_AUTO_TEST_CASE(isInteger) {
-
-    // Known values
-    BOOST_CHECK(utl::isinteger(0.0));
-    BOOST_CHECK(utl::isinteger(1.0));
-    BOOST_CHECK(utl::isinteger(2.0));
-    BOOST_CHECK(utl::isinteger(-666.0));
-    BOOST_CHECK(!utl::isinteger(0.5));
-
-}
-
 // Test the custom power function when input is zero
 BOOST_AUTO_TEST_CASE(powerOfZero) {
 
@@ -116,3 +92,4 @@ BOOST_AUTO_TEST_CASE(undefinedPower) {
     BOOST_CHECK(std::isnan(utl::power(-8.0, 2.0 / 5.0)));
 
 }
+

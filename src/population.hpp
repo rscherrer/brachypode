@@ -76,7 +76,7 @@ private:
     double selfing;                    // rate of selfing
     double recombination;              // recombination rate
     double tolmax;                     // maximum stress tolerance possible 
-    double precis;                     // minimum possible realized carrying capacity
+    double minrealk;                   // minimum possible realized carrying capacity
     size_t tend;                       // simulation time
     size_t tsave;                      // recording time
     size_t tchange;                    // time to initiate warming

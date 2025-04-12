@@ -2,26 +2,6 @@
 
 #include "utilities.hpp"
 
-// Function to tell if an integer is even
-bool utl::iseven(const int &n) {
-
-    // n: integer to check
-
-    // Is it divisible by two?
-    return n % 2 == 0;
-
-}
-
-// Function to tell if a number is an integer
-bool utl::isinteger(const double &x) {
-
-    // x: number to check
-
-    // Is the rounded version equal to the original?
-    return std::floor(x) == x;
-
-}
-
 // Function for power with integer exponent (by squaring)
 double powint(double x, int n) {
 
@@ -48,7 +28,7 @@ double powint(double x, int n) {
     while (n > 0) {
 
         // Go down to even exponent
-        if (!utl::iseven(n)) y *= x;
+        if (n % 2 != 0) y *= x;
 
         // Square
         x *= x;
@@ -85,7 +65,7 @@ double utl::power(const double &x, const double &n) {
     if (n == 1.0) return x;
 
     // Fast function for integer exponents
-    if (isinteger(n)) return powint(x, static_cast<int>(n));
+    if (std::floor(n) == n) return powint(x, static_cast<int>(n));
 
     // Otherwise use heavy duty function
     return std::pow(x, n);

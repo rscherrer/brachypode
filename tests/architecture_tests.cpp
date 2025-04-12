@@ -45,9 +45,9 @@ BOOST_AUTO_TEST_CASE(loadedArchitectureHasRightAttributes) {
     std::ostringstream content;
 
     // Add lines
-    content << "4\n";                // no. loci
-    content << "0.1 0.2 0.6 0.8\n";  // locations of loci
-    content << "0.1 0.1 0.2 0.1\n";  // locus effect sizes
+    content << "nloci 4\n";                    // no. loci
+    content << "locations 0.1 0.2 0.6 0.8\n";  // locations of loci
+    content << "effects 0.1 0.1 0.2 0.1\n";    // locus effect sizes
 
     // Write a new architecture file
     tst::write("architecture.txt", content.str());
@@ -74,137 +74,79 @@ BOOST_AUTO_TEST_CASE(loadedArchitectureHasRightAttributes) {
 
 }
 
-// Test that error when cannot read the file
-BOOST_AUTO_TEST_CASE(errorWhenCannotReadArchitectureFile) {
+// TODO: Test missing architecture file in main
 
-    // Check that error when loading non-existing file
-    tst::checkError([&] { Architecture arch(Parameters(), "nonexistent.txt"); }, "Unable to open file nonexistent.txt");
-
-}
-
-// Test that error if the number of loci cannot be read
-BOOST_AUTO_TEST_CASE(errorWhenCannotReadNumberOfLoci) {
+// Test that error if the parameter is no architecture parameter
+BOOST_AUTO_TEST_CASE(errorWhenUnknownParameter) {
 
     // Write architecture file
-    tst::write("architecture.txt", "hello");
+    tst::write("architecture.txt", "hello 4");
 
     // Check error
-    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Could not read the number of loci in architecture file");
+    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Invalid parameter: hello in line 1 of file architecture.txt");
 
     // Remove files
     std::remove("architecture.txt");
 
 }
 
-// Test that error if the number of loci is zero
-BOOST_AUTO_TEST_CASE(errorWhenZeroLociInArchitecture) {
+// Test errors when invalid number of loci
+BOOST_AUTO_TEST_CASE(errorWhenInvalidNLoci) {
 
     // Write architecture file
-    tst::write("architecture.txt", "\n0");
+    tst::write("a1.txt", "nloci 4 4");
+    tst::write("a2.txt", "nloci 0");
 
     // Check error
-    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "There must be at least one locus in architecture file");
+    tst::checkError([&] { Architecture arch(Parameters(), "a1.txt"); }, "Too many values for parameter nloci in line 1 of file a1.txt");
+    tst::checkError([&] { Architecture arch(Parameters(), "a2.txt"); }, "Parameter nloci must be strictly positive in line 1 of file a2.txt");
 
     // Remove files
-    std::remove("architecture.txt");
+    std::remove("a1.txt");
+    std::remove("a2.txt");
 
 }
 
-// Test that error when locus location cannot be read
-BOOST_AUTO_TEST_CASE(errorWhenCannotReadLocusLocation) {
+// Test errors when invalid locus locations
+BOOST_AUTO_TEST_CASE(errorWhenInvalidLocusLocations) {
 
     // Write architecture file
-    tst::write("architecture.txt", "3 0.1 0.2 hello");
+    tst::write("a1.txt", "nloci 3\nlocations 0.1 0.2 0.3 0.4");
+    tst::write("a2.txt", "nloci 3\nlocations 0.1 0.2");
+    tst::write("a3.txt", "nloci 3\nlocations 0.1 0.2 1.1");
+    tst::write("a4.txt", "nloci 3\nlocations 0.2 0.1 0.3");
 
     // Check error
-    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Could not read the location of locus 3 in architecture file");
+    tst::checkError([&] { Architecture arch(Parameters(), "a1.txt"); }, "Too many values for parameter locations in line 1 of file a1.txt");
+    tst::checkError([&] { Architecture arch(Parameters(), "a2.txt"); }, "Too few values for parameter locations in line 1 of file a2.txt");
+    tst::checkError([&] { Architecture arch(Parameters(), "a3.txt"); }, "Parameter locations must be between 0 and 1 in line 1 of file a3.txt");
+    tst::checkError([&] { Architecture arch(Parameters(), "a4.txt"); }, "Parameter locations must be in strictly increasing order in line 1 of file a4.txt");
 
     // Remove files
-    std::remove("architecture.txt");
+    std::remove("a1.txt");
+    std::remove("a2.txt");
+    std::remove("a3.txt");
+    std::remove("a4.txt");
 
 }
 
-// Test that error when loci are not in increasing order of location
-BOOST_AUTO_TEST_CASE(errorWhenLocusLocationsNotInIncreasingOrder) {
+// Test errors when invalid effect sizes
+BOOST_AUTO_TEST_CASE(errorWhenInvalidEffectSizes) {
 
     // Write architecture file
-    tst::write("architecture.txt", "3 0.1 0.3 0.2");
+    tst::write("a1.txt", "nloci 3\neffects 0.1 0.2 0.3 0.4");
+    tst::write("a2.txt", "nloci 3\neffects 0.1 0.2");
+    tst::write("a3.txt", "nloci 3\neffects 0.1 0.0 0.3");
 
     // Check error
-    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Locus locations must be in strictly increasing order in architecture file");
-
+    tst::checkError([&] { Architecture arch(Parameters(), "a1.txt"); }, "Too many values for parameter effects in line 1 of file a1.txt");
+    tst::checkError([&] { Architecture arch(Parameters(), "a2.txt"); }, "Too few values for parameter effects in line 1 of file a2.txt");
+    tst::checkError([&] { Architecture arch(Parameters(), "a3.txt"); }, "Parameter effects must be strictly positive in line 1 of file a3.txt");
+    
     // Remove files
-    std::remove("architecture.txt");
-
-}
-
-// Test that error when loci start before zero
-BOOST_AUTO_TEST_CASE(errorWhenLociStartBeforeZero) {
-
-    // Write architecture file
-    tst::write("architecture.txt", "3 -0.1 0.2 0.3");
-
-    // Check error
-    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Locus location must be positive in architecture file");
-
-    // Remove files
-    std::remove("architecture.txt");
-
-}
-
-// Test that error when loci go beyond one
-BOOST_AUTO_TEST_CASE(errorWhenLociGoBeyondOne) {
-
-    // Write architecture file
-    tst::write("architecture.txt", "3 0.1 0.2 1.3");
-
-    // Check error
-    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Locus location cannot be beyond the end of the genome");
-
-    // Remove files
-    std::remove("architecture.txt");
-
-}
-
-// Test that error when cannot read locus effect size
-BOOST_AUTO_TEST_CASE(errorWhenCannotReadEffectSize) {
-
-    // Write architecture file
-    tst::write("architecture.txt", "3 0.1 0.2 0.3\n0.1 0.1 hello");
-
-    // Check error
-    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Could not read the effect size of locus 3 in architecture file");
-
-    // Remove files
-    std::remove("architecture.txt");
-
-}
-
-// Test that error when negative effect size
-BOOST_AUTO_TEST_CASE(errorWhenEffectSizeNegative) {
-
-    // Write architecture file
-    tst::write("architecture.txt", "3 0.1 0.2 0.3\n0.1 0.1 -0.1");
-
-    // Check error
-    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Effect size of locus 3 must be positive in architecture file");
-
-    // Remove files
-    std::remove("architecture.txt");
-
-}
-
-// Test that error when total effect size is zero
-BOOST_AUTO_TEST_CASE(errorWhenTotalEffectSizeIsZero) {
-
-    // Write architecture file
-    tst::write("architecture.txt", "3 0.1 0.2 0.3\n0.0 0.0 0.0");
-
-    // Check error
-    tst::checkError([&] { Architecture arch(Parameters(), "architecture.txt"); }, "Sum of effect sizes must be strictly positive in architecture file");
-
-    // Remove files
-    std::remove("architecture.txt");
+    std::remove("a1.txt");
+    std::remove("a2.txt");
+    std::remove("a3.txt");
 
 }
 

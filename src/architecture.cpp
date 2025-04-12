@@ -16,9 +16,6 @@ Architecture::Architecture(const Parameters &pars, const std::string &filename) 
     // Generate a new architecture
     make();
 
-    // Check
-    check();
-
     // Read in architecture if needed
     if (filename != "") read(filename);
     
@@ -27,22 +24,18 @@ Architecture::Architecture(const Parameters &pars, const std::string &filename) 
 // Function to check architecture parameters
 void Architecture::check() const {
 
-    // Scalar checks
-    assert(nloci >= 0u);
+    // Check
+    assert(chk::isstrictpos(nloci));
     assert(locations.size() == nloci);
     assert(effects.size() == locations.size());
-    assert(locations[0u] >= 0.0);
-    assert(locations.back() <= 1.0);
-
-    // Locations in increasing order
-    for (size_t i = 0u; i < locations.size() - 1u; ++i)
-        assert(locations[i + 1u] > locations[i]);
-
-    // Check
+    assert(chk::isproportion(locations[0u]));
+    assert(chk::isproportion(locations.back()));
+    assert(chk::isstrictorder(locations));
     assert(!effects.empty());
-
-    // All effect sizes are positive
-    for (auto &effect : effects) assert(effect > 0.0);
+    assert(chk::isstrictpos(tolmax));
+    
+    // Across values
+    for (auto &effect : effects) assert(chk::isstrictpos(effect));
 
 }
 
@@ -58,22 +51,12 @@ void Architecture::make() {
 
     // Now sort the vector of locations
     std::sort(locations.begin(), locations.end());
-
-    // Check the number of locations
-    assert(locations.size() == nloci);
-
-    // Check increasing order
-    for (size_t l = 1u; l < nloci; ++l) assert(locations[l] > locations[l - 1u]);
-    
-    // Check bounds
-    assert(locations[0u] >= 0.0);
-    assert(locations.back() <= 1.0);
-
-    // Check
-    assert(!effects.empty());
     
     // Compute maximum trait value
     for (double &effect : effects) tolmax += effect;
+
+    // Check
+    check();
 
 }
 
@@ -82,86 +65,54 @@ void Architecture::read(const std::string &filename) {
 
     // filename: name of the file to read from
 
-    // Open the architecture file
-    std::ifstream file(filename.c_str());
+    // Create a reader
+    Reader reader(filename);
 
-    // Check if the file is open
-    if (!file.is_open())
-        throw std::runtime_error("Unable to open file " + filename);
+    // Open it
+    reader.open();
 
-    // Reset
-    nloci = 0u;
+    // For each line in the file...
+    while (!reader.iseof()) {
 
-    // Read the number of loci
-    file >> nloci;
+        // Read a line
+        reader.readline();
 
-    // Error if could not read
-    if (file.fail())
-        throw std::runtime_error("Could not read the number of loci in architecture file");
+        // Skip empty line
+        if (reader.isempty()) continue;
 
-    // Error if no loci
-    if (nloci == 0)
-         throw std::runtime_error("There must be at least one locus in architecture file");
+        // Skip if comment line
+        if (reader.iscomment()) continue;
 
-    // Resize containers
-    locations.resize(nloci);
-    effects.resize(nloci);
+        // Check
+        assert(!reader.isempty());
+        assert(!reader.iscomment());
 
-    // For each locus...
-    for (size_t l = 0u; l < nloci; ++l) {
+        // Current parameter name 
+        std::string name = reader.getname();
 
-        // Read the locus position
-        file >> locations[l];
+        // Read the parameter value(s)
+        if (name == "nloci") reader.readvalue(nloci, "onetothousand");
+        else if (name == "locations") reader.readvalues(locations, nloci, "proportion", "strictorder");
+        else if (name == "effects") reader.readvalues(effects, nloci, "strictpos");
+        else 
+            reader.readerror();
 
-        // Check if could not read
-        if (file.fail())
-            throw std::runtime_error("Could not read the location of locus " + std::to_string(l + 1u) + " in architecture file");
-
-        // Check order
-        if (l > 0u && locations[l] <= locations[l - 1]) 
-            throw std::runtime_error("Locus locations must be in strictly increasing order in architecture file");
-
+        // Check that we have reached the end of the line
+        assert(reader.iseol());
+ 
     }
 
-    // Check bounds
-    if (locations[0u] < 0.0) throw std::runtime_error("Locus location must be positive in architecture file");
-    if (locations.back() > 1.0) throw std::runtime_error("Locus location cannot be beyond the end of the genome");
-
-    // Reset maximum trait value
-    tolmax = 0.0;
-
-    // For each locus...
-    for (size_t l = 0u; l < nloci; ++l) {
-
-        // Read effect size
-        file >> effects[l];
-
-        // Check if could not read
-        if (file.fail())
-            throw std::runtime_error("Could not read the effect size of locus " + std::to_string(l + 1u) + " in architecture file");
-
-        // Check sign
-        if (effects[l] < 0.0)
-            throw std::runtime_error("Effect size of locus " + std::to_string(l + 1u) + " must be positive in architecture file");
-
-        // Sum effect sizees
-        tolmax += effects[l];
-
-    }
-
-    // Error if needed
-    if (tolmax == 0.0) 
-        throw std::runtime_error("Sum of effect sizes must be strictly positive in architecture file");
-
-    // Check
-    assert(tolmax > 0.0);
+    // Check that we have reached the end of the file
+    assert(reader.iseof());
 
     // Close the file
-    file.close();
+    reader.close();
 
-    // Check sizes
-    assert(locations.size() == nloci);
-    assert(effects.size() == nloci);
+    // Reset
+    tolmax = 0.0;
+
+    // Update
+    for (double &effect : effects) tolmax += effect;
 
     // Check
     check();

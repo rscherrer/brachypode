@@ -23,5 +23,3 @@ foreach(TEST_SOURCE IN LISTS TEST_SOURCES)
     target_link_libraries(${TEST_NAME} PUBLIC Boost::unit_test_framework)
     set_target_properties(${TEST_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/tests/$<0:>)
 endforeach()
-
-# TODO: Update docs

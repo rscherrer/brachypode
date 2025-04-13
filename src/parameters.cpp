@@ -105,8 +105,6 @@ void Parameters::read(const std::string &filename)
     // Open it
     reader.open();
 
-    // TODO: Move reader header call here
-
     // For each line in the file...
     while (!reader.iseof()) {
 

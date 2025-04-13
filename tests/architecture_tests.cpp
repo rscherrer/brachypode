@@ -74,8 +74,6 @@ BOOST_AUTO_TEST_CASE(loadedArchitectureHasRightAttributes) {
 
 }
 
-// TODO: Test missing architecture file in main
-
 // Test that error if the parameter is no architecture parameter
 BOOST_AUTO_TEST_CASE(errorWhenUnknownParameter) {
 
@@ -99,7 +97,7 @@ BOOST_AUTO_TEST_CASE(errorWhenInvalidNLoci) {
 
     // Check error
     tst::checkError([&] { Architecture arch(Parameters(), "a1.txt"); }, "Too many values for parameter nloci in line 1 of file a1.txt");
-    tst::checkError([&] { Architecture arch(Parameters(), "a2.txt"); }, "Parameter nloci must be strictly positive in line 1 of file a2.txt");
+    tst::checkError([&] { Architecture arch(Parameters(), "a2.txt"); }, "Parameter nloci must be between 1 and 1000 in line 1 of file a2.txt");
 
     // Remove files
     std::remove("a1.txt");
@@ -117,10 +115,10 @@ BOOST_AUTO_TEST_CASE(errorWhenInvalidLocusLocations) {
     tst::write("a4.txt", "nloci 3\nlocations 0.2 0.1 0.3");
 
     // Check error
-    tst::checkError([&] { Architecture arch(Parameters(), "a1.txt"); }, "Too many values for parameter locations in line 1 of file a1.txt");
-    tst::checkError([&] { Architecture arch(Parameters(), "a2.txt"); }, "Too few values for parameter locations in line 1 of file a2.txt");
-    tst::checkError([&] { Architecture arch(Parameters(), "a3.txt"); }, "Parameter locations must be between 0 and 1 in line 1 of file a3.txt");
-    tst::checkError([&] { Architecture arch(Parameters(), "a4.txt"); }, "Parameter locations must be in strictly increasing order in line 1 of file a4.txt");
+    tst::checkError([&] { Architecture arch(Parameters(), "a1.txt"); }, "Too many values for parameter locations in line 2 of file a1.txt");
+    tst::checkError([&] { Architecture arch(Parameters(), "a2.txt"); }, "Too few values for parameter locations in line 2 of file a2.txt");
+    tst::checkError([&] { Architecture arch(Parameters(), "a3.txt"); }, "Parameter locations must be between 0 and 1 in line 2 of file a3.txt");
+    tst::checkError([&] { Architecture arch(Parameters(), "a4.txt"); }, "Parameter locations must be in strictly increasing order in line 2 of file a4.txt");
 
     // Remove files
     std::remove("a1.txt");
@@ -139,9 +137,9 @@ BOOST_AUTO_TEST_CASE(errorWhenInvalidEffectSizes) {
     tst::write("a3.txt", "nloci 3\neffects 0.1 0.0 0.3");
 
     // Check error
-    tst::checkError([&] { Architecture arch(Parameters(), "a1.txt"); }, "Too many values for parameter effects in line 1 of file a1.txt");
-    tst::checkError([&] { Architecture arch(Parameters(), "a2.txt"); }, "Too few values for parameter effects in line 1 of file a2.txt");
-    tst::checkError([&] { Architecture arch(Parameters(), "a3.txt"); }, "Parameter effects must be strictly positive in line 1 of file a3.txt");
+    tst::checkError([&] { Architecture arch(Parameters(), "a1.txt"); }, "Too many values for parameter effects in line 2 of file a1.txt");
+    tst::checkError([&] { Architecture arch(Parameters(), "a2.txt"); }, "Too few values for parameter effects in line 2 of file a2.txt");
+    tst::checkError([&] { Architecture arch(Parameters(), "a3.txt"); }, "Parameter effects must be strictly positive in line 2 of file a3.txt");
     
     // Remove files
     std::remove("a1.txt");

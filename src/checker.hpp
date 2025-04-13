@@ -12,7 +12,7 @@ namespace chk {
     template <typename T> 
     std::string proportion(const T &x) { 
         
-        return x <= 0.0 || x >= 1.0 ? "must be between 0 and 1" : "";
+        return x < 0.0 || x > 1.0 ? "must be between 0 and 1" : "";
 
     }
 

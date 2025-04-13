@@ -13,6 +13,8 @@ Reader::Reader(const std::string &filename) :
     name("")
 {
 
+    // filename: name of the file to read
+
 }
 
 // Error messages
@@ -36,6 +38,8 @@ void Reader::readerror() const {
 
 // Function to format error message
 void Reader::checkerror(const std::string &error) const {
+
+    // error: error message to format
 
     // Check if error is empty
     if (error.empty()) return;
@@ -84,6 +88,9 @@ void Reader::reset() {
 
 // Function to make sure the next thing can be read
 bool Reader::readnext(std::istringstream &line, std::string &input) {
+
+    // line: line to read from
+    // input: string to read into
 
     // Read the parameter name
     line >> input;

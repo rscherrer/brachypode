@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(useCaseWithArchitectureLoading) {
     tst::write("parameters.txt", "loadarch 1");
 
     // Write an achitecture file
-    tst::write("architecture.txt", "1\n1\n3\n0.1 0.2 0.3\n0.1 0.1 0.1\n");
+    tst::write("architecture.txt", "nloci 3\nlocations 0.1 0.2 0.3\neffects 0.1 0.1 0.1\n");
 
     // Check that the simulation runs
     BOOST_CHECK_NO_THROW(doMain({"program", "parameters.txt"}));

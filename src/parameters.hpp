@@ -11,8 +11,6 @@
 
 #include "reader.hpp"
 
-// TODO: Space out wherever applicable?
-
 struct Parameters {
 
     // Constructor

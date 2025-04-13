@@ -2,7 +2,9 @@
 
 Here we provide an explanation of the various parameters of the model (passed though a parameter file, e.g. `parameters.txt`), as well as their default value(s) when no parameter file is supplied, and their valid ranges. For more information, please refer to the source code or the scientific manuscript accompanying this project (link will be made available once published).
 
-Not that hereafter, "positive" means including zero, while "strictly positive" means excluding zero. Also note that missing parameters in the parameter file will take their default value.
+Not that hereafter, "positive" means ***including zero***, while "strictly positive" means ***excluding zero***. Also note that missing parameters in the parameter file will take their default value.
+
+For parameters specific to the genet
 
 | Parameter name | Default value(s) | Accepted values | Description | No. values | Notes |
 |--|--|--|--|--|--|
@@ -26,10 +28,10 @@ Not that hereafter, "positive" means including zero, while "strictly positive" m
 | `selfing` | `0.95` | Decimals from zero to one | Probability of each offspring produced to be a clone of its parent plant (and not of sexual reproduction with a pollen donor) | 1 |
 | `recombination` | `1` | Positive decimals | Average distance between consecutive crossovers during the recombination process, 1 being the length of the genome | 1 | Set 0 for no recombination 
 | `precis` | `1e-06` | Strictly positive decimals | The minimum value that the realized carrying capacity can take within a patch | 1 | Should be very small
-| `memsave` | `1` | Decimals strictly greater than the size of a double precision floating point number (usually 8 bytes, i.e. 8e-06 MB, on a 64 bit system), in MB ** | Memory that can be filled in by each data saving buffer (in MB) before writing to file | 1 | There will be as many open buffers as there are output files to save (see details [here](OUTPUT.md))
+| `memsave` | `1` | Decimals greater than the size of a double precision floating point number (usually 8 bytes, i.e. 8e-06 MB, on a 64 bit system), in MB | Memory that can be filled in by each data saving buffer (in MB) before writing to file | 1 | There will be as many open buffers as there are output files to save (see details [here](OUTPUT.md))
 | `tend` | `10` | Strictly positive integers | Number of simulation time steps | 1 |
 | `tsave` | `20` | Strictly positive integers | Frequency of data saving (in time steps) | 1 |
-| `tchange` | `100000` | Positive integers | Time at which climate change starts | 1 |
+| `tchange` | `100000` | Positive integers | Time at which climate change starts | 1 | Note that at `tchange`, climate change has not started yet. It only starts at the next generation.
 | `twarming` | `1` | Strictly positive integers | Duration of the climate change period (in time steps) | 1 |
 | `seed` | Clock-generated | Positive integers | Seed of the pseudo-random number generator | 1 | The clock is used to generate a pseudo-random seed. Make sure to set `savepars` to 1 to be able to retrieve the generated seed and reproduce a given simulation. | 
 | `sow` | `0` | One or zero | Whether or not the individuals should be randomly distributed across demes at the start of the simulation | 1 |

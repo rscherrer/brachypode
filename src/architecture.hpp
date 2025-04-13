@@ -10,9 +10,6 @@
 
 #include "parameters.hpp"
 #include "random.hpp"
-#include "utilities.hpp"
-
-// TODO: Maybe move utilities to parameters.hpp
  
 struct Architecture {
 

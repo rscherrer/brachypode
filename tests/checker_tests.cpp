@@ -14,8 +14,8 @@ BOOST_AUTO_TEST_CASE(isProportion) {
     BOOST_CHECK_EQUAL(chk::proportion(0.0), "");
     BOOST_CHECK_EQUAL(chk::proportion(0.5), "");
     BOOST_CHECK_EQUAL(chk::proportion(1.0), "");
-    BOOST_CHECK_EQUAL(chk::proportion(-0.5), "must be a proportion");
-    BOOST_CHECK_EQUAL(chk::proportion(1.5), "must be a proportion");
+    BOOST_CHECK_EQUAL(chk::proportion(-0.5), "must be between 0 and 1");
+    BOOST_CHECK_EQUAL(chk::proportion(1.5), "must be between 0 and 1");
 
 }
 

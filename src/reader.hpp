@@ -45,8 +45,8 @@ public:
         const std::function<std::string(const T&)> &check = nullptr
     ) {
 
-        // TODO: Don't forget to document arguments
-        // TODO: What default when no check to perform?
+        // value: variable to read into
+        // check: function used to check the value
     
         // Read value in
         read(value, check);
@@ -65,6 +65,11 @@ public:
         const std::function<std::string(const T&)> &check = nullptr, 
         const std::function<std::string(const std::vector<T>&)> &checks = nullptr
     ) {
+
+        // values: vector to read into
+        // n: number of values to read
+        // check: function used to check individual values
+        // checks: function used to check the vector of values
 
         // Check
         assert(n != 0);
@@ -111,8 +116,6 @@ public:
         // If error, throw
         checkerror(error);
     
-        // TODO: But then no details on the error
-    
     }
 
 private:
@@ -155,12 +158,11 @@ private:
         const std::function<std::string(const T&)> &check = nullptr
     ) {
 
-        // TODO: Remember to document arguments
+        // value: variable to read into
+        // check: function used to check the value
 
         // Temporary receptacle
         std::string temp;
-
-        // TODO: Access index?
 
         // Make sure the next value can be read
         if (!readnext(line, temp)) 
@@ -181,8 +183,6 @@ private:
 
         // If error, throw
         checkerror(error);
-
-        // TODO: But then no details on the error
 
     }
 };

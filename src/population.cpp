@@ -111,8 +111,6 @@ double lincrement(const double &x, const double &xfinal, const size_t &t, const 
 // Update climate-related parameters
 void Population::update() {
 
-    // TODO: Explain that at tchange the climate has not changed yet
-
     // Early exit if warming has not started
     if (time <= tchange) return;
 

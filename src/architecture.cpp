@@ -133,18 +133,16 @@ void Architecture::save(const std::string &filename) const
         throw std::runtime_error("Unable to open file " + filename);
 
     // Write the number of loci
-    file << nloci << '\n';
+    file << "nloci " << nloci << '\n';
     
     // Write the locations of loci
+    file << "locations";
     for (size_t l = 0u; l < nloci; ++l) file << ' ' << locations[l];
-    
-    // End of line
     file << '\n';
-    
+
     // Write the effect sizes
+    file << "effects";
     for (size_t l = 0u; l < nloci; ++l) file << ' ' << effects[l];
-    
-    // End of line
     file << '\n';
 
     // Close the file

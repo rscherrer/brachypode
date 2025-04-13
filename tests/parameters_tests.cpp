@@ -62,6 +62,9 @@ BOOST_AUTO_TEST_CASE(readParameters)
     content << "choose 1\n";
     content << "verbose 1\n";
 
+    // Write the content to a file
+    tst::write("parameters.txt", content.str());
+
     // Read the parameter file
     Parameters pars("parameters.txt");
 
@@ -110,8 +113,6 @@ BOOST_AUTO_TEST_CASE(readParameters)
     std::remove("parameters.txt");
 
 }
-
-// TODO: Test missing file in main
 
 // Test that parameter reading fails when invalid parameters are provided
 BOOST_AUTO_TEST_CASE(readInvalidParameters)

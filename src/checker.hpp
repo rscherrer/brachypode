@@ -4,72 +4,64 @@
 // This is the header for the chk (checker) namespace.
 
 #include <vector>
+#include <string>
 
 namespace chk {
 
     // Function to check that a value is a proportion
     template <typename T> 
-    bool isproportion(const T &x, const bool &strict = false) { 
+    std::string proportion(const T &x) { 
         
-        return strict ? x > 0.0 && x < 1.0 : x >= 0.0 || x <= 1.0;
+        return x <= 0.0 || x >= 1.0 ? "must be between 0 and 1" : "";
 
     }
 
     // Function to check that a value is between 1 and 1000
     template <typename T>
-    bool isonetothousand(const T &x) {
+    std::string onetothousand(const T &x) {
 
-        return x > 0u && x <= 1000u;
+        return x <= 0u || x > 1000u ? "must be between 1 and 1000" : "";
 
     }
 
     // Function to check that a value is enough MB
     template <typename T>
-    bool isenoughmb(const T &x) {
+    std::string enoughmb(const T &x) {
         
-        return x * 1E6 > sizeof(double);
+        return x * 1E6 < sizeof(double) ? "must be enough MB to store a double" : "";
 
     }
 
     // Function to check that a value is positive
     template <typename T>
-    bool ispositive(const T &x, const bool &strict = false) {
+    std::string positive(const T &x) {
 
-        return strict ? x > 0.0 : x >= 0.0;
+        return x < 0.0 ? "must be positive" : "";
 
     }
 
     // Function to check that a value is strictly positive
     template <typename T>
-    bool isstrictpos(const T &x) {
+    std::string strictpos(const T &x) {
 
-        return ispositive(x, true);
+        return x <= 0.0 ? "must be strictly positive" : "";
 
     }
 
     // Function to check that a vector is in order
     template <typename T> 
-    bool isinorder(const std::vector<T> &v, const bool &strict = false) {
+    std::string strictorder(const std::vector<T> &v) {
 
         // Early exit
-        if (v.size() < 2u) return true;
+        if (v.size() < 2u) return "";
 
         // Check if any two are not
         for (size_t i = 1u; i < v.size(); ++i)
-            if ((strict && v[i] <= v[i - 1u]) || (!strict && v[i] < v[i - 1u]))
-                return false;
-                
-        // Otherwise all good
-        return true;
+            if (v[i] <= v[i - 1u])
+                return "must be in strictly increasing order";
 
-    }
-
-    // Function to check that a vector is in strict order
-    template <typename T> 
-    bool isstrictorder(const std::vector<T> &v) {
-
-        return isinorder(v, true);
-
+        return "";
+        
     }
 }
 

@@ -136,9 +136,6 @@ BOOST_AUTO_TEST_CASE(readerReadLine) {
     // We are not at the end of the file
     BOOST_CHECK_EQUAL(reader.iseof(), false); 
 
-    // We have not yet read a parameter name
-    BOOST_CHECK_EQUAL(reader.getname(), "");
-
     // Read the second line
     reader.readline();
 
@@ -238,7 +235,7 @@ BOOST_AUTO_TEST_CASE(readerCommentLine) {
 BOOST_AUTO_TEST_CASE(readerErrorReadName) {
 
     // Write a parameter file with a control character in parameter name
-    tst::write("parameters.txt", "hello\x01 10\npopsize 10");
+    tst::write("parameters.txt", "hel\x01lo 10\npopsize 10");
 
     // Create a reader
     Reader reader("parameters.txt");
@@ -345,7 +342,7 @@ BOOST_AUTO_TEST_CASE(readerErrorNotJustOneValue) {
 BOOST_AUTO_TEST_CASE(readerErrorReadValue) {
 
     // Write a parameter file with control character
-    tst::write("parameters.txt", "nloci 12\x10\npopsize 10");
+    tst::write("parameters.txt", "nloci \x10\npopsize 10");
 
     // Create a reader
     Reader reader("parameters.txt");
@@ -410,11 +407,15 @@ BOOST_AUTO_TEST_CASE(readerErrorParseValue) {
 BOOST_AUTO_TEST_CASE(readerErrorInvalidValue) {
 
     // Write a parameter file
-    tst::write("parameters1.txt", "hello -1");
-    tst::write("parameters2.txt", "hello 0");
+    tst::write("parameters1.txt", "hello -1\nhello -1\nhello -1");
+    tst::write("parameters2.txt", "hello 0\nhello 0\nhello 0\nhello 0");
     tst::write("parameters3.txt", "hello 1.5");
     tst::write("parameters4.txt", "hello 1001");
     tst::write("parameters5.txt", "hello 0.00000000000000001");
+
+    // Note: We add multiple lines with the same parameters so we can call
+    // the reader functions on the same parameter file several times in
+    // a row to test various error messages.
 
     // Create a reader
     Reader r1("parameters1.txt");
@@ -441,25 +442,26 @@ BOOST_AUTO_TEST_CASE(readerErrorInvalidValue) {
     size_t n = 0u;
     double x = 0.0;
 
-    // Check error when not positive
-    tst::checkError([&]() { r1.readvalue(x, "positive"); }, "Parameter hello must be positive in line 1 of file parameters1.txt");
+    // Parameter file with a negative number
+    tst::checkError([&]() { r1.readvalue<double>(x, chk::positive<double>); }, "Parameter hello must be positive in line 1 of file parameters1.txt");
+    r1.readline();
+    tst::checkError([&]() { r1.readvalue<double>(x, chk::strictpos<double>); }, "Parameter hello must be strictly positive in line 2 of file parameters1.txt");
+    r1.readline();
+    tst::checkError([&]() { r1.readvalue<double>(x, chk::proportion<double>); }, "Parameter hello must be between 0 and 1 in line 3 of file parameters1.txt");
+    
+    // Parameter file with a zero
+    tst::checkError([&]() { r2.readvalue<double>(x, chk::strictpos<double>); }, "Parameter hello must be strictly positive in line 1 of file parameters2.txt");
+    r2.readline();
+    tst::checkError([&]() { r2.readvalue<size_t>(n, chk::strictpos<size_t>); }, "Parameter hello must be strictly positive in line 2 of file parameters2.txt");
+    r2.readline();
+    tst::checkError([&]() { r2.readvalue<size_t>(n, chk::onetothousand<size_t>); }, "Parameter hello must be between 1 and 1000 in line 3 of file parameters2.txt");
+    r2.readline();
+    tst::checkError([&]() { r2.readvalue<double>(x, chk::enoughmb<double>); }, "Parameter hello must be enough MB to store a double in line 4 of file parameters2.txt");
 
-    // Check error when not strictly positive 
-    tst::checkError([&]() { r1.readvalue(x, "strictpositive"); }, "Parameter hello must be stictly positive in line 1 of file parameters1.txt");
-    tst::checkError([&]() { r2.readvalue(x, "strictpositive"); }, "Parameter hello must be stictly positive in line 1 of file parameters2.txt");
-    tst::checkError([&]() { r2.readvalue(n, "strictpositive"); }, "Parameter hello must be stictly positive in line 1 of file parameters2.txt");
-
-    // Check error when not proportion
-    tst::checkError([&]() { r1.readvalue(x, "proportion"); }, "Parameter hello must be between 0 and 1 in line 1 of file parameters1.txt");
-    tst::checkError([&]() { r3.readvalue(x, "proportion"); }, "Parameter hello must be between 0 and 1 in line 1 of file parameters3.txt");
-
-    // Check error when not from one to a thousand
-    tst::checkError([&]() { r2.readvalue(n, "onetothousand"); }, "Parameter hello must be between 1 and 1000 in line 1 of file parameters2.txt");
-    tst::checkError([&]() { r4.readvalue(n, "onetothousand"); }, "Parameter hello must be between 1 and 1000 in line 1 of file parameters4.txt");
-
-    // Check error when not enough MB
-    tst::checkError([&]() { r2.readvalue(x, "isenoughmb"); }, "Parameter hello must be enough MB to store a double in line 1 of file parameters2.txt");
-    tst::checkError([&]() { r5.readvalue(x, "isenoughmb"); }, "Parameter hello must be enough MB to store a double in line 1 of file parameters5.txt");
+    // Other parameter files
+    tst::checkError([&]() { r3.readvalue<double>(x, chk::proportion<double>); }, "Parameter hello must be between 0 and 1 in line 1 of file parameters3.txt");
+    tst::checkError([&]() { r4.readvalue<size_t>(n, chk::onetothousand<size_t>); }, "Parameter hello must be between 1 and 1000 in line 1 of file parameters4.txt");
+    tst::checkError([&]() { r5.readvalue<double>(x, chk::enoughmb<double>); }, "Parameter hello must be enough MB to store a double in line 1 of file parameters5.txt");
 
     // Close the file
     r1.close();
@@ -571,8 +573,8 @@ BOOST_AUTO_TEST_CASE(readerErrorTooFewValues) {
  
 }
 
-// Test that error when invalid values at the vector level
-BOOST_AUTO_TEST_CASE(readerErrorInvalidVector) {
+// Test that error when values are not in strict order
+BOOST_AUTO_TEST_CASE(readerErrorInvalidOrder) {
 
     // Write a parameter file
     tst::write("parameters1.txt", "nloci 30 10 20\npopsize -1 -2 -3");
@@ -594,8 +596,8 @@ BOOST_AUTO_TEST_CASE(readerErrorInvalidVector) {
     std::vector<size_t> nloci;
 
     // Check
-    tst::checkError([&]() { r1.readvalues(nloci, 3u, "strictorder"); }, "Parameter nloci must be in strict order in line 1 of file parameters1.txt");
-    tst::checkError([&]() { r2.readvalues(nloci, 3u, "strictorder"); }, "Parameter nloci must be in strict order in line 1 of file parameters2.txt");
+    tst::checkError([&]() { r1.readvalues<size_t>(nloci, 3u, nullptr, chk::strictorder<size_t>); }, "Parameter nloci must be in strictly increasing order in line 1 of file parameters1.txt");
+    tst::checkError([&]() { r2.readvalues<size_t>(nloci, 3u, nullptr, chk::strictorder<size_t>); }, "Parameter nloci must be in strictly increasing order in line 1 of file parameters2.txt");
 
     // Close the file
     r1.close();

@@ -25,17 +25,17 @@ Architecture::Architecture(const Parameters &pars, const std::string &filename) 
 void Architecture::check() const {
 
     // Check
-    assert(chk::isstrictpos(nloci));
+    assert(nloci != 0u);
+    assert(nloci <= 1000u);
     assert(locations.size() == nloci);
-    assert(effects.size() == locations.size());
-    assert(chk::isproportion(locations[0u]));
-    assert(chk::isproportion(locations.back()));
-    assert(chk::isstrictorder(locations));
+    assert(effects.size() == nloci);
+    assert(locations[0u] >= 0.0);
+    assert(locations.back() <= 1.0);
+    for (size_t l = 1u; l < locations.size(); ++l)
+        assert(locations[l] > locations[l - 1u]);
     assert(!effects.empty());
-    assert(chk::isstrictpos(tolmax));
-    
-    // Across values
-    for (auto &effect : effects) assert(chk::isstrictpos(effect));
+    assert(tolmax > 0.0);
+    for (auto x : effects) assert(x > 0.0);
 
 }
 
@@ -91,9 +91,9 @@ void Architecture::read(const std::string &filename) {
         std::string name = reader.getname();
 
         // Read the parameter value(s)
-        if (name == "nloci") reader.readvalue(nloci, "onetothousand");
-        else if (name == "locations") reader.readvalues(locations, nloci, "proportion", "strictorder");
-        else if (name == "effects") reader.readvalues(effects, nloci, "strictpos");
+        if (name == "nloci") reader.readvalue<size_t>(nloci, chk::onetothousand<size_t>);
+        else if (name == "locations") reader.readvalues<double>(locations, nloci, chk::proportion<double>, chk::strictorder<double>);
+        else if (name == "effects") reader.readvalues<double>(effects, nloci, chk::strictpos<double>);
         else 
             reader.readerror();
 

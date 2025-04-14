@@ -1,3 +1,5 @@
+## Example setup
+
 In this guide we show how to build the program using the [CMake](https://cmake.org/) build system. Below we provide a ready-made CMake configuration file but the user is free to use any custom configuration.
 
 ### Prerequisites
@@ -22,7 +24,7 @@ cd brachypode
 
 ### Configure CMake
 
-Our setup uses the following `CMakeLists.txt` configuration file. Make sure to have it saved in the root directory of the repository.
+Our setup uses the following `CMakeLists.txt` configuration file, which you can also find [here](../dev/cmake/Release.txt). Make sure to have it saved in the root directory of the repository.
 
 ```cmake
 # CMakeLists.txt
@@ -48,7 +50,7 @@ set(CMAKE_BUILD_TYPE "Release")
 add_subdirectory(src)
 ```
 
-Then, make sure to have this other `CMakeLists.txt` file, this time saved in the `src/` folder:
+Then, make sure to have this other `CMakeLists.txt` file, this time saved in the `src/` folder. Normally, it should already be present in the right folder if you downloaded this repository.
 
 ```cmake
 # src/CMakeLists.txt

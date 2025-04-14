@@ -8,7 +8,7 @@ The model is an agent-based simulation where sessile individuals dwel in a metap
 
 ## Installation
 
-This program must be compiled. It is written in C++ and can be compiled using any modern C++ compiler and build system. [Here](doc/SETUP.md) we provide an example setup to build the program on several platforms using CMake.
+This program must be compiled. It is written in C++ and can be built using any modern C++ compiler and build system. [Here](doc/SETUP.md) we provide an example setup to build the program on several platforms using CMake.
 
 ## Usage
 
@@ -59,11 +59,13 @@ savearch 1
 choose 0
 ```
 
- In the parameter file, each line should contain a parameter name followed by its value(s). If there are several values, they should be separated by spaces. Invalid parameter names or values will result in an error. Click [here](doc/PARAMETERS.md) for a description of the available parameters and their meaning.
+In the parameter file, each line should contain a parameter name followed by its value(s). If there are several values, they should be separated by spaces. Invalid parameter names or values will result in an error, and lines starting with **#** will be treated as comments. Click [here](doc/PARAMETERS.md) for a description of the available parameters and their meaning.
 
 ### Genetic architecture
 
-For parameters that have to do with the genetic architecture of the evolving traits in this simulation, see [here](doc/ARCHITECTURE).
+The genetic architecture refers to parameters of the genotype-phenotype map, which are on a per locus basis and may take a lot of space, especially if there are many loci. 
+
+Providing a genetic architecture is not necessary, as it will by default be generated anew based on genetic hyperparameters given in the parameter file such as `nloci` or `effect`. However, it is possible to supply a custom genetic architecture by providing an architecture file, as explained [here](doc/ARCHITECTURE).
 
 ### Output
 
@@ -71,7 +73,15 @@ The user can choose which variables to save from the simulation. Those have to b
 
 ## Tests
 
-This program was tested using the Boost Test library. All the tests can be found in the `tests/` folder. [Here](doc/TESTS.md) we show how we tested the program locally using our own custom setup.
+This program was tested using the [Boost.Test](https://www.boost.org/doc/libs/1_85_0/libs/test/doc/html/index.html) library. All the tests can be found in the `tests/` folder. [Here](doc/TESTS.md) we show how we tested the program locally using our own custom setup.
+
+## About
+
+This code was written in **C++20**, making mostly use of [Visual Studio Code](https://code.visualstudio.com/) (v1.99.0), [CMake](https://cmake.org/) (v3.28.3) and [GCC's g++](https://gcc.gnu.org/) (v13.3.0) on **Linux Ubuntu 24.04 LTS**. 
+
+**Tests** (see [here](doc/TESTS.md)) were written with [Boost.Test](https://www.boost.org/doc/libs/1_85_0/libs/test/doc/html/index.html) (v1.87), which was retrieved with [Git](https://git-scm.com/) (v2.43.0) and [vcpkg](https://github.com/microsoft/vcpkg) (v2025.04.09). **Memory use** was checked with [Valgrind](https://valgrind.org/) (v3.22.0). **Code coverage** was analyzed with [gcov](https://gcc.gnu.org/onlinedocs/gcc/Gcov.html) (v13.3.0) and [LCOV](https://github.com/linux-test-project/lcov) (v2.0-1) and [Coverage Gutters](https://github.com/ryanluker/vscode-coverage-gutters) (v2.13.0). **Profiling** was performed with [gprof](https://ftp.gnu.org/old-gnu/Manuals/gprof-2.9.1/html_mono/gprof.html) (v2.42). (See [this page](dev/README.md) for details.)
+
+During development, occasional use was also made of **ChatGPT** and **GitHub Copilot**.
 
 ## Links
 

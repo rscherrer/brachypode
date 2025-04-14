@@ -1,3 +1,5 @@
+## Test configuration
+
 In this guide we show how to modify our [main CMake setup](SETUP.md) in order to run the tests that come with the program. Those tests were written with the [Boost.Test](https://www.boost.org/doc/libs/1_86_0/libs/test/doc/html/index.html) C++ library, and here we show how to build them as separate executables that can be used to check the proper behavior of the program. Check out [this page](https://en.wikipedia.org/wiki/Test-driven_development) for more information about **_unit testing_** and **_test-driven development_** (TDD).
 
 ### Prerequisites
@@ -19,7 +21,7 @@ cd brachypode
 
 ### Configure CMake
 
-Make sure to save the following as a `CMakeLists.txt` file located in the root of the repository:
+Make sure to save the following as a `CMakeLists.txt` file located in the root of the repository. This file is also available [here](../dev/cmake/Tests.txt).
 
 ```cmake
 # CMakeLists.txt
@@ -61,9 +63,9 @@ add_subdirectory(src)
 add_subdirectory(tests)
 ```
 
-This file is substantially longer than the one used in our main setup, as it now contains all the build information needed to download the necessary tools from the [Boost](https://www.boost.org/) library for unit tests, and compile those tests using CMake. 
+This file is substantially longer than the one used in our [main setup](SETUP.md), as it now contains all the build information needed to download the necessary tools from the [Boost](https://www.boost.org/) library for unit tests, and compile those tests using CMake. 
 
-Note: the source code for the tests is located in `tests/`.
+Note that the source code for the tests is located in `tests/`.
 
 On top of that file, make sure to have the following `CMakeLists.txt` file saved in the `src/` directory (it is the same one as in our [main setup](SETUP.md)):
 
@@ -83,7 +85,7 @@ add_executable(brachypode "${CMAKE_SOURCE_DIR}/main.cpp" ${src})
 set_target_properties(brachypode PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/$<0:>)
 ```
 
-Finally, make sure that the following `CMakeLists.txt` file is saved in the `tests/` directory:
+Finally, make sure that the following `CMakeLists.txt` file is saved in the `tests/` directory (this file should be already provided in the right folder within this repository):
 
 ```cmake
 # tests/CMakeLists.txt
@@ -122,9 +124,9 @@ git submodule add --force https://github.com/microsoft/vcpkg
 git submodule update --init --remote
 ```
 
-These steps will connect the repo to Microsoft's [vcpkg](https://vcpkg.io/) installer, whose job will be to download the required elements from [Boost](https://www.boost.org/) necessary for unit testing (instructions for that are given in the file `vcpkg.json`). 
+These steps will connect the repo to Microsoft's [vcpkg](https://vcpkg.io/) installer, whose job will be to download the required elements from [Boost](https://www.boost.org/) necessary for unit testing (instructions for that are given in the file `vcpkg.json` provided with this repo). 
 
-This setup has the advantage of integrating well with CMake and working well across platforms, so the steps are **the same on Windows, Linux or MacOS**. However, in case errors occur during this installation process, we recommend to refer to the log files created by `vcpkg` (some dependencies may be missing and they will be listed there if that is the case).
+This setup has the advantage of integrating with CMake and working well across platforms, so the steps are **the same on Windows, Linux or MacOS**. However, in case errors occur during this installation process, we recommend to refer to the log files created by `vcpkg` (some dependencies may be missing and they will be listed there if that is the case).
 
 ### Build the tests
 
@@ -137,4 +139,10 @@ cmake ..
 cmake --build .
 ```
 
-Here, the `cmake` command downloads the necessary dependencies through `vcpkg`, and builds all the targets (in debug mode) required by the `CMakeLists.txt` configuration --- not just the program itself, but also the tests, whose executables can be found in `bin/tests/`. Simply run those executables to run the tests. 
+Here, the `cmake` command downloads the necessary dependencies through `vcpkg`, and builds all the targets (in debug mode) required by the `CMakeLists.txt` configuration --- not just the program itself, but also the tests, whose executables can be found in `bin/tests/`. Simply run those executables to run the tests. For example:
+
+```shell
+cd bin/tests
+./tests
+./individual_tests
+```

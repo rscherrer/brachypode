@@ -1,6 +1,6 @@
 ## Genetic architecture
 
-The genetic architecture refers to the parameters controlling aspects of the genome and of the **genotype-phenotype map**. Because these parameters take one value per genetic locus, they may be many, and so they are read and stored separately from the other parameters.
+The genetic architecture refers to the parameters controlling aspects of the genome and of the **genotype-phenotype map**. Because these parameters take one value per genetic locus, they may be many, and so they are read and stored separately from the other parameters. 
 
 The details of the genetic architecture can be supplied in a text file called `architecture.txt` if parameter `loadarch` is set to `1` (see [here](PARAMETERS.md) for how to set basic simulation parameters). To be read, this file must be in the working directory from which the program is run.
 
@@ -24,4 +24,6 @@ Some details about the parameters of the genetic architecture:
 | `locations` | Randomly generated from a uniform distribution | Decimals from zero to one | The relative genomic position of each locus | `nloci` | Must be provided in strictly increasing order and not contain duplicates 
 | `effects` | All `0.1` | Strictly positive decimals | The additive contribution of a one-allele to the phenotype at each locus | `nloci` | Will all be equal to parameter `effect` (defaulting to `0.1`) if no architecture is provided (`loadarch 0`)
 
-The architecture file should be provided when a **custom architecture is needed**, for example, one with varying effect sizes across loci (contrary to the default implementation which attributes the same effect size to all loci).
+The architecture file should be provided when a **custom architecture is needed**, for example, one with varying effect sizes across loci (contrary to the default implementation which attributes the same effect size to all loci). 
+
+The number of loci in the architecture file does not need to match that of the parameter file, as `nloci` will be overwritten when the architecture file is read in.

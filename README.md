@@ -92,4 +92,4 @@ During development, occasional use was also made of **ChatGPT** and **GitHub Cop
 
 ## Permissions
 
-Copyright (c) Raphaël Scherrer, 2024 (open source license will be added upon publication). This code comes with no guarantee whatsoever.
+Copyright (c) [Raphaël Scherrer](https://github.com/rscherrer), 2024 (open source license will be added upon publication). This code comes with no guarantee whatsoever.

@@ -2,6 +2,10 @@
 
 This is the repository for a program simulating the evolution of an annual grass species in a semi-arid patchy environment.
 
+![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
+![Memory Leaks](https://img.shields.io/badge/memory--leaks-none-brightgreen)
+
 ## Description
 
 The model is an agent-based simulation where sessile individuals dwel in a metapopulation consisting of multiple demes, and each deme contains a facilitated and an unfactilitated habitat patch (facilitated patches are basically the undergrowth of nurse shrubs). The individuals possess genes that determine some level of tolerance against the harsh conditions encountered outside of the shrubs, which trade off with reproductive output.
@@ -79,7 +83,7 @@ This program was tested using the [Boost.Test](https://www.boost.org/doc/libs/1_
 
 This code was written in **C++20**, making mostly use of [Visual Studio Code](https://code.visualstudio.com/) (v1.99.0), [CMake](https://cmake.org/) (v3.28.3) and [GCC's g++](https://gcc.gnu.org/) (v13.3.0) on **Linux Ubuntu 24.04 LTS**. 
 
-**Tests** were written with [Boost.Test](https://www.boost.org/doc/libs/1_85_0/libs/test/doc/html/index.html) (v1.87), which was retrieved with [Git](https://git-scm.com/) (v2.43.0) and [vcpkg](https://github.com/microsoft/vcpkg) (v2025.04.09). **Memory use** was checked with [Valgrind](https://valgrind.org/) (v3.22.0). **Code coverage** was analyzed with [gcov](https://gcc.gnu.org/onlinedocs/gcc/Gcov.html) (v13.3.0) and [LCOV](https://github.com/linux-test-project/lcov) (v2.0-1) and [Coverage Gutters](https://github.com/ryanluker/vscode-coverage-gutters) (v2.13.0). **Profiling** was performed with [gprof](https://ftp.gnu.org/old-gnu/Manuals/gprof-2.9.1/html_mono/gprof.html) (v2.42). (See [this page](dev/README.md) for details.)
+Tests were written with [Boost.Test](https://www.boost.org/doc/libs/1_85_0/libs/test/doc/html/index.html) (v1.87), which was retrieved with [Git](https://git-scm.com/) (v2.43.0) and [vcpkg](https://github.com/microsoft/vcpkg) (v2025.04.09). Memory use was checked with [Valgrind](https://valgrind.org/) (v3.22.0). Code coverage was analyzed with [gcov](https://gcc.gnu.org/onlinedocs/gcc/Gcov.html) (v13.3.0) and [LCOV](https://github.com/linux-test-project/lcov) (v2.0-1) and [Coverage Gutters](https://github.com/ryanluker/vscode-coverage-gutters) (v2.13.0). The code was profiled with [gprof](https://ftp.gnu.org/old-gnu/Manuals/gprof-2.9.1/html_mono/gprof.html) (v2.42). (See [this page](dev/README.md) for details.)
 
 During development, occasional use was also made of **ChatGPT** and **GitHub Copilot**.
 

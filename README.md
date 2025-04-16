@@ -2,9 +2,9 @@
 
 This is the repository for a program simulating the evolution of an annual grass species in a semi-arid patchy environment.
 
+![Build](https://img.shields.io/badge/build-passing-brightgreen)
 ![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
 ![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
-![Memory Leaks](https://img.shields.io/badge/memory--leaks-none-brightgreen)
 
 ## Description
 

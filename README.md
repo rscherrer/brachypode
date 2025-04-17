@@ -85,13 +85,13 @@ This code was written in **C++20**, making mostly use of [Visual Studio Code](ht
 
 Tests were written with [Boost.Test](https://www.boost.org/doc/libs/1_85_0/libs/test/doc/html/index.html) (v1.87), which was retrieved with [Git](https://git-scm.com/) (v2.43.0) and [vcpkg](https://github.com/microsoft/vcpkg) (v2025.04.09). Memory use was checked with [Valgrind](https://valgrind.org/) (v3.22.0). Code coverage was analyzed with [gcov](https://gcc.gnu.org/onlinedocs/gcc/Gcov.html) (v13.3.0) and [LCOV](https://github.com/linux-test-project/lcov) (v2.0-1) and [Coverage Gutters](https://github.com/ryanluker/vscode-coverage-gutters) (v2.13.0). The code was profiled with [gprof](https://ftp.gnu.org/old-gnu/Manuals/gprof-2.9.1/html_mono/gprof.html) (v2.42). (See [this page](dev/README.md) for details.)
 
-During development, occasional use was also made of **ChatGPT** and **GitHub Copilot**.
+During development, occasional use was also made of ChatGPT and GitHub Copilot.
 
 ## Links
 
-* [brachypode-results](https://github.com/rscherrer/brachypode-r): analysis code and results
+* [brachypode-r](https://github.com/rscherrer/brachypode-r): analysis code in R and results
 * [brachypode-ms](https://github.com/rscherrer/brachypode-ms): manuscript
-* [brachypode-nb](https://github.com/rscherrer/brachypode-approx): Mathematica notebooks used for some derivations
+* [brachypode-nb](https://github.com/rscherrer/brachypode-approx): derivations in Mathematica
 
 ## Permissions
 

@@ -5,11 +5,11 @@
 // of the parameters of the simulation. All parameters have default values that can be 
 // modified by reading in a parameter text file with user-defined values.
 
+#include "reader.hpp"
+
 #include <iostream>
 #include <chrono>
 #include <cstdint>
-
-#include "reader.hpp"
 
 struct Parameters {
 

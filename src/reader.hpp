@@ -3,14 +3,14 @@
 
 // This header contains the Reader class.
 
+#include "checker.hpp"
+
 #include <string>
 #include <sstream>
 #include <fstream>
 #include <vector>
 #include <cassert>
 #include <functional>
-
-#include "checker.hpp"
 
 class Reader {
 

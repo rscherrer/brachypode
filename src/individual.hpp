@@ -8,6 +8,7 @@
 #include "random.hpp"
 #include "parameters.hpp"
 #include "architecture.hpp"
+
 #include <bitset>
 #include <cmath>
 

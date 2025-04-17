@@ -5,6 +5,7 @@
 // by means of buffers.
 
 #include "buffer.hpp"
+
 #include <unordered_map>
 #include <optional>
 #include <cmath>

@@ -89,8 +89,7 @@ During development, occasional use was also made of **ChatGPT** and **GitHub Cop
 
 ## Links
 
-* [brachypoder](https://github.com/rscherrer/brachypoder): package to read the simulations in R
-* [brachypode-results](https://github.com/rscherrer/brachypode-results): generated data and analyses of the results
+* [brachypode-results](https://github.com/rscherrer/brachypode-r): analysis code and results
 * [brachypode-ms](https://github.com/rscherrer/brachypode-ms): manuscript
 * [brachypode-nb](https://github.com/rscherrer/brachypode-approx): Mathematica notebooks used for some derivations
 

@@ -81,13 +81,13 @@ This program was tested using the [Boost.Test](https://www.boost.org/doc/libs/1_
 
 ## About
 
-This code is written in **C++20**. It was developed on Linux Ubuntu 24.04 LTS, making mostly use of [Visual Studio Code](https://code.visualstudio.com/) (v1.99.0). [CMake](https://cmake.org/) (v3.28.3) was used as build system, with [g++](https://gcc.gnu.org/) (v13.3.0) as compiler. [GDB](https://www.gnu.org/savannah-checkouts/gnu/gdb/index.html) (v15.0.50.20240403) was used for debugging. Tests (see [here](doc/TESTS.md)) were written with [Boost.Test](https://www.boost.org/doc/libs/1_85_0/libs/test/doc/html/index.html) (v1.87), itself retrieved with [Git](https://git-scm.com/) (v2.43.0) and [vcpkg](https://github.com/microsoft/vcpkg) (v2025.04.09). Memory use was checked with [Valgrind](https://valgrind.org/) (v3.22.0). Code coverage was analyzed with [gcov](https://gcc.gnu.org/onlinedocs/gcc/Gcov.html) (v13.3.0), [LCOV](https://github.com/linux-test-project/lcov) (v2.0-1) and [Coverage Gutters](https://github.com/ryanluker/vscode-coverage-gutters) (v2.13.0). Profiling was performed with [gprof](https://ftp.gnu.org/old-gnu/Manuals/gprof-2.9.1/html_mono/gprof.html) (v2.42). (See the `dev/` folder and [this page](dev/README.md) for details about the checks performed.) During development, occasional use was also made of [ChatGPT](https://chatgpt.com/) and [GitHub Copilot](https://github.com/features/copilot).
+This code is written in C++20. It was developed on Ubuntu Linux 24.04 LTS, making mostly use of [Visual Studio Code](https://code.visualstudio.com/) 1.99.0 ([C/C++ Extension Pack](https://marketplace.visualstudio.com/items/?itemName=ms-vscode.cpptools-extension-pack) 1.3.1). [CMake](https://cmake.org/) 3.28.3 was used as build system, with [g++](https://gcc.gnu.org/) 13.3.0 as compiler. [GDB](https://www.gnu.org/savannah-checkouts/gnu/gdb/index.html) 15.0.50.20240403 was used for debugging. Tests (see [here](doc/TESTS.md)) were written with [Boost.Test](https://www.boost.org/doc/libs/1_85_0/libs/test/doc/html/index.html) 1.87, itself retrieved with [Git](https://git-scm.com/) 2.43.0 and [vcpkg](https://github.com/microsoft/vcpkg) 2025.04.09. Memory use was checked with [Valgrind](https://valgrind.org/) 3.22.0. Code coverage was analyzed with [gcov](https://gcc.gnu.org/onlinedocs/gcc/Gcov.html)  v13.3.0, [LCOV](https://github.com/linux-test-project/lcov) 2.0-1 and the [Coverage Gutters](https://github.com/ryanluker/vscode-coverage-gutters) extension for Visual Studio Code 2.13.0. Profiling was performed with [gprof](https://ftp.gnu.org/old-gnu/Manuals/gprof-2.9.1/html_mono/gprof.html) 2.42. (See the `dev/` folder and [this page](dev/README.md) for details about the checks performed.) During development, occasional use was also made of [ChatGPT](https://chatgpt.com/) and [GitHub Copilot](https://github.com/features/copilot).
 
 ## Links
 
-* [brachypode-r](https://github.com/rscherrer/brachypode-r): analysis code in R and results
+* [brachypode-r](https://github.com/rscherrer/brachypode-r): analysis code and results
 * [brachypode-ms](https://github.com/rscherrer/brachypode-ms): manuscript
-* [brachypode-nb](https://github.com/rscherrer/brachypode-approx): derivations in Mathematica
+* [brachypode-nb](https://github.com/rscherrer/brachypode-approx): mathematical derivations
 
 ## Permissions
 

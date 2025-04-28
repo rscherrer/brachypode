@@ -1,3 +1,5 @@
+## Example setup
+
 In this guide we show how to build the program using the [CMake](https://cmake.org/) build system. Below we provide a ready-made CMake configuration file but the user is free to use any custom configuration.
 
 ### Prerequisites
@@ -22,7 +24,7 @@ cd brachypode
 
 ### Configure CMake
 
-Our setup uses the following `CMakeLists.txt` configuration file. Make sure to have it saved in the root directory of the repository.
+Our setup uses the following `CMakeLists.txt` configuration file, which you can also find [here](../dev/cmake/Release.txt). Make sure to have it saved in the root directory of the repository.
 
 ```cmake
 # CMakeLists.txt
@@ -41,11 +43,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR})
 
+# Release mode
+set(CMAKE_BUILD_TYPE "Release")
+
 # Source code
 add_subdirectory(src)
 ```
 
-Then, make sure to have this other `CMakeLists.txt` file, this time saved in the `src/` folder:
+Then, make sure to have this other `CMakeLists.txt` file, this time saved in the `src/` folder. Normally, it should already be present in the right folder if you downloaded this repository.
 
 ```cmake
 # src/CMakeLists.txt
@@ -57,10 +62,10 @@ file(GLOB_RECURSE src
 )
 
 # Instruct CMake to build the binary
-add_executable(setupp "${CMAKE_SOURCE_DIR}/main.cpp" ${src})
+add_executable(brachypode "${CMAKE_SOURCE_DIR}/main.cpp" ${src})
 
 # Place the binary into ./bin/
-set_target_properties(setupp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/$<0:>)
+set_target_properties(brachypode PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/$<0:>)
 ```
 
 ### Build the program
@@ -70,7 +75,7 @@ Then, run the following code from within the repository to create a build folder
 ```shell 
 mkdir build
 cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake ..
 cmake --build .
 ```
 

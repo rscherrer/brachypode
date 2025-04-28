@@ -2,17 +2,21 @@
 
 This is the repository for a program simulating the evolution of an annual grass species in a semi-arid patchy environment.
 
+![Build](https://img.shields.io/badge/build-passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
+
 ## Description
 
-This is an agent-based simulation where sessile individuals dwel in a metapopulation consisting of multiple demes, and each deme contains a facilitated and an unfactilitated habitat patch (facilitated patches are basically the undergrowth of nurse shrubs). The individuals possess genes that determine some level of tolerance against the harsh conditions encountered outside of the shrubs, which trade off with reproductive output. See manuscript for more details.
+The model is an agent-based simulation where sessile individuals dwel in a metapopulation consisting of multiple demes, and each deme contains a facilitated and an unfactilitated habitat patch (facilitated patches are basically the undergrowth of nurse shrubs). The individuals possess genes that determine some level of tolerance against the harsh conditions encountered outside of the shrubs, which trade off with reproductive output.
 
 ## Installation
 
-This program is written in C++ and can be compiled using any modern C++ compiler and build system. [Here](doc/SETUP.md) we provide an example setup to build the program on several platforms using the build system CMake.
+This program must be compiled. It is written in C++ and can be built using any modern C++ compiler and build system. [Here](doc/SETUP.md) we provide an example setup to build the program on several platforms using CMake.
 
 ## Usage
 
-This program is a command-line interface program. Assuming the name of the executable is `brachypode`, use the following command in the terminal from the working directory to run a simulation with default parameter values:
+This program has a command-line interface. Assuming the name of the compiled executable is `brachypode`, use the following command in the terminal from the working directory to run a simulation with default parameter values:
 
 ```shell
 ./brachypode
@@ -28,25 +32,23 @@ where `parameters.txt` is a text file containing a list of parameter names and v
 
 ### Parameters
 
-The file `parameters.txt` should look like:
+The parameter file should look like this:
 
 ```
-type 1
 popsize 10
-pgood 3 0.8 0.6 0.5 0.3 0.1
-maxgrowths 1 2
+pgood 3 0.8 0.6 0.5
+pgoodEnd 0.8 0.6 0.5
 stress 4 0
-zwidths 1 2
-capacities 100 10000
+stressEnd 4 0
+capacities 100 1000
+capacities 100 1000
+maxgrowth 2
 steep 2
 dispersal 0.1
 mutation 0.0001
-nchrom 1
 nloci 50
 effect 0.1
 allfreq 0.5
-xmax 5
-ymax 5
 tradeoff 1
 selfing 0.95
 recombination 1
@@ -58,30 +60,35 @@ loadarch 0
 savepars 1
 savelog 0
 savearch 1
-talkative 0
 choose 0
 ```
 
-and should be present within the working directory where the simulation is launched. Click [here](doc/PARAMETERS.md) for a detailed description of the parameters and their meaning.
+In the parameter file, each line should contain a parameter name followed by its value(s). If there are several values, they should be separated by spaces. Invalid parameter names or values will result in an error, and lines starting with **#** will be treated as comments. Click [here](doc/PARAMETERS.md) for a description of the available parameters and their meaning.
 
 ### Genetic architecture
 
-For parameters that have to do with the genetic architecture of the evolving traits in this simulation, see [here](doc/ARCHITECTURE).
+The genetic architecture refers to parameters of the genotype-phenotype map, which are on a per locus basis and may take a lot of space, especially if there are many loci. 
+
+Providing a genetic architecture is not necessary, as it will by default be generated anew based on genetic hyperparameters given in the parameter file such as `nloci` or `effect`. However, it is possible to supply a custom genetic architecture by providing an architecture file, as explained [here](doc/ARCHITECTURE).
 
 ### Output
 
-The user can choose which variables to save from the simulation. Those have to be encoded in the `whattosave.txt` file provided that parameter `choose` is set to `1` within the `parameters.txt` file, as explained [here](doc/OUTPUT.md). Output data are saved into binary files with the `.dat` extension, which can be read by the custom-made [R](https://www.r-project.org/) package [brachypoder](https://github.com/rscherrer/brachypoder).
+The user can choose which variables to save from the simulation. Those have to be encoded in the `whattosave.txt` file provided that parameter `choose` is set to `1` within the `parameters.txt` file, as explained [here](doc/OUTPUT.md). Output data are saved into binary files with the `.dat` extension. Those files can be read by any utility capable of reading binary, provided that the data type and byte size is known (e.g. doubles taking 8 bytes). We recommend using the [R](https://www.r-project.org/) package [readsim](https://github.com/rscherrer/readsim) for that, as it was specifically designed to read and assemble into tables the kind of data generated by this program.
 
 ## Tests
 
-This program was tested using the Boost Test library. All the tests can be found in the `tests/` folder. [Here](doc/TESTS.md) we show how we tested the program locally using our own custom setup.
+This program was tested using the [Boost.Test](https://www.boost.org/doc/libs/1_85_0/libs/test/doc/html/index.html) library. All the tests can be found in the `tests/` folder. [Here](doc/TESTS.md) we show how we tested the program locally using our own custom setup.
+
+## About
+
+This code is written in C++20. It was developed on Ubuntu Linux 24.04 LTS, making mostly use of [Visual Studio Code](https://code.visualstudio.com/) 1.99.0 ([C/C++ Extension Pack](https://marketplace.visualstudio.com/items/?itemName=ms-vscode.cpptools-extension-pack) 1.3.1). [CMake](https://cmake.org/) 3.28.3 was used as build system, with [g++](https://gcc.gnu.org/) 13.3.0 as compiler. [GDB](https://www.gnu.org/savannah-checkouts/gnu/gdb/index.html) 15.0.50.20240403 was used for debugging. Tests (see [here](doc/TESTS.md)) were written with [Boost.Test](https://www.boost.org/doc/libs/1_85_0/libs/test/doc/html/index.html) 1.87, itself retrieved with [Git](https://git-scm.com/) 2.43.0 and [vcpkg](https://github.com/microsoft/vcpkg) 2025.04.09. Memory use was checked with [Valgrind](https://valgrind.org/) 3.22.0. Code coverage was analyzed with [gcov](https://gcc.gnu.org/onlinedocs/gcc/Gcov.html)  v13.3.0, [LCOV](https://github.com/linux-test-project/lcov) 2.0-1 and the [Coverage Gutters](https://github.com/ryanluker/vscode-coverage-gutters) extension for Visual Studio Code 2.13.0. Profiling was performed with [gprof](https://ftp.gnu.org/old-gnu/Manuals/gprof-2.9.1/html_mono/gprof.html) 2.42. (See the `dev/` folder and [this page](dev/README.md) for details about the checks performed.) During development, occasional use was also made of [ChatGPT](https://chatgpt.com/) and [GitHub Copilot](https://github.com/features/copilot).
 
 ## Links
 
-* [brachypode-results](https://github.com/rscherrer/brachypode-r): analysis code and results
+* [brachypode-r](https://github.com/rscherrer/brachypode-r): analysis code and results
 * [brachypode-ms](https://github.com/rscherrer/brachypode-ms): manuscript
-* [brachypode-nb](https://github.com/rscherrer/brachypode-approx): Mathematica notebooks used for some derivations
+* [brachypode-nb](https://github.com/rscherrer/brachypode-approx): mathematical derivations
 
 ## Permissions
 
-Copyright (c) Raphaël Scherrer, 2024 (open source license will be added upon publication). This code comes with no guarantee whatsoever.
+Copyright (c) [Raphaël Scherrer](https://github.com/rscherrer), 2024 (open source license will be added upon publication). This code comes with no guarantee whatsoever.

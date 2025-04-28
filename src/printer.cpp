@@ -1,73 +1,247 @@
-//
+// Functions pertaining to the stf namespace.
 
-#include "printer.h"
+#include "printer.hpp"
 
-// Function to add and open output file streams to a vector of streams
-void stf::open(
-    std::vector<std::shared_ptr<std::ofstream> > &outfiles,
-    const std::vector<std::string> &filenames
-) {
+// Function to convert computer memory in number of values
+size_t prt::memtosize(const double &m, const double &u) {
 
-    // Reserve space for enough output files
-    outfiles.reserve(filenames.size());
+    // m: memory use
+    // u: the unit (e.g. 1 million for megabyte)
 
-    // For each file...
-    for (size_t f = 0u; f < filenames.size(); ++f) {
+    // Check
+    assert(m >= 0.0);
+    assert(u >= 0.0);
 
-        // Add extension to the file name
-        const std::string filename = filenames[f] + ".dat";
+    // How many values can be stored at most?
+    return std::floor(m * u / sizeof(double));
 
-        // Create a new output stream
-        std::shared_ptr<std::ofstream> out(new std::ofstream);
+}
 
-        // Open the output stream (data are written in binary format)
-        out->open(filename.c_str(), std::ios::binary);
+// Constructor
+Printer::Printer(const std::vector<std::string> &names, const double &memsave) :
+    memory(prt::memtosize(memsave, 1E6)),
+    outputs(names),
+    valids(names),
+    buffers(std::unordered_map<std::string, std::optional<Buffer> >())
+{
+
+    // names: names of the output variables
+    // memsave: memory use (in MB)
+
+    // Check
+    assert(memory > 0u);
+
+}
+
+// Search for a string in a vector of strings
+bool in(const std::string &x, const std::vector<std::string> &v) {
+
+    // x: the string to search for
+    // v: the vector to search in
+
+    // Check
+    assert(!v.empty());
+
+    // For each element in the vector...
+    for (const std::string &s : v) {
+
+        // If the element is found, return true
+        if (x == s) return true;
+
+    }
+
+    // If the element is not found, return false
+    return false;
+
+}
+
+// Function to read a list of user defined outputs
+void Printer::read(const std::string &filename) {
+
+    // filename: the name of the file to read
+
+    // Clear the list of outputs
+    outputs.clear();
+
+    // Open the file
+    std::ifstream file(filename.c_str());
+
+    // Check that the file is open
+    if (!file.is_open())
+        throw std::runtime_error("Unable to open file " + filename);
+
+    // Prepare to read in requested outputs
+    std::string input;
+
+    // For each entry...
+    while (file >> input) {
+
+        // Check that the requested output is valid
+        if (!in(input, valids))
+            throw std::runtime_error("Invalid output requested in " + filename + ": " + input);
+
+        // Save the requested output
+        outputs.push_back(input); 
+
+    }
+
+    // Close the file
+    file.close();
+
+    // Resize
+    outputs.shrink_to_fit();
+
+}
+
+// Function to open buffers
+void Printer::open() {
+
+    // Check
+    assert(!outputs.empty());
+
+    // For each output...
+    for (auto &name : outputs) {
+
+        // Set up a buffer
+        buffers.emplace(name, Buffer(memory, name + ".dat"));
+
+        // Find the buffer
+        auto it = buffers.find(name);
+        
+        // Check
+        assert(it != buffers.end());
+
+        // Open the buffer
+        it->second->open();
 
         // Check
-        if (!out->is_open()) {
-            std::string msg = "Unable to open output file " + filename;
-            throw std::runtime_error(msg);
-        }
+        assert(it->second->isopen());
 
-        // Add the stream to the vector of streams
-        outfiles.push_back(out);
+    }
+
+    // Check
+    assert(buffers.size() == outputs.size());
+
+}
+
+// Function to tell if a buffer exists
+bool Printer::exists(const std::string &name) {
+
+    // name: name of the buffer to check
+
+    // Find the buffer
+    auto it = buffers.find(name);
+
+    // Check if exists
+    return it != buffers.end();
+
+}
+
+// Function to tell if a buffer is open
+bool Printer::isopen(const std::string &name) {
+
+    // name: name of the buffer to check
+
+    // Find the buffer
+    auto it = buffers.find(name);
+
+    // Check
+    assert(it != buffers.end());
+
+    // Check if open
+    return it->second->isopen();
+
+}
+
+// Function to get the capacity of a buffer
+size_t Printer::capacity(const std::string &name) {
+
+    // name: name of the buffer to check
+
+    // Find the buffer
+    auto it = buffers.find(name);
+    
+    // Check
+    assert(it != buffers.end());
+
+    // Get capacity
+    return it->second->capacity();
+
+}
+
+// Function to save data into a buffer
+void Printer::save(const std::string &name, const double &x) {
+
+    // name: name of the buffer in which to save
+    // x: value to save
+
+    // Find the buffer
+    auto it = buffers.find(name);
+
+    // Make sure it exists
+    if (it == buffers.end()) return;
+
+    // Check
+    assert(it->second->isopen());
+
+    // Save if it does
+    it->second->save(static_cast<double>(x));
+
+}
+
+// Version for an unsigned integer
+void Printer::save(const std::string &name, const size_t &x) {
+
+    // name: name of the buffer in which to save
+    // x: value to save
+
+    // Find the buffer
+    auto it = buffers.find(name);
+
+    // Make sure it exists
+    if (it == buffers.end()) return;
+
+    // Check
+    assert(it->second->isopen());
+
+    // Save if it does
+    it->second->save(static_cast<double>(x));
+
+}
+
+// Function to close buffers
+void Printer::close() {
+
+    // Check
+    assert(!outputs.empty());
+
+    // For each buffer...
+    for (auto &buffer : buffers) {
+
+        // Close the buffer
+        buffer.second->close();
 
     }
 }
 
-// Function to close all the file streams
-void stf::close(std::vector<std::shared_ptr<std::ofstream> > &outfiles) {
+// Function to check if all buffers are open
+bool Printer::ison() {
 
-    for (size_t f = 0u; f < outfiles.size(); ++f)
-        outfiles[f]->close();
+    // Early exit if needed
+    if (buffers.empty()) return false;
 
-}
+    // Check
+    assert(!buffers.empty());
 
-// Function to check that the provided file names are good
-void stf::check(const std::vector<std::string> &v1, const std::vector<std::string> &v2) {
+    // For each buffer...
+    for (auto &buffer : buffers) {
 
-    // v1 is the vector of provided file names
-    // v2 is the vector of default file names
+        // Exit if any is found close
+        if (!buffer.second->isopen()) return false;
 
-    if (!v1.size()) return;
-
-    bool found = false;
-
-    // For each supplied file name...
-    for (size_t i = 0u; i < v1.size(); ++i) {
-
-        // Match it to each file name in the default list...
-        for (size_t j = 0u; j < v2.size(); ++j) {
-
-            // If there is one match, the provided name is valid
-            if (v1[i] == v2[j]) {
-                found = true;
-                break;
-            }
-        }
-
-        // Error if the file name is unknown
-        if (!found) throw std::runtime_error("Invalid file name provided in whattosave");
     }
+
+    // Otherwise say yes
+    return true;
 
 }

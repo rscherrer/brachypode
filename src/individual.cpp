@@ -1,137 +1,327 @@
-// This script contains all the functions of the Individual class
+// This script contains all the functions of the Individual class.
 
-#include "individual.h"
-#include "utilities.h"
-#include <cmath>
+#include "individual.hpp"
 
-Individual::Individual(const double &p, const size_t &n, const std::vector<double> &effects) :
+// Constructor
+Individual::Individual(const double &freq, const std::shared_ptr<Architecture> &arch) :
+    tolerance(0.0),    
     deme(0u),
     patch(1u),
-    x(0.0),
-    alive(true),
-    genome(std::bitset<1000>())
+    nseeds(0u),
+    alleles(std::bitset<1000>()),
+    architecture(arch)
 {
 
-    // Throw mutations around
-    assert(genome.count() == 0u);
-    auto ismutation = rnd::bernoulli(p);
-    for (size_t i = 0u; i < n; ++i)
-        if (ismutation(rnd::rng)) genome.set(i);
+    // freq: frequency of allele 1
+    // arch: a genetic architecture
 
-    // Compute phenotypes
-    develop(effects);
+    // Check that the genome only has zeros
+    assert(alleles.count() == 0u);
 
+    // Prepare a mutation sampler
+    auto isMutation = rnd::bernoulli(freq);
+
+    // For each locus...
+    for (size_t i = 0u; i < architecture->nloci; ++i) {
+
+        // If there is a mutation...
+        if (isMutation(rnd::rng)) {
+         
+            // Flip the allele
+            flip(i);
+            
+        }
+    }
 }
 
-void Individual::kill() { alive = false; }
+// Resetters
 void Individual::setDeme(const size_t &d) { deme = d; }
 void Individual::setPatch(const size_t &p) { patch = p; }
-void Individual::setX(const double &val) { x = val; }
+void Individual::setNSeeds(const size_t &n) { nseeds = n; }
+void Individual::setTolerance(const double &x) { tolerance = x; }
 
-void Individual::mutate(const double &mu, const size_t &n) {
+// Function to update trait value when an allele has just flipped
+void Individual::flip(const size_t &i) {
 
-    if (mu == 0.0) return;
-    if (mu == 1.0) { for (size_t i = 0u; i < n; ++i) genome.flip(i); return; }
+    // i: index of the allele to flip
 
-    // Mutations are sampled from a geometric distribution
-    auto getnextmutant = rnd::iotagap(mu);
-    getnextmutant.reset(0u);
-    for (;;) {
-        const size_t mut = getnextmutant(rnd::rng);
-        if (mut >= n) break;
-        genome.flip(mut);
+    // Flip the allele
+    alleles.flip(i);
+
+    // Update trait value
+    tolerance += architecture->effects[i] * (alleles.test(i) * 2.0 - 1.0);
+
+    // Note: this translates the new allele into plus or minus one.
+
+}
+
+// Function to mutate all loci
+void Individual::flipall() {
+
+    // Flip every locus
+    for (size_t i = 0u; i < architecture->nloci; ++i) flip(i);
+
+}
+
+// Function to mutate using Bernoulli sampling
+void Individual::mutateBernoulli(const double &mu) {
+
+    // Prepare a mutation sampler
+    auto isMutation = rnd::bernoulli(mu);
+
+    // For each locus...
+    for (size_t i = 0u; i < architecture->nloci; ++i) {
+
+        // Mutate if needed
+        if (isMutation(rnd::rng)) flip(i);
+
+    }
+}
+
+// Function to sample a number of mutations and shuffle them around
+void Individual::mutateShuffle(const double &mu) {
+
+    // Sample the number of mutations
+    const size_t n = rnd::binomial(architecture->nloci, mu)(rnd::rng);
+
+    // Check
+    assert(n <= architecture->nloci);
+
+    // Exit if zero
+    if (n == 0u) return;
+
+    // If needed...
+    if (n == architecture->nloci) { 
+        
+        // Mutate all loci
+        flipall();
+
+        // Exit
+        return; 
+
     }
 
+    // Prepare a vector
+    std::vector<size_t> indices(architecture->nloci);
+
+    // Fill it with indices
+    std::iota(indices.begin(), indices.end(), 0u);
+
+    // Shuffle them
+    std::shuffle(indices.begin(), indices.end(), rnd::rng);
+
+    // For each of the mutated loci... 
+    for (size_t i = 0u; i < n; ++i) {
+
+        // Flip the correct random locus
+        flip(indices[i]);
+
+    }
 }
 
-void Individual::develop(const std::vector<double> &effects) {
+// Function to mutate using geometric sampling
+void Individual::mutateGeometric(const double &mu) {
 
-    x = 0.0;
-    
-    for (size_t l = 0u; l < effects.size(); ++l)
-        x += genome.test(l) * effects[l];
+    // Prepare a next mutation sampler
+    auto getNextMutant = rnd::geometric(mu);
+
+    // Initialize
+    size_t i = getNextMutant(rnd::rng);
+
+    // For as long as it takes...
+    while (i < architecture->nloci) {
+
+        // Flip the sampled position
+        flip(i);
+
+        // Sample the next mutation
+        i += getNextMutant(rnd::rng) + 1u;        
+
+    }
+
+    // Check
+    assert(i >= architecture->nloci);
 
 }
 
-void Individual::recombine(
-    const double &rho, const Individual &pollen,
-    const std::vector<double> &chromends, const std::vector<double> &locations
-) {
+// Function to mutate using binomial sampling
+void Individual::mutateBinomial(const double &mu) {
 
-    if (rho == 0.0) return;
+    // Sample the number of mutations
+    size_t n = rnd::binomial(architecture->nloci, mu)(rnd::rng);
 
-    size_t locus = 0u;
-    size_t chrom = 0u;
+    // Check
+    assert(n <= architecture->nloci);
 
-    const size_t nloci = locations.size();
-    const size_t nchrom = chromends.size();
+    // Exit if zero
+    if (n == 0u) return;
 
-    // Haplotypes have equal chances to be transmitted
-    auto gethaplotype = rnd::bernoulli(0.5);
+    // If needed...
+    if (n == architecture->nloci) { 
+        
+        // Mutate all loci
+        flipall();
 
-    // Crossovers are sampled from an exponential distribution
-    auto nextcrossover = rnd::exponential(rho);
+        // Exit
+        return; 
 
-    double crossover = 1.1; // beyond the end of the genome
-    crossover = nextcrossover(rnd::rng);
+    }
 
-    double position = locations[0u];
-    double chromend = chromends[0u];
+    // Prepare a locus sampler
+    auto sampleLocus = rnd::random(0u, architecture->nloci - 1u);
 
-    // Starting haplotype
-    size_t hap = gethaplotype(rnd::rng);
+    // Prepare to record mutated loci
+    std::bitset<1000u> mutated;
 
-    // While we progress through loci...
-    while (locus < nloci) {
+    // For as long as it takes...
+    while (n > 0u) {
 
-        // What is the next thing coming up?
-        size_t next = static_cast<size_t>(crossover);
-        if (crossover < chromend && crossover < position)
-            next = 0u; // is it a crossover point?
-        else if (chromend < crossover && chromend < position)
-            next = 1u; // is it a chromosome end?
-        else
-            next = 2u; // or is it a locus?
+        // Sample a random locus
+        const size_t i = sampleLocus(rnd::rng);
 
-        // Depending on the case...
-        switch (next) {
+        // Check
+        assert(i < architecture->nloci);
 
-        // Upon crossover point, switch haplotype
-        case 0u:
-            hap = hap ? 0u : 1u;
-            crossover += nextcrossover(rnd::rng);
-            break;
+        // If it has not been hit yet...
+        if (!mutated.test(i)) {
 
-        // Upon free recombination point, switch to random chromosome
-        case 1u:
-            hap = gethaplotype(rnd::rng);
-            ++chrom;
-            if (chrom < nchrom) chromend = chromends[chrom];
-            assert(chrom < nchrom);
-            break;
+            // Flip it
+            flip(i);
 
-        // Upon gene, change to haplotype of the pollen
-        default:
+            // Record
+            mutated.set(i);
 
-            if (hap) {
-                if (pollen.getAllele(locus)) genome.set(locus);
-                else genome.reset(locus);
-            }
+            // Update counter
+            --n;
 
-            ++locus;
-            if (locus < nloci) position = locations[locus];
-            break;
         }
     }
 
-    assert(locus == nloci);
-    assert(chrom == nchrom - 1u);
+    // Check
+    assert(n == 0u);
 
 }
 
-size_t Individual::getDeme() const { return deme; }
-size_t Individual::getPatch() const { return patch; }
-double Individual::getX() const { return x; }
-bool Individual::isAlive() const { return alive; }
-size_t Individual::getAllele(const size_t &l) const { return genome.test(l); }
-size_t Individual::getAlleleSum() const { return genome.count(); }
+// Function to mutate the genome
+void Individual::mutate(const double &mu) {
+
+    // mu: mutation rate
+    
+    // No mutation if the rate is zero
+    if (mu == 0.0) return;
+
+    // If the rate is one...
+    if (mu == 1.0) { 
+        
+        // Mutate all loci
+        flipall();
+
+        // Exit
+        return;
+    
+    }
+    
+    // Depending on the muation rate...
+    if (mu < 0.01) {
+
+        // Mutate using geometric sampling
+        mutateGeometric(mu);
+
+    } else if (mu < 0.1) {
+
+        // Mutate using binomial sampling
+        mutateBinomial(mu);
+
+    } else if (mu < 0.9) {
+
+        // Mutate using shuffle sampling
+        mutateShuffle(mu);
+
+    } else {
+
+        // Mutate using Bernoulli sampling
+        mutateBernoulli(mu);
+
+    }
+}
+
+// Function to recombine genome with a pollen donor
+void Individual::recombine(const double &rho, const Individual &pollen) {
+
+    // rho: recombination rate
+    // pollen: pollen donor individual
+
+    // Exit if no recombination
+    if (rho == 0.0) return;
+
+    // Check
+    assert(rho > 0.0);
+
+    // Initialization
+    size_t locus = 0u;
+
+    // Crossovers are sampled from an exponential distribution
+    auto getNextCrossover = rnd::exponential(rho);
+
+    /// Sample the first crossover point
+    double crossover = getNextCrossover(rnd::rng);
+
+    // Initialize the current position
+    double position = architecture->locations[0u];
+
+    // Sample the starting haplotype
+    size_t hap = rnd::bernoulli(0.5)(rnd::rng);
+
+    // While we progress through loci...
+    while (locus < architecture->nloci) {
+
+        // If the next thing coming up is a crossover point...
+        if (crossover < position) {
+
+            // Switch haplotype
+            hap = hap ? 0u : 1u;
+
+            // Update current crossover location
+            crossover += getNextCrossover(rnd::rng);
+
+        } else {
+
+            // Note: Otherwise, it is a locus
+
+            // If we are on the opposite (i.e. pollen) haplotype
+            if (hap) {
+
+                // If the pollen has a different allele...
+                if (alleles.test(locus) != pollen.getAllele(locus)) {
+
+                    // Flip the local allele
+                    flip(locus);
+                    
+                }
+            }
+
+            // Move on to the next locus
+            ++locus;
+
+            // Update current position
+            if (locus < architecture->nloci) position = architecture->locations[locus];
+
+        }
+    }
+
+    // Safety checks
+    assert(locus == architecture->nloci); 
+
+}
+
+// Function to check validity of members
+void Individual::check(const size_t &n) {
+
+    // n: number of demes
+
+    // Check
+    assert(patch < 2u);
+    assert(deme < n);
+    assert(tolerance >= 0.0);
+
+}

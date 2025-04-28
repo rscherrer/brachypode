@@ -3,35 +3,62 @@
 
 // Here we test functionalities of the Individual class.
 
-#include "../src/individual.h"
+#include "../src/individual.hpp"
 #include <boost/test/unit_test.hpp>
 
 // Test that an individual is initialized properly
 BOOST_AUTO_TEST_CASE(individualInitialization) {
 
-    Individual ind(0.0, 3u, {0.1, 0.1, 0.1});
+    // Create architecture
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(Parameters()));
+
+    // Create individual
+    Individual ind(0.0, arch);
+
+    // Check attributes
     BOOST_CHECK_EQUAL(ind.getDeme(), 0u);
     BOOST_CHECK_EQUAL(ind.getPatch(), 1u);
-    BOOST_CHECK_EQUAL(ind.getX(), 0.0);
-    BOOST_CHECK(ind.isAlive());
-    BOOST_CHECK_EQUAL(ind.getAlleleSum(), 0u);
+    BOOST_CHECK_EQUAL(ind.getNSeeds(), 0u);
+    BOOST_CHECK_EQUAL(ind.getTolerance(), 0.0);
+    BOOST_CHECK_EQUAL(ind.countAlleles(), 0u);
 
 }
 
-// Test that an individual is dead after we kill it
-BOOST_AUTO_TEST_CASE(individualIsDeadAfterBeingKilled) {
+// Test that an individual is initialized properly with maximum allele frequency
+BOOST_AUTO_TEST_CASE(individualInitializationWithAllMutations) {
 
-    Individual ind(0.0, 3u, {0.1, 0.1, 0.1});
-    ind.kill();
-    BOOST_CHECK(!ind.isAlive());
+    // Parameters
+    Parameters pars;
+
+    // Tweak
+    pars.effect = 0.1;
+    pars.nloci = 20u;
+
+    // Create architecture
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(pars));
+
+    // Create individual
+    Individual ind(1.0, arch);
+
+    // Check attributes
+    BOOST_CHECK_EQUAL(ind.countAlleles(), 20u);
+    BOOST_CHECK_CLOSE(ind.getTolerance(), 2.0, 1E6);
 
 }
 
 // Test that an individual has its deme changed properly
 BOOST_AUTO_TEST_CASE(changeInDeme) {
 
-    Individual ind(0.0, 3u, {0.1, 0.1, 0.1});
+    // Create architecture
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(Parameters()));
+
+    // Create individual
+    Individual ind(0.0, arch);
+
+    // Update the deme
     ind.setDeme(1u);
+
+    // Check
     BOOST_CHECK_EQUAL(ind.getDeme(), 1u);
 
 }
@@ -39,74 +66,241 @@ BOOST_AUTO_TEST_CASE(changeInDeme) {
 // Test that an individual has its patch changed properly
 BOOST_AUTO_TEST_CASE(changeInPatch) {
 
-    Individual ind(0.0, 3u, {0.1, 0.1, 0.1});
+    // Create architecture
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(Parameters()));
+
+    // Create individual
+    Individual ind(0.0, arch);
+
+    // Update the patch
     ind.setPatch(1u);
+
+    // Check
     BOOST_CHECK_EQUAL(ind.getPatch(), 1u);
+
+}
+
+// Test that assigning number of seeds works
+BOOST_AUTO_TEST_CASE(changeInNSeeds) {
+
+    // Create architecture
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(Parameters()));
+
+    // Create individual
+    Individual ind(0.0, arch);
+
+    // Update the patch
+    ind.setNSeeds(666u);
+
+    // Check
+    BOOST_CHECK_EQUAL(ind.getNSeeds(), 666u);
 
 }
 
 // Test that an individual has its trait value changed properly
 BOOST_AUTO_TEST_CASE(changeInTrait) {
 
-    Individual ind(0.0, 3u, {0.1, 0.1, 0.1});
-    ind.setX(3.0);
-    BOOST_CHECK_EQUAL(ind.getX(), 3.0);
+    // Create architecture
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(Parameters()));
+
+    // Create individual
+    Individual ind(0.0, arch);
+
+    // Update trait
+    ind.setTolerance(3.0);
+
+    // Check
+    BOOST_CHECK_EQUAL(ind.getTolerance(), 3.0);
 
 }
 
 // Test that no mutation does not change the genome
 BOOST_AUTO_TEST_CASE(noMutationDoesNotChangeTheGenome) {
 
-    Individual ind(0.0, 20u, std::vector<double>(20u, 0.1));
-    const size_t sum = ind.getAlleleSum();
-    ind.mutate(0.0, 20u); // mu = 0, nloci = 20
-    const size_t newsum = ind.getAlleleSum();
-    BOOST_CHECK_EQUAL(sum, newsum); // check that no locus has mutated
+    // Create architecture
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(Parameters()));
+
+    // Create individual
+    Individual ind(0.0, arch);
+
+    // Get sum of alleles
+    const size_t sum = ind.countAlleles();
+
+    // Mutate with zero mutation rate
+    ind.mutate(0.0);
+
+    // Re-compute sum of alleles
+    const size_t newsum = ind.countAlleles();
+
+    // Should not have changed
+    BOOST_CHECK_EQUAL(sum, newsum);
 
 }
 
 // Test that full mutation changes the whole genome
 BOOST_AUTO_TEST_CASE(fullMutationChangesTheWholeGenome) {
 
-    Individual ind(0.0, 20u, std::vector<double>(20u, 0.1));
-    ind.mutate(1.0, 20u); // mu = 1, nloci = 20
-    const size_t newsum = ind.getAlleleSum();
-    BOOST_CHECK_EQUAL(newsum, 20u); // check that 20 loci have been mutated
+    // Parameters
+    Parameters pars;
+
+    // Tweak
+    pars.nloci = 20u;
+    pars.effect = 0.1;
+
+    // Create architecture
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(pars));
+
+    // Create individual
+    Individual ind(0.0, arch);
+
+    // Mutate with certainty
+    ind.mutate(1.0);
+
+    // All alleles should be one
+    BOOST_CHECK_EQUAL(ind.countAlleles(), 20u);
+
+    // Trait should have changed
+    BOOST_CHECK_CLOSE(ind.getTolerance(), 2.0, 0.0001);
+
 
 }
 
-// Test development
-BOOST_AUTO_TEST_CASE(development) {
+// Test the different kinds of mutation
+BOOST_AUTO_TEST_CASE(differentMutationTypes) {
 
-    Individual ind(0.0, 20u, std::vector<double>(20u, 0.1));
-    ind.develop(std::vector<double>(20u, 0.1)); // effect size
-    BOOST_CHECK_EQUAL(ind.getX(), 0.0);
-    ind.mutate(1.0, 20u); // mu = 1, nloci = 20
-    ind.develop(std::vector<double>(20u, 0.1));
-    BOOST_CHECK_EQUAL(round(ind.getX() * 1000.0) / 1000.0, 2.0);
+    // Parameters
+    Parameters pars;
+
+    // Create architecture
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(pars));
+
+    // Create individual
+    Individual ind(0.0, arch);
+
+    // Mutate with some rate
+    BOOST_CHECK_NO_THROW(ind.mutate(0.9));
+    BOOST_CHECK_NO_THROW(ind.mutate(0.6));
+    BOOST_CHECK_NO_THROW(ind.mutate(0.05));
+    BOOST_CHECK_NO_THROW(ind.mutate(0.001));
+
+}
+
+// Test early exit in binomial mutation
+BOOST_AUTO_TEST_CASE(earlyExitInBinomialMutation) {
+
+    // Parameters
+    Parameters pars;
+
+    // Tweak
+    pars.nloci = 10u;
+
+    // Create architecture
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(pars));
+
+    // Create individual
+    Individual ind(0.0, arch);
+
+    // Binomial mutation with full probability
+    ind.mutateBinomial(1.0);
+
+    // Check that all alleles have been mutated
+    BOOST_CHECK_EQUAL(ind.countAlleles(), 10u); 
+
+    // Revert all mutations with shuffle
+    ind.mutateShuffle(1.0);
+
+    // Check
+    BOOST_CHECK_EQUAL(ind.countAlleles(), 0u);
+    
+    // Run with zero mutations
+    ind.mutateBinomial(0.0);
+
+    // Check
+    BOOST_CHECK_EQUAL(ind.countAlleles(), 0u);
+
+    // Same with shuffle
+    ind.mutateShuffle(0.0);
+
+    // Check
+    BOOST_CHECK_EQUAL(ind.countAlleles(), 0u);
+
+}
+
+// Cover binomial mutations with nonzero rate (PROBABILISTIC)
+BOOST_AUTO_TEST_CASE(nonZeroBinomialMutation) {
+
+    // Parameters
+    Parameters pars;
+
+    // Tweak
+    pars.nloci = 1000u;
+
+    // Create architecture
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(pars));
+
+    // Create individual
+    Individual ind(0.0, arch);
+
+    // Binomial mutation with some probability
+    ind.mutateBinomial(0.5);
+
+    // Check that some alleles have been mutated
+    BOOST_CHECK(ind.countAlleles() > 0u); 
 
 }
 
 // Test that no change if recombination is zero
 BOOST_AUTO_TEST_CASE(noChangeIfRecombinationIsZero) {
 
-    Individual ind(0.0, 5u, std::vector<double>(5u, 0.1));
-    const std::vector<double> chromends = {1.0}; // make sure there is no free recombination between chromosomes
-    const std::vector<double> locations = {0.1, 0.19, 0.5, 0.8, 0.9};
-    Individual pollen(0.0, 5u, std::vector<double>(5u, 0.1));
-    pollen.mutate(1.0, locations.size());
-    ind.recombine(0.0, pollen, chromends, locations);
-    BOOST_CHECK_EQUAL(ind.getAlleleSum(), 0u);
+    // Parameters
+    Parameters pars;
+
+    // Create architecture
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(pars));
+
+    // Create individual
+    Individual ind(0.0, arch);
+
+    // Create a pollen donor individual
+    Individual pollen(1.0, arch);
+
+    // Recombine with rate zero
+    ind.recombine(0.0, pollen);
+
+    // Should not have inherited any of the 1-alleles
+    BOOST_CHECK_EQUAL(ind.countAlleles(), 0u);
 
 }
 
-// Make sure that founder individuals develop
-BOOST_AUTO_TEST_CASE(founderDevelops) {
+// Test that recombination produces intermediate phenotypes (PROBABILISTIC)
+BOOST_AUTO_TEST_CASE(nonZeroRecombination) {
 
-    // Create an individual with default parameters (initial allele frequency, number of loci, effect size)
-    Individual ind(1.0, 50u,  std::vector<double>(50u, 0.1));
-    
-    // Check that all traits are nonzero (should be the case if has developed)
-    BOOST_CHECK(ind.getX() > 0.0);
+    // Parameters
+    Parameters pars;
+
+    // Tweak
+    pars.nloci = 100u;
+
+    // Create architecture
+    std::shared_ptr<Architecture> arch = std::make_shared<Architecture>(Architecture(pars));
+
+    // Create individual
+    Individual ind(0.0, arch);
+
+    // Record allele sum
+    const size_t mom = ind.countAlleles();
+
+    // Create a pollen donor individual
+    Individual pollen(1.0, arch);
+
+    // Record allele sum
+    const size_t dad = pollen.countAlleles();
+
+    // Recombine with some rate
+    ind.recombine(30.0, pollen);
+
+    // New sum of alleles should be between original and pollen donor
+    BOOST_CHECK(ind.countAlleles() > mom);
+    BOOST_CHECK(ind.countAlleles() < dad);
 
 }

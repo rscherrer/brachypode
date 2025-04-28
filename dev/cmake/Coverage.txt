@@ -29,7 +29,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR})
 
-# Debug mode
+# Coverage mode
 set(CMAKE_BUILD_TYPE "Coverage")
 
 # Set up code coverage

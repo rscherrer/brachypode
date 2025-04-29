@@ -37,7 +37,7 @@ public:
     void show() const;
 
     // Function to tell whether to keep on simulating
-    bool keepon() const { return time < tend; };
+    bool keepon() const { return time <= tend; };
 
     // Function to tell whether the popultion has gone extinct
     bool extinct() const { return individuals->empty(); };

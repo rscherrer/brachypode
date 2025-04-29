@@ -29,8 +29,8 @@ For parameters specific to the genet
 | `recombination` | `1` | Positive decimals | Average distance between consecutive crossovers during the recombination process, 1 being the length of the genome | 1 | Set 0 for no recombination 
 | `precis` | `1e-06` | Strictly positive decimals | The minimum value that the realized carrying capacity can take within a patch | 1 | Should be very small
 | `memsave` | `1` | Decimals greater than the size of a double precision floating point number (usually 8 bytes, i.e. 8e-06 MB, on a 64 bit system), in MB | Memory that can be filled in by each data saving buffer (in MB) before writing to file | 1 | There will be as many open buffers as there are output files to save (see details [here](OUTPUT.md))
-| `tend` | `10` | Strictly positive integers | Number of simulation time steps | 1 |
-| `tsave` | `20` | Strictly positive integers | Frequency of data saving (in time steps) | 1 |
+| `tend` | `10` | Strictly positive integers | Number of simulation time steps | 1 | 
+| `tsave` | `20` | Strictly positive integers | Frequency of data saving (in time steps) | 1 | There will be **`tend` / `tsave` + 1** time steps saved, including the first and last ones
 | `tchange` | `100000` | Positive integers | Time at which climate change starts | 1 | Note that at `tchange`, climate change has not started yet. It only starts at the next generation.
 | `twarming` | `1` | Strictly positive integers | Duration of the climate change period (in time steps) | 1 |
 | `seed` | Clock-generated | Positive integers | Seed of the pseudo-random number generator | 1 | The clock is used to generate a pseudo-random seed. Make sure to set `savepars` to 1 to be able to retrieve the generated seed and reproduce a given simulation. | 

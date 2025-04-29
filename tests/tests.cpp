@@ -208,10 +208,10 @@ BOOST_AUTO_TEST_CASE(useCaseAllOutputsIfNoChoice) {
     BOOST_CHECK_NO_THROW(tst::read("individuals.dat"));
 
     // Check some values
-    BOOST_CHECK_EQUAL(tst::read("time.dat").size(), 10u);
-    BOOST_CHECK_EQUAL(tst::read("popsize.dat").size(), 10u);
-    BOOST_CHECK_EQUAL(tst::read("patchsizes.dat").size(), 40u);
-    BOOST_CHECK_EQUAL(tst::read("traitmeans.dat").size(), 40u);
+    BOOST_CHECK_EQUAL(tst::read("time.dat").size(), 11u);
+    BOOST_CHECK_EQUAL(tst::read("popsize.dat").size(), 11u);
+    BOOST_CHECK_EQUAL(tst::read("patchsizes.dat").size(), 44u);
+    BOOST_CHECK_EQUAL(tst::read("traitmeans.dat").size(), 44u);
 
     // Read the saved population sizes
     const std::vector<double> popsizes = tst::read("popsize.dat");

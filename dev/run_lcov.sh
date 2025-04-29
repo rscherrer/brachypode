@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Use this script to analyze code coverage across tests. Will only
-# work in the coverage configuration (see documentation).
+## Use this script to analyze code coverage across tests. Will only
+## work in the coverage configuration (see documentation).
 
 # Path to the lcov output folder
 LCOV_DIR="./lcov"

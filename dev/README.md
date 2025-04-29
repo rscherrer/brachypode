@@ -17,6 +17,7 @@ To use any of these build configurations, simply copy their content in the `CMak
 
 In addition, the `dev/` folder contains custom helper scripts used to automatize the quality checks described above:
 
+* `build.sh` compiles the program according to `CMakeLists.txt` in the root folder
 * `run_tests.sh` runs all the tests and checks for errors
 * `run_valgrind.sh` runs all the tests while analysing memory use
 * `run_lcov.sh` runs all the tests and analyzed coverage
@@ -24,6 +25,6 @@ In addition, the `dev/` folder contains custom helper scripts used to automatize
 
 (Use `chmod +x ...` if needed to allow these scripts to run.) 
 
-These scripts must be run from the root directory after the relevant executables have been built. Specifically, `run_tests.sh` and `run_valgrind.sh` require the test executables (e.g. configurations `Tests.txt` or `Coverage.txt`), while `run_lcov.sh` requires tests with coverage enabled (e.g. `Coverage.txt`) and `run_gprof.sh` requires the compiled program with profiling flags on (e.g. `Profile.txt`).
+These scripts must be run from the root directory after the relevant executables have been built. Specifically, `run_tests.sh` and `run_valgrind.sh` require the test executables (e.g. configurations `Tests.txt` or `Coverage.txt`), while `run_lcov.sh` requires tests with coverage enabled (e.g. `Coverage.txt`) and `run_gprof.sh` requires the compiled program with profiling flags on (e.g. `Profile.txt`). So, make sure to have the right `CMakeLists.txt` file in the root folder before building.
 
 Please note that these scripts are helper tools used on a Linux machine during development. As such, they **are not made to be compatible across platforms** and will require specific packages installed in order to run (e.g. Valgrind or LCOV).

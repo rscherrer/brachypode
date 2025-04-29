@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Use this script to profile the code. The program must have 
-# been compiled already.
+## Use this script to profile the code. The program must have 
+## been compiled already.
 
 # Path to the bin folder
 BIN_DIR="./bin"

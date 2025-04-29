@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Use this script to perform memory check. Will only work if the tests have been
-# compiled.
+## Use this script to perform memory check. Will only work if the tests have been
+## compiled.
 
 # Ensure the script exits on errors
 set -e

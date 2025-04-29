@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Use this script to run all the test executables. Will only
-# run if tests have been compiled.
+## Use this script to run all the test executables. Will only
+## run if tests have been compiled.
 
 # Ensure the script exits on errors
 set -e

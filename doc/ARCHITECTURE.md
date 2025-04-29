@@ -1,4 +1,4 @@
-## Genetic architecture
+## Genetic Architecture
 
 The genetic architecture refers to the parameters controlling aspects of the genome and of the **genotype-phenotype map**. Because these parameters take one value per genetic locus, they may be many, and so they are read and stored separately from the other parameters. 
 

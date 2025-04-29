@@ -65,7 +65,7 @@ choose 0
 
 In the parameter file, each line should contain a parameter name followed by its value(s). If there are several values, they should be separated by spaces. Invalid parameter names or values will result in an error, and lines starting with **#** will be treated as comments. Click [here](doc/PARAMETERS.md) for a description of the available parameters and their meaning.
 
-### Genetic architecture
+### Genetic Architecture
 
 The genetic architecture refers to parameters of the genotype-phenotype map, which are on a per locus basis and may take a lot of space, especially if there are many loci. 
 

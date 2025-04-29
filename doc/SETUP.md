@@ -1,4 +1,4 @@
-## Example setup
+## Example Setup
 
 In this guide we show how to build the program using the [CMake](https://cmake.org/) build system. Below we provide a ready-made CMake configuration file but the user is free to use any custom configuration.
 
@@ -8,7 +8,7 @@ In this guide we show how to build the program using the [CMake](https://cmake.o
 - Build system: [CMake](https://cmake.org/) (>= 3.16)
 - Source retrieval: [git](https://git-scm.com/) (optional)
 
-### Download the code
+### Download the Code
 
 You can download the source code using `git`:
 
@@ -68,7 +68,7 @@ add_executable(brachypode "${CMAKE_SOURCE_DIR}/main.cpp" ${src})
 set_target_properties(brachypode PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/$<0:>)
 ```
 
-### Build the program
+### Build the Program
 
 Then, run the following code from within the repository to create a build folder and instruct CMake to build the program in release mode according to the instructions given in the `CMakeLists.txt` configuration file.
 
@@ -100,3 +100,7 @@ cmake -G Xcode
 ```
 
 This will place the project files in `build/`.
+
+### Note
+
+During development the script `build.sh` was used to build the program. It is located in the `dev/` folder and should work fine on a Unix-like system. See [here](../dev/README.md) for more details.

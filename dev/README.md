@@ -1,4 +1,4 @@
-## Development tools
+## Development Tools
 
 The specific scripts and files used during the development of the program can be found in the `dev/` folder. 
 
@@ -17,11 +17,14 @@ To use any of these build configurations, simply copy their content in the `CMak
 
 In addition, the `dev/` folder contains custom helper scripts used to automatize the quality checks described above:
 
+* `switch.sh` changes the `CMakeLists.txt` configuration to use
 * `build.sh` compiles the program according to `CMakeLists.txt` in the root folder
 * `run_tests.sh` runs all the tests and checks for errors
 * `run_valgrind.sh` runs all the tests while analysing memory use
 * `run_lcov.sh` runs all the tests and analyzed coverage
 * `run_gprof.sh` runs the main program and analyzes performance
+
+(See comments in the scripts for more details on how to use them.)
 
 (Use `chmod +x ...` if needed to allow these scripts to run.) 
 

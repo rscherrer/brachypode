@@ -19,7 +19,7 @@ The program saves data every `tsave` generations. The data are saved **in binary
 | Name | Description | Frequency | 
 |--|--|--|
 | `time.dat` | Each saved generation | 1 per time step |
-| `popsieze.dat` | Total population size | 1 per time step |
+| `popsize.dat` | Total population size | 1 per time step |
 | `patchsizes.dat` | Number of individuals in each patch | 2 per deme per time step |
 | `traitmeans.dat` | Mean trait value in each patch | 2 per deme per time step |
 | `individuals.dat` | Deme, patch and trait value of each individual | 3 per individual per time step |

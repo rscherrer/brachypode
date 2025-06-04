@@ -19,7 +19,7 @@ The program saves data every `tsave` generations. The data are saved **in binary
 | Name | Description | Frequency | 
 |--|--|--|
 | `time.dat` | Each saved generation | 1 per time step |
-| `popsieze.dat` | Total population size | 1 per time step |
+| `popsize.dat` | Total population size | 1 per time step |
 | `patchsizes.dat` | Number of individuals in each patch | 2 per deme per time step |
 | `traitmeans.dat` | Mean trait value in each patch | 2 per deme per time step |
 | `individuals.dat` | Deme, patch and trait value of each individual | 3 per individual per time step |
@@ -34,4 +34,4 @@ individuals
 
 Note that the names of the variables to save must be given without the `.dat` extension. 
 
-For the sake of speed and modularity in combining outputs into tables, the data are converted to **double precision floating point numbers** before being saved as **binary**, and because the data is saved in this format, each file contains a **one-dimensional array** of data (e.g. `individuals.dat` starts with the deme, patch, and trait value of the first individual of the first saved generation, followed by the same variables for the second individual, etc.). The data are therefore not human-readable. To read them, you must convert them back into numbers using **a function decoding binary**, and knowledge of **how many bytes each value takes**. Although double precision-floating point numbers usually take up **8 bytes** on a 64-bit system, this might vary, and so we recommend share the simulated data alongside platform details needed to read the data back in. To do just that and read the data into R, we developed the accompanying package [`brachypoder`](https://github.com/rscherrer/brachypoder).
+For the sake of speed and modularity in combining outputs into tables, the data are converted to **double precision floating point numbers** before being saved as **binary**, and because the data is saved in this format, each file contains a **one-dimensional array** of data (e.g. `individuals.dat` starts with the deme, patch, and trait value of the first individual of the first saved generation, followed by the same variables for the second individual, etc.). The data are therefore not human-readable. To read them, you must convert them back into numbers using **a function decoding binary**, and knowledge of **how many bytes each value takes**. Although double precision-floating point numbers usually take up **8 bytes** on a 64-bit system, this might vary, and so we recommend to share the simulated data alongside platform details needed to read the data back in. To do just that and read the data into R, we developed the package [`readsim`](https://github.com/rscherrer/readsim).

@@ -2,9 +2,9 @@
 
 Here we provide an explanation of the various parameters of the model (passed though a parameter file, e.g. `parameters.txt`), as well as their default value(s) when no parameter file is supplied, and their valid ranges. For more information, please refer to the source code or the scientific manuscript accompanying this project (link will be made available once published).
 
-Not that hereafter, "positive" means ***including zero***, while "strictly positive" means ***excluding zero***. Also note that missing parameters in the parameter file will take their default value.
+Note that hereafter, "positive" means ***including zero***, while "strictly positive" means ***excluding zero***. Also note that missing parameters in the parameter file will take their default value.
 
-For parameters specific to the genet
+For parameters specfic to the genetic architecture (e.g. effect sizes of individual loci, please check this [page](ARCHITECTURE.md).)
 
 | Parameter name | Default value(s) | Accepted values | Description | No. values | Notes |
 |--|--|--|--|--|--|

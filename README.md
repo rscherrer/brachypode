@@ -68,7 +68,7 @@ In the parameter file, each line should contain a parameter name followed by its
 
 ### Genetic Architecture
 
-The genetic architecture refers to parameters of the genotype-phenotype map, which are on a per locus basis and may take a lot of space, especially if there are many loci. 
+The genetic architecture refers to parameters of the genotype-phenotype map. They are on a per locus basis and may take a lot of space, especially if there are many loci, hence storing them in a special parameter file called an architecture file. 
 
 Providing a genetic architecture is not necessary, as it will by default be generated anew based on genetic hyperparameters given in the parameter file such as `nloci` or `effect`. However, it is possible to supply a custom genetic architecture by providing an architecture file, as explained [here](doc/ARCHITECTURE).
 

@@ -35,8 +35,9 @@ where `parameters.txt` is a text file containing a list of parameter names and v
 The parameter file should look like this:
 
 ```
+ndemes 3
 popsize 10
-pgood 3 0.8 0.6 0.5
+pgood 0.8 0.6 0.5
 pgoodEnd 0.8 0.6 0.5
 stress 4 0
 stressEnd 4 0

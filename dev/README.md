@@ -6,10 +6,10 @@ The specific scripts and files used during the development of the program can be
 
 The `dev/` folder contains a subfolder called `cmake/`, in which we store the CMake configuration files used for various tasks, including:
 
-* `Release.txt` to compile in release mode for the end user (default)
-* `Tests.txt` to compile the tests in debug mode and check for memory leaks
-* `Profile.txt` to profile the code in release mode 
-* `Coverage.txt` to analyze code coverage across tests
+* `release.txt` to compile in release mode for the end user (default)
+* `tests.txt` to compile the tests in debug mode and check for memory leaks
+* `profile.txt` to profile the code in release mode 
+* `coverage.txt` to analyze code coverage across tests
 
 To use any of these build configurations, simply copy their content in the `CMakeLists.txt` file located in the root folder, and build the project with CMake (as shown [here](../doc/SETUP.md) and [here](../doc/TESTS.md)). The `CMakesLists.txt` files located in the `src/` and the `tests/` directories should not be changed.
 

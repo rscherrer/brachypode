@@ -8,7 +8,7 @@ For parameters specfic to the genetic architecture (e.g. effect sizes of individ
 
 | Parameter name | Default value(s) | Accepted values | Description | No. values | Notes |
 |--|--|--|--|--|--|
-| `popsize` | `10` | Positive integers | Number of individuals in the starting population | `1` |
+| `popsize` | `10` | Positive integers | Number of individuals in the starting population | 1 |
 | `ndemes` | `3` | Positive integers | Number of demes in the landscape | 1 | If set, make sure that `pgood` and `pgoodEnd` have the right number of values
 | `pgood` | `0.8 0.8 0.8` | Decimals from zero to one | Proportion of the area covered by good patches in each deme | `ndemes` | If set, make sure that `ndemes` is set (or defaults) to read the right number of values
 | `pgoodEnd` | `0.1 0.1 0.1` | Decimals from zero to one | Same as `pgood` but at the end of the period of climate change | `ndemes` | If set, make sure that `ndemes` is set (or defaults) to read the right number of values

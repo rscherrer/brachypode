@@ -21,7 +21,7 @@ cd brachypode
 
 ### Configure CMake
 
-Make sure to save the following as a `CMakeLists.txt` file located in the root of the repository. This file is also available [here](../dev/cmake/Tests.txt).
+Make sure to save the following as a `CMakeLists.txt` file located in the root of the repository. This file is also available [here](../dev/cmake/tests.txt).
 
 ```cmake
 # CMakeLists.txt

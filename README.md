@@ -8,7 +8,7 @@ This is the repository for a program simulating the evolution of an annual grass
 
 ## Description
 
-The model is an agent-based simulation where sessile individuals dwel in a metapopulation consisting of multiple demes, and each deme contains a facilitated and an unfactilitated habitat patch (facilitated patches are basically the undergrowth of nurse shrubs). The individuals possess genes that determine some level of tolerance against the harsh conditions encountered outside of the shrubs, which trade off with reproductive output.
+The model is an agent-based simulation where sessile individuals dwel in a metapopulation consisting of multiple demes, and each deme contains a facilitated and an unfactilitated habitat patch (facilitated patches are basically the undergrowth of nurse shrubs). The individuals possess genes that determine some level of tolerance against the harsh conditions encountered outside of the shrubs, which trade off with reproductive output. See manuscript for more details.
 
 ## Installation
 

@@ -1,4 +1,4 @@
-// Source code of the rdr namespace.
+// Source code of the Reader class.
 
 #include "reader.hpp"
 

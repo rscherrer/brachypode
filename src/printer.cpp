@@ -1,4 +1,4 @@
-// Functions pertaining to the stf namespace.
+// Functions pertaining to the Printer class.
 
 #include "printer.hpp"
 

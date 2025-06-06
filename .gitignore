@@ -1,3 +1,8 @@
+# Subdirs
+r/
+ms/
+nb/
+
 # CMake setup
 vcpkg
 vcpkg/

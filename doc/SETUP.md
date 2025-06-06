@@ -24,7 +24,7 @@ cd brachypode
 
 ### Configure CMake
 
-Our setup uses the following `CMakeLists.txt` configuration file, which you can also find [here](../dev/cmake/Release.txt). Make sure to have it saved in the root directory of the repository.
+Our setup uses the following `CMakeLists.txt` configuration file, which you can also find [here](../dev/cmake/release.cmake). Make sure to have it saved in the root directory of the repository.
 
 ```cmake
 # CMakeLists.txt

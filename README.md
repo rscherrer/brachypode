@@ -86,8 +86,7 @@ This code is written in C++20. It was developed on Ubuntu Linux 24.04 LTS, makin
 
 ## Links
 
-Sister repositories include:
-
+* [brachypode](https://github.com/rscherrer/brachypode): source code
 * [brachypode-r](https://github.com/rscherrer/brachypode-r): analysis code and results
 * [brachypode-ms](https://github.com/rscherrer/brachypode-ms): manuscript
 * [brachypode-nb](https://github.com/rscherrer/brachypode-approx): mathematical derivations

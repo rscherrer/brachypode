@@ -93,4 +93,6 @@ This code is written in C++20. It was developed on Ubuntu Linux 24.04 LTS, makin
 
 ## Permissions
 
-Copyright (c) [Raphaël Scherrer](https://github.com/rscherrer), 2024 (open source license will be added upon publication). This code comes with no guarantee whatsoever.
+Copyright (c) 2024-2026, Raphaël Scherrer.
+
+This code is licensed under the MIT license. See [license file](LICENSE.txt) for details. This program was inspired by discussions with Richèl Bilderbeek. This code comes with no guarantee whatsoever.

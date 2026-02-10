@@ -5,6 +5,7 @@ This is the repository for a program simulating the evolution of an annual grass
 ![Build](https://img.shields.io/badge/build-passing-brightgreen)
 ![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
 ![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
+[![DOI](https://img.shields.io/badge/DOI-10.32942/X2WW8P-blue)](https://doi.org/10.32942/X2WW8P)
 [![Zenodo](https://img.shields.io/badge/Zenodo-10.5281/zenodo.18568184-blue)](https://doi.org/10.5281/zenodo.18568184)
 
 ## Description
@@ -95,6 +96,7 @@ This code is written in C++20. It was developed on Ubuntu Linux 24.04 LTS, makin
 ## Notes
 
 * A version of this repository has been archived at Zenodo and can be accessed via the following [link](https://doi.org/10.5281/zenodo.18568184).
+* The associated manuscript is publicly available on the preprint server EcoEvoRxiv, accessible [here](https://doi.org/10.32942/X2WW8P).
 
 ## Permissions
 
